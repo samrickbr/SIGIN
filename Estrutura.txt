@@ -1,0 +1,14 @@
+Estrutura que pretendo usar
+br.com.inova.sigin
+│
+├── config          ← Configurações do Spring
+├── controller      ← Endpoints REST
+├── dto             ← Objetos de entrada/saída
+├── entity          ← Entidades do banco
+├── exception       ← Tratamento de erros
+├── repository      ← Acesso ao banco
+├── service         ← Regras de negócio
+├── validation      ← Validações
+└── util            ← Classes utilitárias
+
+padrão package by feature
