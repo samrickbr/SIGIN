@@ -33,9 +33,11 @@ public class Produto {
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean ativo = true;
 
+    @Builder.Default
     @Column(name = "data_criacao", nullable = false)
-    private LocalDateTime dataCriacao;
+    private LocalDateTime dataCriacao = LocalDateTime.now();
 }

@@ -21,9 +21,11 @@ public class Categoria {
     @Column(nullable = false, unique = true)
     private String nome;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean ativo = true;
 
+    @Builder.Default
     @Column(name = "data_criacao", nullable = false)
-    private LocalDateTime dataCriacao;
+    private LocalDateTime dataCriacao = LocalDateTime.now();
 }

@@ -1,0 +1,2 @@
+ALTER TABLE produtos
+ALTER COLUMN codigo DROP NOT NULL;
