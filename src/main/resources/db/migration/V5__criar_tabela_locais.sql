@@ -1,0 +1,11 @@
+CREATE TABLE locais (
+
+    id BIGSERIAL PRIMARY KEY,
+
+    nome VARCHAR(100) NOT NULL UNIQUE,
+
+    ativo BOOLEAN NOT NULL,
+
+    data_criacao TIMESTAMP NOT NULL
+
+);
