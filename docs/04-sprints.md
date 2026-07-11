@@ -31,3 +31,15 @@ Status: ⏳ Planejamento
 Objetivo:
 
 Criar os cadastros base necessários para suportar clientes, fornecedores, impressoras e materiais.
+
+---
+## Sprint 06 - Cadastro de Materiais
+
+Status: Concluída
+
+Implementado:
+- Cadastro de materiais
+- Controle de unidade de medida
+- Estoque mínimo inicial
+- CRUD completo
+- Novo padrão com Mapper

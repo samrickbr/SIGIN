@@ -17,3 +17,9 @@
 - Categoria
 - Local
 - Tratamentos iniciais de exceção
+
+## Sprint 06
+
+- Criado módulo de materiais
+- Implementado padrão Mapper
+- Criado CRUD de materiais

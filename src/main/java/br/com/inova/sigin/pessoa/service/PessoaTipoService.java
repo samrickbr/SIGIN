@@ -32,7 +32,7 @@ public class PessoaTipoService {
 
         TipoPessoa tipoPessoa = tipoPessoaRepository.findById(request.getTipoPessoaId())
                 .orElseThrow(() ->
-                        new RegraNegocioException("Tipo de pessoa não encontrado")
+                        new RegraNegocioException("Tipo de pessoa não encontrada")
                 );
 
 
@@ -42,6 +42,12 @@ public class PessoaTipoService {
                 .dataCriacao(LocalDateTime.now())
                 .build();
 
+        if (pessoaTipoRepository.existsByPessoaIdAndTipoPessoaId(
+                pessoaId,
+                request.getTipoPessoaId())) {
+
+            throw new RegraNegocioException("A pessoa já possui esse tipo.");
+        }
 
         pessoaTipoRepository.save(pessoaTipo);
     }

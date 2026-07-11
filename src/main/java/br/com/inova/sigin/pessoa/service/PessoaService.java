@@ -104,7 +104,6 @@ public class PessoaService {
         repository.save(pessoa);
     }
 
-
     private PessoaResponse converter(Pessoa pessoa) {
 
         return PessoaResponse.builder()
@@ -117,6 +116,12 @@ public class PessoaService {
                 .observacao(pessoa.getObservacao())
                 .ativo(pessoa.getAtivo())
                 .dataCriacao(pessoa.getDataCriacao())
+                .tipos(
+                        pessoa.getTipos()
+                                .stream()
+                                .map(pt -> pt.getTipoPessoa().getNome())
+                                .toList()
+                )
                 .build();
     }
 }

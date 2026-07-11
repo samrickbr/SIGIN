@@ -1,0 +1,18 @@
+CREATE TABLE materiais (
+
+    id BIGSERIAL PRIMARY KEY,
+
+    codigo VARCHAR(30) NOT NULL UNIQUE,
+
+    nome VARCHAR(150) NOT NULL,
+
+    descricao VARCHAR(255),
+
+    unidade_medida VARCHAR(20) NOT NULL,
+
+    estoque_minimo NUMERIC(12,3) DEFAULT 0,
+
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
+
+    data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
