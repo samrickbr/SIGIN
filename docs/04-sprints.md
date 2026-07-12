@@ -91,3 +91,12 @@ Implementado:
 - Vinculação com local e responsável
 - Rastreabilidade por referência
 - Validação produto x material
+
+## Sprint 12 - Consulta de Estoque
+
+Status: Concluída
+
+Implementado:
+- Consulta de saldo de estoque
+- Cálculo baseado em movimentações
+- Consulta consolidada de produtos e materiais

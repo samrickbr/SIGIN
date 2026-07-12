@@ -49,3 +49,8 @@
 - Implementado registro de entradas de materiais
 - Implementado registro de produtos acabados
 - Criado histórico de movimentações
+
+## Sprint 12
+
+- Criada consulta de saldo de estoque
+- Implementado cálculo de estoque baseado em movimentações
