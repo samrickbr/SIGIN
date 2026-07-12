@@ -120,3 +120,19 @@ Campos principais:
 Relacionamentos:
 - Pertence a uma Ordem de Produção
 - Utiliza um Material
+
+## Apontamentos de Produção
+
+Campos principais:
+- id
+- ordem_producao_id
+- quantidade_produzida
+- quantidade_perda
+- observacao
+- responsavel_id
+- data_apontamento
+- ativo
+
+Relacionamentos:
+- Pertence a uma Ordem de Produção
+- Possui um responsável

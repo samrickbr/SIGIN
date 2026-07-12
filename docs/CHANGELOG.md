@@ -35,3 +35,10 @@
 - Criado controle de materiais da Ordem de Produção
 - Implementado vínculo OP x Material
 - Criado CRUD de consumo planejado
+
+## Sprint 10
+
+- Criado módulo de apontamento de produção
+- Implementado controle de produção realizada
+- Implementado registro de perdas
+- Atualização automática da OP

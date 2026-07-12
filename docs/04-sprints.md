@@ -67,3 +67,14 @@ Implementado:
 - Controle de quantidade consumida
 - Relacionamento OP x Material
 - CRUD completo
+
+## Sprint 10 - Execução da Produção
+
+Status: Concluída
+
+Implementado:
+- Apontamento de produção
+- Registro de perdas
+- Histórico de produção
+- Atualização da quantidade produzida na OP
+- CRUD completo
