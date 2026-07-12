@@ -136,3 +136,30 @@ Campos principais:
 Relacionamentos:
 - Pertence a uma Ordem de Produção
 - Possui um responsável
+
+## Movimentações de Estoque
+
+Campos principais:
+- id
+- produto_id
+- material_id
+- local_id
+- tipo
+- quantidade
+- origem
+- referencia_id
+- observacao
+- responsavel_id
+- data_movimentacao
+- ativo
+
+Regras:
+- Uma movimentação deve possuir produto ou material.
+- Não é permitido informar os dois.
+- Toda movimentação pertence a um local.
+
+Relacionamentos:
+- Pode estar vinculada a um Produto
+- Pode estar vinculada a um Material
+- Possui um Local
+- Pode possuir um responsável

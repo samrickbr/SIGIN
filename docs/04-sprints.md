@@ -78,3 +78,16 @@ Implementado:
 - Histórico de produção
 - Atualização da quantidade produzida na OP
 - CRUD completo
+
+## Sprint 11 - Movimentação de Estoque
+
+Status: Concluída
+
+Implementado:
+- Cadastro de movimentações de estoque
+- Entrada de materiais
+- Entrada de produtos acabados
+- Controle de origem da movimentação
+- Vinculação com local e responsável
+- Rastreabilidade por referência
+- Validação produto x material

@@ -42,3 +42,10 @@
 - Implementado controle de produção realizada
 - Implementado registro de perdas
 - Atualização automática da OP
+
+## Sprint 11
+
+- Criado módulo de movimentação de estoque
+- Implementado registro de entradas de materiais
+- Implementado registro de produtos acabados
+- Criado histórico de movimentações
