@@ -105,3 +105,18 @@ Relacionamentos:
 - Ordem de Produção pertence a um Produto
 - Ordem de Produção possui um Local destino
 - Ordem de Produção pode possuir um responsável
+
+## OP Materiais
+
+Campos principais:
+- id
+- ordem_producao_id
+- material_id
+- quantidade_planejada
+- quantidade_consumida
+- ativo
+- data_criacao
+
+Relacionamentos:
+- Pertence a uma Ordem de Produção
+- Utiliza um Material

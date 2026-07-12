@@ -29,3 +29,9 @@
 - Criado módulo de Ordem de Produção
 - Implementado controle inicial de produção
 - Criado CRUD de OP
+
+## Sprint 09
+
+- Criado controle de materiais da Ordem de Produção
+- Implementado vínculo OP x Material
+- Criado CRUD de consumo planejado

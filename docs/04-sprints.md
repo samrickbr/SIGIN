@@ -56,3 +56,14 @@ Implementado:
 - Origem da produção
 - Controle de status inicial
 - CRUD completo
+
+## Sprint 09 - Consumo de Materiais da OP
+
+Status: Concluída
+
+Implementado:
+- Cadastro de materiais vinculados à OP
+- Controle de quantidade planejada
+- Controle de quantidade consumida
+- Relacionamento OP x Material
+- CRUD completo
