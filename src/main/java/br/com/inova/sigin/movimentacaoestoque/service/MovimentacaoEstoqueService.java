@@ -37,12 +37,9 @@ public class MovimentacaoEstoqueService {
             MovimentacaoEstoqueRequest request) {
 
         validarProdutoMaterial(request);
-
-
         Produto produto = null;
         Material material = null;
         Pessoa responsavel = null;
-
 
         if (request.getProdutoId() != null) {
             produto = produtoRepository.findById(request.getProdutoId())
@@ -52,7 +49,6 @@ public class MovimentacaoEstoqueService {
                             ));
         }
 
-
         if (request.getMaterialId() != null) {
             material = materialRepository.findById(request.getMaterialId())
                     .orElseThrow(() ->
@@ -61,13 +57,11 @@ public class MovimentacaoEstoqueService {
                             ));
         }
 
-
         Local local = localRepository.findById(request.getLocalId())
                 .orElseThrow(() ->
                         new RegraNegocioException(
                                 "Local não encontrado"
                         ));
-
 
         if (request.getResponsavelId() != null) {
             responsavel = pessoaRepository.findById(request.getResponsavelId())
@@ -77,12 +71,16 @@ public class MovimentacaoEstoqueService {
                             ));
         }
 
-
         MovimentacaoEstoque entity = MovimentacaoEstoque.builder()
                 .produto(produto)
                 .material(material)
                 .local(local)
                 .tipo(request.getTipo().toUpperCase())
+                .movimento(
+                        request.getMovimento() != null
+                                ? request.getMovimento().toUpperCase()
+                                : definirMovimento(request.getTipo())
+                )
                 .quantidade(request.getQuantidade())
                 .origem(request.getOrigem().toUpperCase())
                 .referenciaId(request.getReferenciaId())
@@ -91,7 +89,6 @@ public class MovimentacaoEstoqueService {
                 .dataMovimentacao(LocalDateTime.now())
                 .ativo(true)
                 .build();
-
 
         return mapper.toResponse(repository.save(entity));
     }
@@ -133,7 +130,6 @@ public class MovimentacaoEstoqueService {
         return mapper.toResponse(entity);
     }
 
-
     public MovimentacaoEstoqueResponse atualizar(
             Long id,
             MovimentacaoEstoqueUpdateRequest request) {
@@ -156,11 +152,8 @@ public class MovimentacaoEstoqueService {
         if (request.getAtivo() != null) {
             entity.setAtivo(request.getAtivo());
         }
-
-
         return mapper.toResponse(repository.save(entity));
     }
-
 
     public void excluir(Long id) {
 
@@ -173,5 +166,24 @@ public class MovimentacaoEstoqueService {
         entity.setAtivo(false);
 
         repository.save(entity);
+    }
+
+    private String definirMovimento(String tipo) {
+
+        return switch (tipo.toUpperCase()) {
+
+            case "COMPRA",
+                    "PRODUCAO",
+                    "AJUSTE_ENTRADA" -> "ENTRADA";
+
+            case "CONSUMO_PRODUCAO",
+                    "PERDA",
+                    "VENDA",
+                    "AJUSTE_SAIDA" -> "SAIDA";
+
+            default -> throw new RegraNegocioException(
+                    "Tipo de movimentação inválido"
+            );
+        };
     }
 }

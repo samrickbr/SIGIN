@@ -23,6 +23,8 @@ public class MovimentacaoEstoqueResponse {
 
     private String tipo;
 
+    private String movimento;
+
     private BigDecimal quantidade;
 
     private String origem;

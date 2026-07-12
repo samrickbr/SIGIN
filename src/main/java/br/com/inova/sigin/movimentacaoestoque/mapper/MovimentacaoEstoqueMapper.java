@@ -12,7 +12,6 @@ public class MovimentacaoEstoqueMapper {
 
         return MovimentacaoEstoqueResponse.builder()
                 .id(entity.getId())
-
                 .produtoId(
                         entity.getProduto() != null
                                 ? entity.getProduto().getId()
@@ -23,7 +22,6 @@ public class MovimentacaoEstoqueMapper {
                                 ? entity.getProduto().getNome()
                                 : null
                 )
-
                 .materialId(
                         entity.getMaterial() != null
                                 ? entity.getMaterial().getId()
@@ -34,20 +32,14 @@ public class MovimentacaoEstoqueMapper {
                                 ? entity.getMaterial().getNome()
                                 : null
                 )
-
                 .localId(entity.getLocal().getId())
                 .local(entity.getLocal().getNome())
-
                 .tipo(entity.getTipo())
-
+                .movimento(entity.getMovimento())
                 .quantidade(entity.getQuantidade())
-
                 .origem(entity.getOrigem())
-
                 .referenciaId(entity.getReferenciaId())
-
                 .observacao(entity.getObservacao())
-
                 .responsavelId(
                         entity.getResponsavel() != null
                                 ? entity.getResponsavel().getId()
@@ -58,13 +50,10 @@ public class MovimentacaoEstoqueMapper {
                                 ? entity.getResponsavel().getNome()
                                 : null
                 )
-
                 .dataMovimentacao(
                         entity.getDataMovimentacao()
                 )
-
                 .ativo(entity.getAtivo())
-
                 .build();
     }
 }

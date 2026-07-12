@@ -1,0 +1,2 @@
+ALTER TABLE movimentacoes_estoque
+ADD COLUMN movimento VARCHAR(20) NOT NULL DEFAULT 'ENTRADA';

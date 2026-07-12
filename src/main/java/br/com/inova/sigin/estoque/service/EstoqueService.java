@@ -59,16 +59,13 @@ public class EstoqueService {
         return movimentacao.getMaterial().getNome();
     }
 
-
     private BigDecimal quantidadeMovimentacao(
             MovimentacaoEstoque movimentacao) {
-
-        /*
-         * Nesta primeira versão:
-         * tipos de entrada somam
-         * tipos de saída futuramente serão negativos
-         */
-
+        if ("SAIDA".equalsIgnoreCase(
+                movimentacao.getMovimento())) {
+            return movimentacao.getQuantidade()
+                    .negate();
+        }
         return movimentacao.getQuantidade();
     }
 }

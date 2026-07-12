@@ -44,6 +44,24 @@ Implementado:
 - CRUD completo
 - Novo padrão com Mapper
 
+## Sprint 07 - Produto x Material
+
+Status: Concluída
+
+Implementado:
+
+* Cadastro do vínculo entre produto e material
+* Definição da composição do produto (BOM)
+* Controle da quantidade de material utilizada por unidade produzida
+* Validação de materiais duplicados no mesmo produto
+* CRUD completo do relacionamento Produto x Material
+
+Relacionamentos:
+
+* Um produto pode possuir vários materiais
+* Um material pode estar vinculado a vários produtos
+* A quantidade representa o consumo necessário para produzir uma unidade do produto
+
 ## Sprint 08 - Ordem de Produção
 
 Status: Concluída
@@ -100,3 +118,26 @@ Implementado:
 - Consulta de saldo de estoque
 - Cálculo baseado em movimentações
 - Consulta consolidada de produtos e materiais
+
+## Sprint 13 - Consumo Automático de Materiais
+
+Status: Concluída
+
+Objetivo:
+Automatizar o consumo de matérias-primas durante o apontamento da produção.
+
+Implementado:
+
+* Controle de movimentações de entrada e saída
+* Campo `movimento` (ENTRADA/SAIDA)
+* Ajuste no cálculo do saldo de estoque
+* Consumo automático baseado na composição do produto (BOM)
+* Geração automática de movimentações de consumo ao registrar um apontamento de produção
+
+Fluxo:
+
+Apontamento de Produção
+→ Busca composição do produto
+→ Calcula consumo de cada material
+→ Gera movimentações de saída
+→ Atualiza automaticamente o saldo do estoque

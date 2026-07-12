@@ -83,6 +83,33 @@ Campos principais:
 - ativo
 - data_criacao
 
+## Produto x Material
+
+Tabela:
+
+* produto_material
+
+Campos principais:
+
+* id
+* produto_id
+* material_id
+* quantidade
+* ativo
+* data_criacao
+
+Regra:
+A quantidade representa o consumo do material para produzir uma unidade do produto.
+
+Exemplo:
+Produto: Chaveiro Taça Copa 2026 Premium
+
+Material:
+PLA Preto
+
+Quantidade:
+0,018 kg por unidade produzida.
+
 ## Ordens de Produção
 
 Campos principais:
@@ -163,3 +190,29 @@ Relacionamentos:
 - Pode estar vinculada a um Material
 - Possui um Local
 - Pode possuir um responsável
+
+### Campo movimento
+
+Valores possíveis:
+
+* ENTRADA
+* SAIDA
+
+Utilização:
+
+ENTRADA
+
+* Compra
+* Produção
+* Ajuste positivo
+
+SAIDA
+
+* Consumo de produção
+* Venda
+* Perda
+* Ajuste negativo
+
+O saldo do estoque é calculado dinamicamente:
+
+Saldo = Soma(ENTRADAS) - Soma(SAIDAS)

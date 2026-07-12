@@ -42,6 +42,8 @@ public class MovimentacaoEstoque {
     @Column(nullable = false, length = 50)
     private String tipo;
 
+    @Column(nullable = false, length = 20)
+    private String movimento;
 
     @Column(nullable = false, precision = 12, scale = 3)
     private BigDecimal quantidade;

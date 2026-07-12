@@ -54,3 +54,10 @@
 
 - Criada consulta de saldo de estoque
 - Implementado cálculo de estoque baseado em movimentações
+
+## Sprint 13
+
+* Adicionado controle de ENTRADA e SAIDA nas movimentações de estoque
+* Implementado cálculo de saldo considerando movimentações de saída
+* Automatizado o consumo de materiais durante o apontamento de produção
+* Integrada a estrutura do produto (BOM) ao estoque

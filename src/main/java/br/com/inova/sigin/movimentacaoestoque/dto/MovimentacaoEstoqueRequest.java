@@ -19,6 +19,8 @@ public class MovimentacaoEstoqueRequest {
     @NotNull
     private String tipo;
 
+    private String movimento;
+
     @NotNull
     @DecimalMin("0.001")
     private BigDecimal quantidade;
