@@ -43,3 +43,16 @@ Implementado:
 - Estoque mínimo inicial
 - CRUD completo
 - Novo padrão com Mapper
+
+## Sprint 08 - Ordem de Produção
+
+Status: Concluída
+
+Implementado:
+- Cadastro de ordens de produção
+- Controle de produto produzido
+- Local destino
+- Responsável
+- Origem da produção
+- Controle de status inicial
+- CRUD completo

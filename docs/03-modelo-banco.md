@@ -82,3 +82,26 @@ Campos principais:
 - estoque_minimo
 - ativo
 - data_criacao
+
+## Ordens de Produção
+
+Campos principais:
+- id
+- numero
+- produto_id
+- quantidade_planejada
+- quantidade_produzida
+- local_destino_id
+- responsavel_id
+- status
+- origem
+- observacao
+- ativo
+- data_abertura
+- data_inicio
+- data_fim
+
+Relacionamentos:
+- Ordem de Produção pertence a um Produto
+- Ordem de Produção possui um Local destino
+- Ordem de Produção pode possuir um responsável

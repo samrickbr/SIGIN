@@ -23,3 +23,9 @@
 - Criado módulo de materiais
 - Implementado padrão Mapper
 - Criado CRUD de materiais
+
+## Sprint 08
+
+- Criado módulo de Ordem de Produção
+- Implementado controle inicial de produção
+- Criado CRUD de OP
