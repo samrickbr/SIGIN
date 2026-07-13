@@ -121,12 +121,21 @@ Campos principais:
 - local_destino_id
 - responsavel_id
 - status
-- origem
-- observacao
-- ativo
-- data_abertura
-- data_inicio
-- data_fim
+  - Tipo:
+  - Enum(StatusOrdemProducao)
+    - Valores:
+      - ABERTA
+      - RESERVADA
+      - EM_PRODUCAO
+      - CONCLUIDA
+      - CANCELADA
+      - FALHA_PRODUCAO
+      - origem
+      - observacao
+      - ativo
+      - data_abertura
+      - data_inicio
+      - data_fim
 
 Relacionamentos:
 - Ordem de Produção pertence a um Produto

@@ -6,6 +6,7 @@ import br.com.inova.sigin.ordemproducao.dto.OrdemProducaoRequest;
 import br.com.inova.sigin.ordemproducao.dto.OrdemProducaoResponse;
 import br.com.inova.sigin.ordemproducao.dto.OrdemProducaoUpdateRequest;
 import br.com.inova.sigin.ordemproducao.entity.OrdemProducao;
+import br.com.inova.sigin.ordemproducao.enums.StatusOrdemProducao;
 import br.com.inova.sigin.ordemproducao.mapper.OrdemProducaoMapper;
 import br.com.inova.sigin.ordemproducao.repository.OrdemProducaoRepository;
 import br.com.inova.sigin.pessoa.entity.Pessoa;
@@ -68,7 +69,7 @@ public class OrdemProducaoService {
                 .quantidadePlanejada(request.getQuantidadePlanejada())
                 .localDestino(local)
                 .responsavel(responsavel)
-                .status("ABERTA")
+                .status(StatusOrdemProducao.ABERTA)
                 .origem(request.getOrigem().toUpperCase())
                 .observacao(request.getObservacao())
                 .quantidadeProduzida(BigDecimal.ZERO)
@@ -77,8 +78,6 @@ public class OrdemProducaoService {
                 .build();
 
         OrdemProducao ordemSalva = repository.save(op);
-
-        reservaEstoqueService.reservarMateriais(ordemSalva);
 
         return mapper.toResponse(ordemSalva);
     }
@@ -120,10 +119,6 @@ public class OrdemProducaoService {
             op.setQuantidadeProduzida(request.getQuantidadeProduzida());
         }
 
-        if (request.getStatus() != null) {
-            op.setStatus(request.getStatus().toUpperCase());
-        }
-
         if (request.getOrigem() != null) {
             op.setOrigem(request.getOrigem().toUpperCase());
         }
@@ -143,12 +138,119 @@ public class OrdemProducaoService {
 
     public void excluir(Long id) {
 
-        OrdemProducao op = repository.findById(id)
-                .orElseThrow(() ->
-                        new RegraNegocioException("Ordem de produção não encontrada"));
+        OrdemProducao op = buscarEntidadePorId(id);
 
         op.setAtivo(false);
 
         repository.save(op);
+    }
+
+    @Transactional
+    public OrdemProducaoResponse reservar(Long id) {
+
+        OrdemProducao op = buscarEntidadePorId(id);
+
+        if (op.getStatus() != StatusOrdemProducao.ABERTA) {
+            throw new RegraNegocioException(
+                    "Apenas OPs abertas podem ser reservadas.");
+        }
+
+        reservaEstoqueService.reservarMateriais(op);
+
+        op.setStatus(StatusOrdemProducao.RESERVADA);
+
+        return mapper.toResponse(repository.save(op));
+    }
+
+    @Transactional
+    public OrdemProducaoResponse iniciar(Long id) {
+
+        OrdemProducao op = buscarEntidadePorId(id);
+
+        if (op.getStatus() != StatusOrdemProducao.RESERVADA) {
+            throw new RegraNegocioException(
+                    "Apenas OPs reservadas podem iniciar a produção.");
+        }
+
+        op.setStatus(StatusOrdemProducao.EM_PRODUCAO);
+
+        return mapper.toResponse(
+                repository.save(op)
+        );
+    }
+
+    @Transactional
+    public OrdemProducaoResponse concluir(Long id) {
+
+        OrdemProducao op = buscarEntidadePorId(id);
+
+        if (op.getStatus() != StatusOrdemProducao.EM_PRODUCAO) {
+            throw new RegraNegocioException(
+                    "Apenas OPs em produção podem ser concluídas.");
+        }
+
+        op.setStatus(StatusOrdemProducao.CONCLUIDA);
+
+        return mapper.toResponse(
+                repository.save(op)
+        );
+    }
+
+    @Transactional
+    public OrdemProducaoResponse cancelar(Long id) {
+
+        OrdemProducao op = buscarEntidadePorId(id);
+
+        if (op.getStatus() == StatusOrdemProducao.CONCLUIDA) {
+            throw new RegraNegocioException(
+                    "Não é possível cancelar uma OP concluída.");
+        }
+
+        op.setStatus(StatusOrdemProducao.CANCELADA);
+
+        return mapper.toResponse(
+                repository.save(op)
+        );
+    }
+
+    @Transactional
+    public OrdemProducaoResponse falhar(Long id) {
+
+        OrdemProducao op = buscarEntidadePorId(id);
+
+        if (op.getStatus() != StatusOrdemProducao.EM_PRODUCAO) {
+            throw new RegraNegocioException(
+                    "Apenas OPs em produção podem falhar.");
+        }
+
+        op.setStatus(StatusOrdemProducao.FALHA_PRODUCAO);
+
+        return mapper.toResponse(
+                repository.save(op)
+        );
+    }
+
+    @Transactional
+    public OrdemProducaoResponse reabrir(Long id) {
+
+        OrdemProducao op = buscarEntidadePorId(id);
+
+        if (op.getStatus() != StatusOrdemProducao.FALHA_PRODUCAO) {
+            throw new RegraNegocioException(
+                    "Apenas OPs com falha podem ser reabertas.");
+        }
+
+        op.setStatus(StatusOrdemProducao.RESERVADA);
+
+        return mapper.toResponse(
+                repository.save(op)
+        );
+    }
+
+    private OrdemProducao buscarEntidadePorId(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() ->
+                        new RegraNegocioException(
+                                "Ordem de produção não encontrada"));
     }
 }

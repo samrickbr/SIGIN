@@ -79,3 +79,22 @@
 
 ### Fixed
 - Garantido rollback transacional caso a reserva de materiais falhe.
+
+# Sprint 15
+
+## Added
+
+- Implementado ciclo de vida da Ordem de Produção.
+- Adicionado enum `StatusOrdemProducao`.
+- Criados endpoints para mudança de status da OP.
+- Implementada reserva automática de materiais.
+- Adicionadas validações de transição de status.
+- Registro automático de `dataInicio` e `dataFim`.
+- Correção de `LazyInitializationException` nos endpoints de status.
+- Integração inicial da Collection Postman para testes automatizados.
+
+## Changed
+
+- Ordem de Produção passou a utilizar enum para controle de status.
+- Refatoração do `OrdemProducaoService`.
+- Refatoração do `OrdemProducaoMapper`.

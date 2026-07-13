@@ -2,275 +2,349 @@
 
 ## Sistema de Gestão INOVA
 
-O SIGIN (Sistema de Gestão INOVA) tem como objetivo controlar os processos internos da INOVA Studio 3D, abrangendo produção, estoque, vendas, custos e gestão operacional.
+O **SIGIN (Sistema de Gestão INOVA)** é um ERP desenvolvido para atender as necessidades da **INOVA Studio 3D**, permitindo controlar desde o cadastro de produtos até todo o fluxo de produção, estoque, custos, vendas e gestão operacional.
 
-A arquitetura será desenvolvida de forma modular, permitindo evolução gradual conforme a necessidade do negócio.
+O sistema está sendo desenvolvido utilizando arquitetura modular baseada em **Spring Boot**, seguindo princípios de código limpo, separação de responsabilidades, versionamento por sprints e documentação contínua.
 
 ---
 
-# Fase 1 — Fundação do Sistema
+# Visão Geral do Projeto
 
-## Sprint 01 — Estrutura inicial
+## Fase 1 — Fundação
+
+### Sprint 01 — Estrutura Inicial
 
 **Status:** ✅ Concluída
 
-### Objetivos
-
-Criar a base técnica do projeto.
-
-### Entregas
+**Entregas**
 
 * Projeto Spring Boot
-* Configuração PostgreSQL
-* Flyway para migrations
+* PostgreSQL
+* Flyway
 * Swagger/OpenAPI
-* Configuração Git/GitHub
-* Estrutura inicial de pacotes
+* Git/GitHub
+* Estrutura base da aplicação
 
 ---
 
-## Sprint 02 — Cadastro de Produtos
+### Sprint 02 — Cadastro de Produtos
 
 **Status:** ✅ Concluída
 
-### Objetivos
+**Entregas**
 
-Criar a base de cadastro dos itens comercializados pela INOVA.
-
-### Entregas
-
-* Cadastro de Produto
-* Cadastro de Categoria
-* Relacionamento Produto x Categoria
+* Categoria
+* Produto
 * CRUD completo
-* Validações iniciais
 * DTOs
+* Mappers
+* Validações
 
 ---
 
-## Sprint 03 — Padronização e tratamento
+### Sprint 03 — Padronização
 
 **Status:** ✅ Concluída
 
-### Objetivos
+**Entregas**
 
-Melhorar a estrutura interna da aplicação.
-
-### Entregas
-
-* Padronização de respostas
-* Tratamento inicial de exceções
-* Organização dos pacotes
-* Melhorias na arquitetura REST
+* Tratamento de exceções
+* Respostas padronizadas
+* Organização da arquitetura
+* Padronização REST
 
 ---
 
-## Sprint 04 — Cadastro de Locais
+### Sprint 04 — Cadastro de Locais
 
 **Status:** ✅ Concluída
 
-### Objetivos
+**Entregas**
 
-Criar a estrutura para controle dos locais físicos e lógicos utilizados pelo estoque.
-
-### Entregas
-
-* Entidade Local
-* Migration V5
-* CRUD completo
+* Cadastro de Locais
 * Exclusão lógica
-* Padronização de nomes
-* Utilitário StringUtil
-* Regras iniciais de qualidade dos dados
+* StringUtil
+* Padronização de dados
 
 ---
 
 # Fase 2 — Cadastros Operacionais
 
-## Sprint 05 — Cadastros auxiliares
+### Sprint 05
 
-**Status:** ⏳ Planejada
+**Status:** ✅ Concluída
 
-### Objetivo
+**Entregas**
 
-Criar os cadastros necessários para suportar a operação da INOVA.
-
----
-
-## Cliente
-
-Responsável por armazenar informações dos compradores e demandas externas.
-
-Campos iniciais:
-
-* Nome
-* Telefone
-* Email
-* Observações
-* Status ativo/inativo
+* Pessoas
+* Clientes
+* Fornecedores
+* Responsáveis
+* Materiais
+* Impressoras
+* Validações
+* CRUD completo
 
 ---
 
-## Fornecedor
+### Sprint 06
 
-Responsável por armazenar parceiros e fornecedores.
+**Status:** ✅ Concluída
 
-Campos iniciais:
+**Entregas**
 
-* Nome
-* Contato
-* Telefone
-* Email
-* Observações
-* Status ativo/inativo
+* Estrutura de BOM (Produto x Material)
+* Consumo por unidade produzida
+* Base para cálculo automático de materiais
 
 ---
 
-## Impressora
+# Fase 3 — Produção
 
-Responsável pelo controle dos equipamentos utilizados na produção.
+### Sprint 07
 
-Campos iniciais:
+**Status:** ✅ Concluída
 
-* Nome
-* Modelo
-* Identificação
-* Status
-* Observações
+**Entregas**
 
-Exemplos:
-
-* Ender 3 V2 Neo
-* Bambu Lab A1
+* Ordem de Produção
+* Controle de quantidade planejada
+* Controle de quantidade produzida
+* Origem da produção
+* Local de destino
 
 ---
 
-## Material
+### Sprint 08
 
-Responsável pelo controle de insumos utilizados.
+**Status:** ✅ Concluída
 
-Campos iniciais:
+**Entregas**
 
-* Nome
-* Tipo
-* Fabricante
-* Cor
-* Peso comprado
-* Estoque disponível
-
-Exemplos:
-
-* PLA Preto Elegoo
-* PETG Branco
-* TPU Azul
+* Apontamento de Produção
+* Controle de perdas
+* Atualização automática da OP
 
 ---
 
-# Fase 3 — Comercial
+### Sprint 09
 
-## Sprint 06 — Pedidos e Encomendas
+**Status:** ✅ Concluída
 
-**Status:** ⏳ Planejada
+**Entregas**
 
-### Objetivo
-
-Controlar demandas comerciais e necessidades de produção.
-
-Tipos de demanda:
-
-* Venda para cliente
-* Produção para estoque
-* Reposição
-* Mostruário
-* Parceiros
-
-Entidades previstas:
-
-* Pedido
-* PedidoItem
-
----
-
-# Fase 4 — Produção
-
-## Sprint 07 — Ordem de Produção
-
-**Status:** ⏳ Planejada
-
-### Objetivo
-
-Controlar o processo produtivo.
-
-Informações previstas:
-
-* Produto
-* Quantidade planejada
-* Quantidade produzida
-* Perdas
-* Impressora utilizada
-* Material utilizado
-* Prazo
-* Origem da demanda
-
----
-
-# Fase 5 — Estoque
-
-## Sprint 08 — Movimentações
-
-**Status:** ⏳ Planejada
-
-### Objetivo
-
-Criar o histórico completo das alterações de estoque.
-
-O estoque será calculado através das movimentações registradas.
-
-Tipos previstos:
-
-* ENTRADA_COMPRA
-* PRODUCAO
-* SAIDA_VENDA
-* TRANSFERENCIA
-* PERDA_PRODUCAO
-* PERDA_ESTOQUE
-* CONSUMO_OPERACIONAL
-* DEVOLUCAO
-* AJUSTE_INVENTARIO
-
----
-
-# Fase 6 — Gestão e Inteligência
-
-## Sprint 09 — Custos
-
-**Status:** ⏳ Planejada
-
-Objetivos:
-
-* Controle de custo de material
-* Custo de produção
-* Tempo de máquina
-* Margem de lucro
-
----
-
-## Sprint 10 — Relatórios
-
-**Status:** ⏳ Planejada
-
-Relatórios previstos:
-
-* Estoque atual
+* Movimentação de Estoque
+* Entradas
+* Saídas
 * Produção
-* Perdas
-* Vendas
-* Rentabilidade
-* Indicadores operacionais
+* Histórico completo de movimentações
 
 ---
 
-# Princípios do projeto
+### Sprint 10
+
+**Status:** ✅ Concluída
+
+**Entregas**
+
+* Consulta de Saldo
+* Estoque calculado por movimentações
+* Visão consolidada de materiais e produtos
+
+---
+
+### Sprint 11
+
+**Status:** ✅ Concluída
+
+**Entregas**
+
+* Consumo manual de materiais
+* Integração inicial entre produção e estoque
+
+---
+
+### Sprint 12
+
+**Status:** ✅ Concluída
+
+**Entregas**
+
+* Consumo automático baseado na BOM
+* Integração entre Produto x Material
+* Automatização da baixa de insumos
+
+---
+
+### Sprint 13
+
+**Status:** ✅ Concluída
+
+**Entregas**
+
+* Refatoração do consumo automático
+* Centralização da geração de movimentações
+* Evolução da arquitetura dos serviços
+* Melhor organização das responsabilidades
+
+---
+
+### Sprint 14
+
+**Status:** ✅ Concluída
+
+**Entregas**
+
+* Reserva de Estoque
+* Estoque Disponível
+* Consulta de materiais reservados
+* Reserva automática na criação da Ordem de Produção
+* Validação de disponibilidade
+* Rollback transacional
+
+---
+
+# Fase 4 — Produção Inteligente
+
+### Sprint 15
+
+**Status:** 🚧 Em desenvolvimento
+
+**Objetivos**
+
+* Máquina de estados da Ordem de Produção
+* Fluxo operacional da produção
+* Início da produção
+* Conclusão da produção
+* Cancelamento
+* Falha de produção
+* Reabertura de OP
+* Baixa automática das reservas
+* Sprint 15
+* Máquina de estados da OP
+* Reserva de estoque 
+* Integração Postman Collection 
+* Documentação automática da API
+
+---
+
+### Sprint 16
+
+Planejamento da produção.
+
+* Filas
+* Prioridades
+* Planejamento
+* Capacidade produtiva
+
+---
+
+### Sprint 17
+
+Integração com Impressoras.
+
+* Associação da OP
+* Tempo previsto
+* Tempo realizado
+* Histórico por equipamento
+
+---
+
+# Fase 5 — Comercial
+
+### Sprint 18
+
+* Pedidos
+* Clientes
+* Itens
+* Integração Pedido → OP
+
+---
+
+### Sprint 19
+
+* Expedição
+* Separação
+* Entrega
+* Histórico de vendas
+
+---
+
+# Fase 6 — Gestão
+
+### Sprint 20
+
+Documentação completa do SIGIN.
+
+Será gerado o **SIGIN Development Guide**, contendo:
+
+* Arquitetura
+* Banco de Dados
+* Diagramas
+* Fluxos
+* Convenções
+* Roadmap
+* Manual técnico
+
+---
+
+### Sprint 21
+
+Dashboards.
+
+* Produção
+* Estoque
+* Custos
+* Eficiência
+* Indicadores
+
+---
+
+### Sprint 22
+
+Financeiro.
+
+* Custos
+* Receitas
+* Fluxo de caixa
+* Rentabilidade
+
+---
+
+### Sprint 23
+
+Usuários e Permissões.
+
+* Login
+* Perfis
+* Papéis
+* Auditoria
+
+---
+
+### Sprint 24
+
+Multiempresa.
+
+* Empresas
+* Filiais
+* Estoques independentes
+* Produção independente
+
+---
+
+### Sprint 25
+
+API Pública.
+
+* Tokens
+* Integrações
+* Marketplace
+* ERP externo
+
+---
+
+# Princípios do Projeto
 
 ## Estoque
 
@@ -278,37 +352,64 @@ O estoque nunca será alterado diretamente.
 
 Toda alteração deverá gerar uma movimentação.
 
-Modelo:
+Fluxo:
 
-```
 Pedido
-   ↓
+
+↓
+
 Ordem de Produção
-   ↓
+
+↓
+
+Reserva
+
+↓
+
 Movimentação
-   ↓
+
+↓
+
 Estoque
-```
 
 ---
 
-## Dados
+## Produção
 
-Todos os cadastros seguirão regras padronizadas:
+A Ordem de Produção representa o centro operacional do sistema.
 
-* Nomes normalizados
-* Códigos técnicos sem acentos
-* Histórico preservado
-* Exclusão lógica quando aplicável
+Todo o fluxo produtivo será controlado através de estados e eventos.
+
+---
+
+## Arquitetura
+
+O SIGIN utiliza arquitetura em camadas:
+
+* Controller
+* DTO
+* Mapper
+* Service
+* Repository
+* Entity
+
+Toda regra de negócio permanece na camada de Service.
 
 ---
 
 ## Evolução
 
-O SIGIN será desenvolvido por etapas, com cada sprint contendo:
+Cada Sprint somente será considerada concluída após:
 
-1. Planejamento
-2. Desenvolvimento
-3. Testes
-4. Documentação
-5. Commit e versionamento
+1. Desenvolvimento
+2. Testes
+3. Documentação
+4. Versionamento
+5. Commit
+6. Push
+
+---
+
+## Visão de Longo Prazo
+
+O objetivo do SIGIN é evoluir de um sistema de gestão para um ERP completo especializado em manufatura aditiva (Impressão 3D), permitindo controlar integralmente os processos da INOVA Studio 3D e servindo como base para futuras integrações com impressoras, marketplaces e sistemas externos.

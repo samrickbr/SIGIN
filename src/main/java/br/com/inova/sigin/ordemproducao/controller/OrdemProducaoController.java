@@ -59,4 +59,53 @@ public class OrdemProducaoController {
 
         return ResponseEntity.noContent().build();
     }
+    @PostMapping("/{id}/reservar")
+    public ResponseEntity<OrdemProducaoResponse> reservar(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                service.reservar(id)
+        );
+    }
+    @PostMapping("/{id}/iniciar")
+    public ResponseEntity<OrdemProducaoResponse> iniciar(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                service.iniciar(id)
+        );
+    }
+    @PostMapping("/{id}/concluir")
+    public ResponseEntity<OrdemProducaoResponse> concluir(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                service.concluir(id)
+        );
+    }
+    @PostMapping("/{id}/cancelar")
+    public ResponseEntity<OrdemProducaoResponse> cancelar(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                service.cancelar(id)
+        );
+    }
+    @PostMapping("/{id}/falhar")
+    public ResponseEntity<OrdemProducaoResponse> falhar(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                service.falhar(id)
+        );
+    }
+    @PostMapping("/{id}/reabrir")
+    public ResponseEntity<OrdemProducaoResponse> reabrir(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                service.reabrir(id)
+        );
+    }
+
 }

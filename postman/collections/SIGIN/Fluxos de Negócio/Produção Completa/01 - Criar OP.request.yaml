@@ -1,26 +1,22 @@
 $kind: http-request
-name: Criar Ordem de Producao
+url: "{{baseUrl}}/ordens-producao"
 method: POST
-url: '{{baseUrl}}/ordens-producao'
-order: 3000
 headers:
-  - key: Content-Type
-    value: application/json
+  Content-Type: application/json
 body:
   type: json
   content: |-
     {
-      "numero": "OP-2026-001",
-      "produtoId": 1,
-      "quantidadePlanejada": 10.0,
+      "numero": "OP000003",
+      "produtoId": 4,
+      "quantidadePlanejada": 20,
       "localDestinoId": 1,
       "responsavelId": 1,
-      "origem": "MANUAL",
-      "observacao": "Ordem de teste"
+      "origem": "POSTMAN",
+      "observacao": "Fluxo teste produção automática"
     }
 scripts:
   - type: afterResponse
-    language: text/javascript
     code: |-
       pm.test("Status 200", () => pm.response.to.have.status(200));
       pm.test("OP criada com ID", () => {
@@ -28,3 +24,5 @@ scripts:
         pm.expect(json).to.have.property('id');
         pm.environment.set("ordemProducaoId", json.id);
       });
+    language: text/javascript
+order: 1783981867378

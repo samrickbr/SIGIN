@@ -1,6 +1,7 @@
 package br.com.inova.sigin.ordemproducao.entity;
 
 import br.com.inova.sigin.local.entity.Local;
+import br.com.inova.sigin.ordemproducao.enums.StatusOrdemProducao;
 import br.com.inova.sigin.pessoa.entity.Pessoa;
 import br.com.inova.sigin.produto.entity.Produto;
 import jakarta.persistence.*;
@@ -44,8 +45,9 @@ public class OrdemProducao {
     @JoinColumn(name = "responsavel_id")
     private Pessoa responsavel;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
-    private String status;
+    private StatusOrdemProducao status;
 
     @Column(nullable = false, length = 30)
     private String origem;

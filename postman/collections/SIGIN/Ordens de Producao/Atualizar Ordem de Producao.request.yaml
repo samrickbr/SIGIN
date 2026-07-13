@@ -2,7 +2,7 @@ $kind: http-request
 name: Atualizar Ordem de Producao
 method: PUT
 url: '{{baseUrl}}/ordens-producao/{{ordemProducaoId}}'
-order: 4000
+order: 5000
 headers:
   - key: Content-Type
     value: application/json

@@ -1,0 +1,6 @@
+name: Sigin Local
+values:
+  - key: baseUrl
+    value: ''
+  - key: ordemProducaoId
+    value: ''

@@ -2,7 +2,7 @@ $kind: http-request
 name: Buscar Ordem de Producao por ID
 method: GET
 url: '{{baseUrl}}/ordens-producao/{{ordemProducaoId}}'
-order: 3000
+order: 4000
 scripts:
   - type: afterResponse
     language: text/javascript

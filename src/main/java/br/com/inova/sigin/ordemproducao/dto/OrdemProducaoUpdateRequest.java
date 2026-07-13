@@ -15,8 +15,6 @@ public class OrdemProducaoUpdateRequest {
 
     private Long responsavelId;
 
-    private String status;
-
     private String origem;
 
     private String observacao;

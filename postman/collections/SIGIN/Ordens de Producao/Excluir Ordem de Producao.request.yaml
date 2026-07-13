@@ -2,7 +2,7 @@ $kind: http-request
 name: Excluir Ordem de Producao
 method: DELETE
 url: '{{baseUrl}}/ordens-producao/{{ordemProducaoId}}'
-order: 5000
+order: 6000
 scripts:
   - type: afterResponse
     language: text/javascript

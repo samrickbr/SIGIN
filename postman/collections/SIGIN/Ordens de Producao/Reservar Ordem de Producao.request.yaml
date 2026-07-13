@@ -1,0 +1,15 @@
+$kind: http-request
+name: Reservar Ordem de Producao
+method: POST
+url: '{{baseUrl}}/ordens-producao/{{ordemProducaoId}}/reservar'
+order: 6000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("Status da OP é RESERVADA", () => {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('status');
+        pm.expect(json.status).to.eql('RESERVADA');
+      });

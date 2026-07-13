@@ -1,0 +1,2 @@
+ALTER TABLE ordens_producao
+ALTER COLUMN status TYPE VARCHAR(30);

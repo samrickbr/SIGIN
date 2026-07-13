@@ -159,3 +159,18 @@ Implementar o planejamento de materiais através da reserva automática de estoq
 Resultado:
 A Ordem de Produção passa a garantir a disponibilidade de materiais antes do início da fabricação.
 
+# Sprint 15 — Workflow da Ordem de Produção
+
+## Objetivo
+
+Implementar o ciclo completo de vida de uma Ordem de Produção, garantindo transições válidas de status e integração com a reserva de estoque.
+
+## Entregas
+
+- Enum `StatusOrdemProducao`
+- Workflow da OP
+- Reserva automática de materiais
+- Endpoints de mudança de status
+- Datas automáticas de início e fim
+- Validações de regras de negócio
+- Refatoração do service e mapper

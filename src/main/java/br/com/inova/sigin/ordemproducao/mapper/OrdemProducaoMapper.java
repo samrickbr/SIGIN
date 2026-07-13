@@ -32,13 +32,10 @@ public class OrdemProducaoMapper {
                                 ? op.getResponsavel().getNome()
                                 : null
                 )
-
-                .status(op.getStatus())
+                .status(op.getStatus().name())
                 .origem(op.getOrigem())
                 .observacao(op.getObservacao())
-
                 .ativo(op.getAtivo())
-
                 .dataAbertura(op.getDataAbertura())
                 .dataInicio(op.getDataInicio())
                 .dataFim(op.getDataFim())
