@@ -1,0 +1,10 @@
+$kind: http-request
+name: Excluir Apontamento de Producao
+method: DELETE
+url: '{{baseUrl}}/apontamentos-producao/{{apontamentoId}}'
+order: 5000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 204", () => pm.response.to.have.status(204));

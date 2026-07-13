@@ -8,8 +8,7 @@ import br.com.inova.sigin.apontamentoproducao.mapper.ApontamentoProducaoMapper;
 import br.com.inova.sigin.apontamentoproducao.repository.ApontamentoProducaoRepository;
 import br.com.inova.sigin.local.entity.Local;
 import br.com.inova.sigin.local.repository.LocalRepository;
-import br.com.inova.sigin.movimentacaoestoque.entity.MovimentacaoEstoque;
-import br.com.inova.sigin.movimentacaoestoque.repository.MovimentacaoEstoqueRepository;
+import br.com.inova.sigin.movimentacaoestoque.service.MovimentacaoEstoqueService;
 import br.com.inova.sigin.ordemproducao.entity.OrdemProducao;
 import br.com.inova.sigin.ordemproducao.repository.OrdemProducaoRepository;
 import br.com.inova.sigin.pessoa.entity.Pessoa;
@@ -33,8 +32,8 @@ public class ApontamentoProducaoService {
     private final PessoaRepository pessoaRepository;
     private final ApontamentoProducaoMapper mapper;
     private final ProdutoMaterialRepository produtoMaterialRepository;
-    private final MovimentacaoEstoqueRepository movimentacaoEstoqueRepository;
     private final LocalRepository localRepository;
+    private final MovimentacaoEstoqueService movimentacaoEstoqueService;
 
     public ApontamentoProducaoResponse criar(
             ApontamentoProducaoRequest request) {
@@ -71,31 +70,31 @@ public class ApontamentoProducaoService {
                 ordemProducao,
                 request.getQuantidadeProduzida()
         );
+        ApontamentoProducao salvo = repository.save(entity);
+
+        atualizarQuantidadeProduzida(
+                ordemProducao,
+                salvo.getQuantidadeProduzida()
+        );
         gerarConsumoMateriais(
                 ordemProducao,
-                request.getQuantidadeProduzida()
+                salvo
         );
-        return mapper.toResponse(
-                repository.save(entity)
-        );
+        return mapper.toResponse(salvo);
     }
 
     private void atualizarQuantidadeProduzida(
             OrdemProducao ordemProducao,
             BigDecimal quantidade) {
-
         BigDecimal atual =
                 ordemProducao.getQuantidadeProduzida();
-
         ordemProducao.setQuantidadeProduzida(
                 atual.add(quantidade)
         );
         ordemProducaoRepository.save(ordemProducao);
     }
-
     public List<ApontamentoProducaoResponse> listarPorOp(
             Long ordemProducaoId) {
-
         return repository.findByOrdemProducaoId(ordemProducaoId)
                 .stream()
                 .map(mapper::toResponse)
@@ -109,10 +108,8 @@ public class ApontamentoProducaoService {
                                 new RegraNegocioException(
                                         "Apontamento não encontrado"
                                 ));
-
         return mapper.toResponse(entity);
     }
-
     public ApontamentoProducaoResponse atualizar(
             Long id,
             ApontamentoProducaoUpdateRequest request) {
@@ -161,38 +158,41 @@ public class ApontamentoProducaoService {
 
     private void gerarConsumoMateriais(
             OrdemProducao ordemProducao,
-            BigDecimal quantidadeProduzida) {
+            ApontamentoProducao apontamento) {
+
+        BigDecimal quantidadeProduzida =
+                apontamento.getQuantidadeProduzida();
+
         List<ProdutoMaterial> materiais =
                 produtoMaterialRepository.findByProdutoId(
                         ordemProducao.getProduto().getId()
                 );
+
         Local local = localRepository.findById(
                 ordemProducao.getLocalDestino().getId()
         ).orElseThrow(() ->
                 new RegraNegocioException(
                         "Local não encontrado"
                 ));
+
         for (ProdutoMaterial produtoMaterial : materiais) {
+
             BigDecimal consumo =
                     produtoMaterial.getQuantidade()
                             .multiply(quantidadeProduzida);
-            MovimentacaoEstoque movimentacao =
-                    MovimentacaoEstoque.builder()
-                            .material(produtoMaterial.getMaterial())
-                            .local(local)
-                            .tipo("CONSUMO_PRODUCAO")
-                            .movimento("SAIDA")
-                            .quantidade(consumo)
-                            .origem("OP")
-                            .referenciaId(ordemProducao.getId())
-                            .observacao(
-                                    "Consumo automático da OP "
-                                            + ordemProducao.getNumero()
-                            )
-                            .dataMovimentacao(LocalDateTime.now())
-                            .ativo(true)
-                            .build();
-            movimentacaoEstoqueRepository.save(movimentacao);
+
+            movimentacaoEstoqueService.registrarMovimentacao(
+                    produtoMaterial.getMaterial(),
+                    null,
+                    local,
+                    "CONSUMO_PRODUCAO",
+                    "SAIDA",
+                    consumo,
+                    "OP",
+                    ordemProducao.getId(),
+                    apontamento.getResponsavel(),
+                    "Consumo automático da OP " + ordemProducao.getNumero()
+            );
         }
     }
 }

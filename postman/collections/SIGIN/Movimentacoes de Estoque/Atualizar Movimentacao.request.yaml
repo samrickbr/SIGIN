@@ -1,0 +1,21 @@
+$kind: http-request
+name: Atualizar Movimentacao
+method: PUT
+url: '{{baseUrl}}/movimentacoes-estoque/{{movimentacaoId}}'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "quantidade": 12.0,
+      "observacao": "Atualizado",
+      "ativo": true
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));

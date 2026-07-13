@@ -1,0 +1,12 @@
+$kind: http-request
+name: Excluir Produto
+method: DELETE
+url: '{{baseUrl}}/produtos/{{produtoId}}'
+order: 5000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200 ou 204", () => {
+        pm.expect(pm.response.code).to.be.oneOf([200, 204]);
+      });

@@ -1,0 +1,29 @@
+$kind: http-request
+name: Criar Pessoa
+method: POST
+url: '{{baseUrl}}/pessoas'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nome": "João Silva",
+      "tipoDocumento": "CPF",
+      "documento": "123.456.789-00",
+      "telefone": "(11) 99999-0001",
+      "email": "joao@inova3d.com.br",
+      "observacao": "Cliente teste"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("Pessoa criada com ID", () => {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('id');
+        pm.environment.set("pessoaId", json.id);
+      });

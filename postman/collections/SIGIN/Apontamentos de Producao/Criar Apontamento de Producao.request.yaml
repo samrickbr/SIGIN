@@ -1,0 +1,28 @@
+$kind: http-request
+name: Criar Apontamento de Producao
+method: POST
+url: '{{baseUrl}}/apontamentos-producao'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "ordemProducaoId": 1,
+      "quantidadeProduzida": 5.0,
+      "quantidadePerda": 0.5,
+      "responsavelId": 1,
+      "observacao": "Apontamento de teste"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("Apontamento criado com ID", () => {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('id');
+        pm.environment.set("apontamentoId", json.id);
+      });

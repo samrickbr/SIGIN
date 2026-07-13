@@ -1,0 +1,24 @@
+$kind: http-request
+name: Criar Local
+method: POST
+url: '{{baseUrl}}/locais'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nome": "Estoque Principal"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("Local criado com ID", () => {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('id');
+        pm.environment.set("localId", json.id);
+      });

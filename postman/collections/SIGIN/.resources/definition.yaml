@@ -1,0 +1,5 @@
+$kind: collection
+name: SIGIN
+variables:
+  - key: baseUrl
+    value: 'http://localhost:8080'

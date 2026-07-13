@@ -18,6 +18,7 @@ import br.com.inova.sigin.shared.exception.RegraNegocioException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -185,5 +186,35 @@ public class MovimentacaoEstoqueService {
                     "Tipo de movimentação inválido"
             );
         };
+    }
+
+    public MovimentacaoEstoque registrarMovimentacao(
+            Material material,
+            Produto produto,
+            Local local,
+            String tipo,
+            String movimento,
+            BigDecimal quantidade,
+            String origem,
+            Long referenciaId,
+            Pessoa responsavel,
+            String observacao) {
+
+        MovimentacaoEstoque entity = MovimentacaoEstoque.builder()
+                .material(material)
+                .produto(produto)
+                .local(local)
+                .tipo(tipo)
+                .movimento(movimento)
+                .quantidade(quantidade)
+                .origem(origem)
+                .referenciaId(referenciaId)
+                .responsavel(responsavel)
+                .observacao(observacao)
+                .dataMovimentacao(LocalDateTime.now())
+                .ativo(true)
+                .build();
+
+        return repository.save(entity);
     }
 }

@@ -1,0 +1,29 @@
+$kind: http-request
+name: Atualizar Pessoa
+method: PUT
+url: '{{baseUrl}}/pessoas/{{pessoaId}}'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nome": "João Silva Atualizado",
+      "tipoDocumento": "CPF",
+      "documento": "123.456.789-00",
+      "telefone": "(11) 99999-0002",
+      "email": "joao.atualizado@inova3d.com.br",
+      "observacao": "Atualizado",
+      "ativo": true
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("Nome atualizado", () => {
+        const json = pm.response.json();
+        pm.expect(json.nome).to.include("Atualizado");
+      });

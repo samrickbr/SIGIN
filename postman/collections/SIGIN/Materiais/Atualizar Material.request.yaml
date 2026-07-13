@@ -1,0 +1,27 @@
+$kind: http-request
+name: Atualizar Material
+method: PUT
+url: '{{baseUrl}}/materiais/{{materialId}}'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nome": "PLA Branco 1kg - Atualizado",
+      "descricao": "Filamento atualizado",
+      "unidadeMedida": "KG",
+      "estoqueMinimo": 3.0,
+      "ativo": true
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("Nome atualizado", () => {
+        const json = pm.response.json();
+        pm.expect(json.nome).to.include("Atualizado");
+      });

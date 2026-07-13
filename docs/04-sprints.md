@@ -141,3 +141,21 @@ Apontamento de Produção
 → Calcula consumo de cada material
 → Gera movimentações de saída
 → Atualiza automaticamente o saldo do estoque
+
+## Sprint 14 — Reserva de Estoque
+
+Status: ✅ Concluída
+
+### Objetivo
+Implementar o planejamento de materiais através da reserva automática de estoque no momento da criação da Ordem de Produção.
+
+### Entregas
+- Cadastro de reservas.
+- Cálculo de estoque disponível.
+- Validação de disponibilidade.
+- Reserva automática.
+- Rollback transacional.
+
+Resultado:
+A Ordem de Produção passa a garantir a disponibilidade de materiais antes do início da fabricação.
+

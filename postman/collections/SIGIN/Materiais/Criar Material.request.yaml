@@ -1,0 +1,28 @@
+$kind: http-request
+name: Criar Material
+method: POST
+url: '{{baseUrl}}/materiais'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "codigo": "MAT-001",
+      "nome": "PLA Branco 1kg",
+      "descricao": "Filamento PLA branco 1kg",
+      "unidadeMedida": "KG",
+      "estoqueMinimo": 2.0
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("Material criado com ID", () => {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('id');
+        pm.environment.set("materialId", json.id);
+      });

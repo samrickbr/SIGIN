@@ -1,0 +1,10 @@
+$kind: http-request
+name: Excluir Movimentacao
+method: DELETE
+url: '{{baseUrl}}/movimentacoes-estoque/{{movimentacaoId}}'
+order: 5000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 204", () => pm.response.to.have.status(204));

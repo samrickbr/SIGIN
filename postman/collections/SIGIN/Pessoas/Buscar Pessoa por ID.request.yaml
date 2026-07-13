@@ -1,0 +1,14 @@
+$kind: http-request
+name: Buscar Pessoa por ID
+method: GET
+url: '{{baseUrl}}/pessoas/{{pessoaId}}'
+order: 3000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("ID correto", () => {
+        const json = pm.response.json();
+        pm.expect(String(json.id)).to.eql(String(pm.environment.get("pessoaId")));
+      });

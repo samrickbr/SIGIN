@@ -1,0 +1,25 @@
+$kind: http-request
+name: Criar Categoria
+method: POST
+url: '{{baseUrl}}/categorias'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nome": "Decoração",
+      "ativo": true
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("Categoria criada com ID", () => {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('id');
+        pm.environment.set("categoriaId", json.id);
+      });

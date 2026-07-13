@@ -1,8 +1,10 @@
 package br.com.inova.sigin.estoque.service;
 
 import br.com.inova.sigin.estoque.dto.EstoqueResponse;
+import br.com.inova.sigin.estoque.repository.EstoqueRepository;
 import br.com.inova.sigin.movimentacaoestoque.entity.MovimentacaoEstoque;
 import br.com.inova.sigin.movimentacaoestoque.repository.MovimentacaoEstoqueRepository;
+import br.com.inova.sigin.reservaestoque.repository.ReservaEstoqueRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +18,8 @@ import java.util.stream.Collectors;
 public class EstoqueService {
 
     private final MovimentacaoEstoqueRepository movimentacaoRepository;
-
+    private final ReservaEstoqueRepository reservaEstoqueRepository;
+    private final EstoqueRepository estoqueRepository;
 
     public List<EstoqueResponse> listarSaldo() {
 
@@ -67,5 +70,34 @@ public class EstoqueService {
                     .negate();
         }
         return movimentacao.getQuantidade();
+    }
+
+    public BigDecimal calcularSaldoMaterial(Long materialId) {
+
+        List<MovimentacaoEstoque> movimentacoes =
+                estoqueRepository.buscarMovimentacoesPorMaterial(materialId);
+
+        return movimentacoes.stream()
+                .map(this::quantidadeMovimentacao)
+                .reduce(
+                        BigDecimal.ZERO,
+                        BigDecimal::add
+                );
+    }
+
+    public BigDecimal calcularDisponivel(Long materialId) {
+
+        BigDecimal saldo =
+                calcularSaldoMaterial(materialId);
+
+        BigDecimal reservado =
+                reservaEstoqueRepository
+                        .calcularQuantidadeReservada(materialId);
+
+        return saldo.subtract(reservado);
+    }
+
+    public BigDecimal testeSaldoMaterial(Long materialId){
+        return calcularSaldoMaterial(materialId);
     }
 }

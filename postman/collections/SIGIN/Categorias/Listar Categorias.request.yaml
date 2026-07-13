@@ -1,0 +1,13 @@
+$kind: http-request
+name: Listar Categorias
+method: GET
+url: '{{baseUrl}}/categorias'
+order: 1000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("Resposta é array", () => {
+        pm.expect(pm.response.json()).to.be.an('array');
+      });

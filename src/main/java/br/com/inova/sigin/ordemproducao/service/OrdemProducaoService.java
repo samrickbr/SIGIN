@@ -12,10 +12,13 @@ import br.com.inova.sigin.pessoa.entity.Pessoa;
 import br.com.inova.sigin.pessoa.repository.PessoaRepository;
 import br.com.inova.sigin.produto.entity.Produto;
 import br.com.inova.sigin.produto.repository.ProdutoRepository;
+import br.com.inova.sigin.reservaestoque.service.ReservaEstoqueService;
 import br.com.inova.sigin.shared.exception.RegraNegocioException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,8 +31,10 @@ public class OrdemProducaoService {
     private final LocalRepository localRepository;
     private final PessoaRepository pessoaRepository;
     private final OrdemProducaoMapper mapper;
+    private final ReservaEstoqueService reservaEstoqueService;
 
 
+    @Transactional
     public OrdemProducaoResponse criar(OrdemProducaoRequest request) {
 
         if (repository.existsByNumero(request.getNumero())) {
@@ -66,13 +71,16 @@ public class OrdemProducaoService {
                 .status("ABERTA")
                 .origem(request.getOrigem().toUpperCase())
                 .observacao(request.getObservacao())
-                .quantidadeProduzida(java.math.BigDecimal.ZERO)
+                .quantidadeProduzida(BigDecimal.ZERO)
                 .ativo(true)
                 .dataAbertura(LocalDateTime.now())
                 .build();
 
+        OrdemProducao ordemSalva = repository.save(op);
 
-        return mapper.toResponse(repository.save(op));
+        reservaEstoqueService.reservarMateriais(ordemSalva);
+
+        return mapper.toResponse(ordemSalva);
     }
 
 

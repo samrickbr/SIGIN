@@ -61,3 +61,21 @@
 * Implementado cálculo de saldo considerando movimentações de saída
 * Automatizado o consumo de materiais durante o apontamento de produção
 * Integrada a estrutura do produto (BOM) ao estoque
+
+## [Sprint 14] - 2026-07-13
+
+### Added
+- Implementado módulo de Reserva de Estoque.
+- Criada entidade ReservaEstoque.
+- Implementado cálculo de estoque disponível.
+- Implementada consulta de quantidade reservada por material.
+- Implementada reserva automática de materiais na criação da Ordem de Produção.
+- Validação de disponibilidade de estoque antes da reserva.
+- Integração entre Ordem de Produção e Reserva de Estoque.
+
+### Changed
+- Estoque passa a considerar materiais reservados no cálculo de disponibilidade.
+- Ordem de Produção passa a iniciar o planejamento de materiais automaticamente.
+
+### Fixed
+- Garantido rollback transacional caso a reserva de materiais falhe.

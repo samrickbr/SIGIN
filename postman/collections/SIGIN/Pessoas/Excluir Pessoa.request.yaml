@@ -1,0 +1,10 @@
+$kind: http-request
+name: Excluir Pessoa
+method: DELETE
+url: '{{baseUrl}}/pessoas/{{pessoaId}}'
+order: 5000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 204", () => pm.response.to.have.status(204));

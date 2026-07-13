@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -22,5 +23,11 @@ public class EstoqueController {
         return ResponseEntity.ok(
                 service.listarSaldo()
         );
+    }
+    @GetMapping("/disponivel/{materialId}")
+    public BigDecimal consultarDisponivel(
+            @PathVariable Long materialId) {
+
+        return service.calcularDisponivel(materialId);
     }
 }

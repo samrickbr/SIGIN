@@ -1,0 +1,26 @@
+$kind: http-request
+name: Atualizar Ordem de Producao
+method: PUT
+url: '{{baseUrl}}/ordens-producao/{{ordemProducaoId}}'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "quantidadePlanejada": 15.0,
+      "quantidadeProduzida": 5.0,
+      "localDestinoId": 1,
+      "responsavelId": 1,
+      "status": "EM_ANDAMENTO",
+      "origem": "MANUAL",
+      "observacao": "Atualizado",
+      "ativo": true
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
