@@ -225,3 +225,29 @@ SAIDA
 O saldo do estoque é calculado dinamicamente:
 
 Saldo = Soma(ENTRADAS) - Soma(SAIDAS)
+
+## Pedido
+
+Representa uma solicitação comercial realizada por um cliente.
+
+Relacionamentos:
+
+- Pessoa (cliente)
+- PedidoItem (1:N)
+
+---
+
+## PedidoItem
+
+Itens pertencentes ao pedido.
+
+Relacionamentos:
+
+- Pedido
+- Produto
+
+Campos:
+
+- quantidade
+- valorUnitario
+- valorTotal

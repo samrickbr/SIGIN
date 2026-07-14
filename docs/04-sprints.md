@@ -174,3 +174,23 @@ Implementar o ciclo completo de vida de uma Ordem de Produção, garantindo tran
 - Datas automáticas de início e fim
 - Validações de regras de negócio
 - Refatoração do service e mapper
+
+# Sprint 16 — Pedidos Comerciais
+
+**Status:** ✅ Concluída
+
+## Objetivo
+
+Implementar o módulo comercial de pedidos, preparando a integração entre vendas e produção.
+
+## Entregas
+
+- Cadastro de Pedidos
+- CRUD completo de Pedidos
+- Status do Pedido
+- Exclusão lógica
+- Cadastro de Itens do Pedido
+- Cálculo automático do valor total do pedido
+- Relacionamento Pedido x Cliente
+- Relacionamento Pedido x Produto
+- Estrutura preparada para integração com Ordem de Produção

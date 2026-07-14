@@ -98,3 +98,16 @@
 - Ordem de Produção passou a utilizar enum para controle de status.
 - Refatoração do `OrdemProducaoService`.
 - Refatoração do `OrdemProducaoMapper`.
+
+# Sprint 16
+
+## Adicionado
+
+- Módulo de Pedidos
+- Módulo de Itens do Pedido
+- Enum StatusPedido
+- Cálculo automático do valor total
+- Relacionamento Pedido x Cliente
+- Relacionamento Pedido x Produto
+- Preparação estrutural para integração com Produção
+

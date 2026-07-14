@@ -15,3 +15,10 @@ Evitar que múltiplas Ordens de Produção utilizem o mesmo estoque disponível,
 - Separação entre estoque físico e estoque disponível.
 - Base para implementação futura de MRP.
 - Preparação para integração com pedidos e planejamento da produção.
+
+## Pedido x Ordem de Produção
+
+O Pedido não cria automaticamente uma Ordem de Produção.
+
+A integração será realizada na Sprint 17 através de um serviço específico de conversão Pedido → Ordem de Produção, preservando o desacoplamento entre os módulos Comercial e Produção.
+
