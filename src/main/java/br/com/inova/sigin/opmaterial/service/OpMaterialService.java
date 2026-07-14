@@ -10,10 +10,14 @@ import br.com.inova.sigin.opmaterial.mapper.OpMaterialMapper;
 import br.com.inova.sigin.opmaterial.repository.OpMaterialRepository;
 import br.com.inova.sigin.ordemproducao.entity.OrdemProducao;
 import br.com.inova.sigin.ordemproducao.repository.OrdemProducaoRepository;
+import br.com.inova.sigin.produtomaterial.entity.ProdutoMaterial;
 import br.com.inova.sigin.shared.exception.RegraNegocioException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import br.com.inova.sigin.produtomaterial.repository.ProdutoMaterialRepository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,6 +29,7 @@ public class OpMaterialService {
     private final OrdemProducaoRepository ordemProducaoRepository;
     private final MaterialRepository materialRepository;
     private final OpMaterialMapper mapper;
+    private final ProdutoMaterialRepository produtoMaterialRepository;
     public OpMaterialResponse criar(OpMaterialRequest request) {
 
         if (repository.existsByOrdemProducao_IdAndMaterial_Id(
@@ -105,5 +110,37 @@ public class OpMaterialService {
                         ));
         entity.setAtivo(false);
         repository.save(entity);
+    }
+    @Transactional
+    public void gerarMateriaisDaOP(OrdemProducao op) {
+
+        List<ProdutoMaterial> fichaTecnica =
+                produtoMaterialRepository
+                        .findByProdutoIdAndAtivoTrue(
+                                op.getProduto().getId()
+                        );
+        if (fichaTecnica.isEmpty()) {
+            throw new RegraNegocioException(
+                    "Produto sem ficha técnica cadastrada"
+            );
+        }
+        for (ProdutoMaterial item : fichaTecnica) {
+
+            OpMaterial opMaterial = OpMaterial.builder()
+                    .ordemProducao(op)
+                    .material(item.getMaterial())
+                    .quantidadePlanejada(
+                            item.getQuantidade()
+                                    .multiply(
+                                            op.getQuantidadePlanejada()
+                                    )
+                    )
+                    .quantidadeConsumida(BigDecimal.ZERO)
+                    .ativo(true)
+                    .dataCriacao(LocalDateTime.now())
+                    .build();
+
+            repository.save(opMaterial);
+        }
     }
 }

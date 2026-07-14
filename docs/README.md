@@ -204,6 +204,38 @@ SiginApplication
 
 ---
 
+# Situação atual
+
+Atualmente o SIGIN possui fluxo completo entre:
+
+Cliente
+
+↓
+
+Pedido
+
+↓
+
+Itens
+
+↓
+
+Ordem Produção
+
+↓
+
+Ficha Técnica
+
+↓
+
+Materiais da Produção
+
+O backend encontra-se em fase de estabilização.
+
+Antes do desenvolvimento do Front-end será criada uma infraestrutura completa de testes automatizados utilizando Postman.
+
+---
+
 # 💡 Motivação
 
 O projeto surgiu durante o desenvolvimento da operação da **INOVA Studio 3D**, buscando substituir controles em planilhas por um sistema profissional, preparado para crescer junto com a empresa.

@@ -229,3 +229,146 @@ Produção
 - A OP recebe origem PEDIDO.
 - Pedidos gerados para produção ficam como AGUARDANDO_PRODUCAO.
 
+# SIGIN - Sprint 18
+
+## Objetivo
+
+Integrar completamente o fluxo entre Pedidos e Produção através da ficha técnica do produto.
+
+---
+
+# Funcionalidades implementadas
+
+## Pedido
+
+- Cadastro de pedidos
+- Cancelamento de pedidos
+- Geração automática do número do pedido
+- Atualização automática do valor total
+- Integração com itens
+
+---
+
+## PedidoItem
+
+- Inclusão de itens
+- Cálculo automático do valor total
+- Atualização do pedido após alterações
+
+---
+
+## Ordem de Produção
+
+Implementada geração automática da OP através do pedido.
+
+Fluxo:
+
+Pedido
+→ Item
+→ Ordem de Produção
+
+---
+
+## Ficha Técnica
+
+Criada integração entre:
+
+Produto
+→ ProdutoMaterial
+
+Cada produto possui sua ficha técnica de materiais.
+
+---
+
+## Explosão da Ficha Técnica
+
+Ao gerar uma Ordem de Produção o sistema:
+
+- localiza a ficha técnica
+- calcula consumo
+- cria automaticamente os materiais da OP
+
+Fluxo:
+
+Pedido
+
+↓
+
+Ordem Produção
+
+↓
+
+ProdutoMaterial
+
+↓
+
+OpMaterial
+
+---
+
+## OpMaterial
+
+Novo módulo responsável por armazenar:
+
+- material utilizado
+- quantidade planejada
+- quantidade consumida
+
+Preparado para futuras baixas de estoque.
+
+---
+
+## Validações
+
+Implementadas:
+
+- Produto sem ficha técnica
+- Produto inativo
+- Correção da geração sequencial de números
+
+---
+
+# Fluxo validado
+
+Pedido
+
+↓
+
+Adicionar Item
+
+↓
+
+Calcular Valor
+
+↓
+
+Gerar OP
+
+↓
+
+Gerar Materiais
+
+↓
+
+Consultar Materiais
+
+Todos os testes executados com sucesso.
+
+---
+
+# Status
+
+Sprint concluída
+
+✅ Pedido
+
+✅ PedidoItem
+
+✅ Ordem Produção
+
+✅ ProdutoMaterial
+
+✅ OpMaterial
+
+✅ Integração Pedido → Produção
+

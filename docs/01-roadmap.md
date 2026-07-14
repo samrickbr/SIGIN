@@ -413,3 +413,33 @@ Cada Sprint somente será considerada concluída após:
 ## Visão de Longo Prazo
 
 O objetivo do SIGIN é evoluir de um sistema de gestão para um ERP completo especializado em manufatura aditiva (Impressão 3D), permitindo controlar integralmente os processos da INOVA Studio 3D e servindo como base para futuras integrações com impressoras, marketplaces e sistemas externos.
+
+# Sprint 19
+
+## Tema
+
+Infraestrutura de Desenvolvimento
+
+### Objetivo
+
+Reduzir drasticamente o tempo gasto em testes durante o desenvolvimento.
+
+### Entregas
+
+- Collection Postman organizada
+- Fluxo automatizado de produção
+- Variáveis automáticas
+- Scripts de validação
+- Massa de dados para testes
+- Documentação dos testes
+
+### Não faz parte desta sprint
+
+- Front-end
+- Dashboard
+- Telas
+
+Motivo:
+
+Prioridade é aumentar produtividade durante o desenvolvimento do backend.
+

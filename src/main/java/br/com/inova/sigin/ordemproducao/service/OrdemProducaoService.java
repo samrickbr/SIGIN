@@ -3,6 +3,7 @@ package br.com.inova.sigin.ordemproducao.service;
 import br.com.inova.sigin.configuracao.service.ConfiguracaoSistemaService;
 import br.com.inova.sigin.local.entity.Local;
 import br.com.inova.sigin.local.repository.LocalRepository;
+import br.com.inova.sigin.opmaterial.service.OpMaterialService;
 import br.com.inova.sigin.ordemproducao.dto.OrdemProducaoRequest;
 import br.com.inova.sigin.ordemproducao.dto.OrdemProducaoResponse;
 import br.com.inova.sigin.ordemproducao.dto.OrdemProducaoUpdateRequest;
@@ -37,6 +38,7 @@ public class OrdemProducaoService {
     private final OrdemProducaoMapper mapper;
     private final ReservaEstoqueService reservaEstoqueService;
     private final ConfiguracaoSistemaService configuracaoSistemaService;
+    private final OpMaterialService opMaterialService;
 
     @Transactional
     public OrdemProducaoResponse criar(OrdemProducaoRequest request) {
@@ -286,6 +288,10 @@ public class OrdemProducaoService {
                 .dataAbertura(LocalDateTime.now())
                 .build();
 
-        return mapper.toResponse(repository.save(op));
+        OrdemProducao salva = repository.save(op);
+
+        opMaterialService.gerarMateriaisDaOP(salva);
+
+        return mapper.toResponse(salva);
     }
 }

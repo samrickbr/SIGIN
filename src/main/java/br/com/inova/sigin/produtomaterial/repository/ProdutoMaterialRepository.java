@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface ProdutoMaterialRepository extends JpaRepository<ProdutoMaterial, Long> {
 
+    List<ProdutoMaterial> findByProdutoIdAndAtivoTrue(Long produtoId);
     @EntityGraph(attributePaths = {"produto", "material"})
     List<ProdutoMaterial> findByProdutoId(Long produtoId);
 

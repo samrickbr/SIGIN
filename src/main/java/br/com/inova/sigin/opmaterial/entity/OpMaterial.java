@@ -29,30 +29,24 @@ public class OpMaterial {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ordem_producao_id", nullable = false)
     private OrdemProducao ordemProducao;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "material_id", nullable = false)
     private Material material;
 
-
     @Column(name = "quantidade_planejada", nullable = false, precision = 12, scale = 3)
     private BigDecimal quantidadePlanejada;
-
 
     @Column(name = "quantidade_consumida", nullable = false, precision = 12, scale = 3)
     @Builder.Default
     private BigDecimal quantidadeConsumida = BigDecimal.ZERO;
 
-
     @Column(nullable = false)
     @Builder.Default
     private Boolean ativo = true;
-
 
     @Column(name = "data_criacao", nullable = false)
     private LocalDateTime dataCriacao;
