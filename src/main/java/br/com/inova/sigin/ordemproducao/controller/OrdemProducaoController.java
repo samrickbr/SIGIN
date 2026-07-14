@@ -59,6 +59,7 @@ public class OrdemProducaoController {
 
         return ResponseEntity.noContent().build();
     }
+
     @PostMapping("/{id}/reservar")
     public ResponseEntity<OrdemProducaoResponse> reservar(
             @PathVariable Long id) {
@@ -67,6 +68,7 @@ public class OrdemProducaoController {
                 service.reservar(id)
         );
     }
+
     @PostMapping("/{id}/iniciar")
     public ResponseEntity<OrdemProducaoResponse> iniciar(
             @PathVariable Long id) {
@@ -75,6 +77,7 @@ public class OrdemProducaoController {
                 service.iniciar(id)
         );
     }
+
     @PostMapping("/{id}/concluir")
     public ResponseEntity<OrdemProducaoResponse> concluir(
             @PathVariable Long id) {
@@ -83,6 +86,7 @@ public class OrdemProducaoController {
                 service.concluir(id)
         );
     }
+
     @PostMapping("/{id}/cancelar")
     public ResponseEntity<OrdemProducaoResponse> cancelar(
             @PathVariable Long id) {
@@ -91,6 +95,7 @@ public class OrdemProducaoController {
                 service.cancelar(id)
         );
     }
+
     @PostMapping("/{id}/falhar")
     public ResponseEntity<OrdemProducaoResponse> falhar(
             @PathVariable Long id) {
@@ -99,6 +104,7 @@ public class OrdemProducaoController {
                 service.falhar(id)
         );
     }
+
     @PostMapping("/{id}/reabrir")
     public ResponseEntity<OrdemProducaoResponse> reabrir(
             @PathVariable Long id) {
@@ -107,5 +113,4 @@ public class OrdemProducaoController {
                 service.reabrir(id)
         );
     }
-
 }

@@ -34,7 +34,6 @@ public class OrdemProducaoService {
     private final OrdemProducaoMapper mapper;
     private final ReservaEstoqueService reservaEstoqueService;
 
-
     @Transactional
     public OrdemProducaoResponse criar(OrdemProducaoRequest request) {
 
