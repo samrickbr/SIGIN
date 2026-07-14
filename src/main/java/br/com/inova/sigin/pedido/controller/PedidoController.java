@@ -1,6 +1,7 @@
 package br.com.inova.sigin.pedido.controller;
 
 import br.com.inova.sigin.local.repository.LocalRepository;
+import br.com.inova.sigin.ordemproducao.dto.OrdemProducaoResponse;
 import br.com.inova.sigin.ordemproducao.repository.OrdemProducaoRepository;
 import br.com.inova.sigin.pedido.dto.PedidoRequest;
 import br.com.inova.sigin.pedido.dto.PedidoResponse;
@@ -65,6 +66,15 @@ public class PedidoController {
 
         return ResponseEntity.ok(
                 service.enviarParaProducao(id)
+        );
+    }
+
+    @PostMapping("/{id}/gerar-op")
+    public ResponseEntity<List<OrdemProducaoResponse>> gerarOrdemProducao(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                service.gerarOrdemProducao(id)
         );
     }
 }

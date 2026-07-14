@@ -1,5 +1,6 @@
 package br.com.inova.sigin.ordemproducao.service;
 
+import br.com.inova.sigin.configuracao.service.ConfiguracaoSistemaService;
 import br.com.inova.sigin.local.entity.Local;
 import br.com.inova.sigin.local.repository.LocalRepository;
 import br.com.inova.sigin.ordemproducao.dto.OrdemProducaoRequest;
@@ -9,6 +10,8 @@ import br.com.inova.sigin.ordemproducao.entity.OrdemProducao;
 import br.com.inova.sigin.ordemproducao.enums.StatusOrdemProducao;
 import br.com.inova.sigin.ordemproducao.mapper.OrdemProducaoMapper;
 import br.com.inova.sigin.ordemproducao.repository.OrdemProducaoRepository;
+import br.com.inova.sigin.pedido.entity.Pedido;
+import br.com.inova.sigin.pedido.entity.PedidoItem;
 import br.com.inova.sigin.pessoa.entity.Pessoa;
 import br.com.inova.sigin.pessoa.repository.PessoaRepository;
 import br.com.inova.sigin.produto.entity.Produto;
@@ -33,15 +36,10 @@ public class OrdemProducaoService {
     private final PessoaRepository pessoaRepository;
     private final OrdemProducaoMapper mapper;
     private final ReservaEstoqueService reservaEstoqueService;
+    private final ConfiguracaoSistemaService configuracaoSistemaService;
 
     @Transactional
     public OrdemProducaoResponse criar(OrdemProducaoRequest request) {
-
-        if (repository.existsByNumero(request.getNumero())) {
-            throw new RegraNegocioException(
-                    "Número da ordem de produção já cadastrado."
-            );
-        }
 
         Produto produto = produtoRepository.findById(request.getProdutoId())
                 .orElseThrow(() ->
@@ -63,7 +61,7 @@ public class OrdemProducaoService {
 
 
         OrdemProducao op = OrdemProducao.builder()
-                .numero(request.getNumero().toUpperCase())
+                .numero(configuracaoSistemaService.gerarProximoNumeroOp())
                 .produto(produto)
                 .quantidadePlanejada(request.getQuantidadePlanejada())
                 .localDestino(local)
@@ -251,5 +249,43 @@ public class OrdemProducaoService {
                 .orElseThrow(() ->
                         new RegraNegocioException(
                                 "Ordem de produção não encontrada"));
+    }
+
+    @Transactional
+    public OrdemProducaoResponse criarAPartirPedidoItem(
+            Pedido pedido,
+            PedidoItem item) {
+
+        Produto produto = item.getProduto();
+
+        Local local = localRepository.findById(
+                        configuracaoSistemaService.getLocalProducaoPadraoId()
+                )
+                .orElseThrow(() ->
+                        new RegraNegocioException(
+                                "Local de produção padrão não encontrado."
+                        ));
+
+        Pessoa responsavel = null;
+
+        OrdemProducao op = OrdemProducao.builder()
+                .numero(configuracaoSistemaService.gerarProximoNumeroOp())
+                .produto(produto)
+                .quantidadePlanejada(item.getQuantidade())
+                .localDestino(local)
+                .responsavel(responsavel)
+                .pedido(pedido)
+                .status(StatusOrdemProducao.ABERTA)
+                .origem("PEDIDO")
+                .observacao(
+                        "Gerada automaticamente pelo pedido "
+                                + pedido.getNumero()
+                )
+                .quantidadeProduzida(BigDecimal.ZERO)
+                .ativo(true)
+                .dataAbertura(LocalDateTime.now())
+                .build();
+
+        return mapper.toResponse(repository.save(op));
     }
 }

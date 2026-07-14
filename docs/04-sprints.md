@@ -194,3 +194,38 @@ Implementar o módulo comercial de pedidos, preparando a integração entre vend
 - Relacionamento Pedido x Cliente
 - Relacionamento Pedido x Produto
 - Estrutura preparada para integração com Ordem de Produção
+
+# Sprint 17 — Integração Pedido e Produção
+
+**Status:** ✅ Concluída
+
+## Objetivo
+
+Criar o primeiro fluxo integrado entre módulo comercial e módulo de produção.
+
+## Entregas
+
+- Numeração automática de pedidos
+- Numeração automática de ordens de produção
+- Configuração centralizada de sequências
+- Geração de OP a partir de pedido
+- Criação automática de OP por item do pedido
+- Atualização automática do status do pedido
+- Integração Pedido → Ordem de Produção
+
+## Fluxo implementado
+
+Pedido
+↓
+PedidoItem
+↓
+Ordem de Produção
+↓
+Produção
+
+## Regras
+
+- Um pedido pode gerar várias ordens de produção.
+- A OP recebe origem PEDIDO.
+- Pedidos gerados para produção ficam como AGUARDANDO_PRODUCAO.
+

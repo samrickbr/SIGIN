@@ -1,0 +1,11 @@
+$kind: http-request
+name: Listar Itens do Pedido
+method: GET
+url: '{{baseUrl}}/pedidos/{{pedidoId}}/itens'
+order: 2000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("Retorna lista", () => pm.expect(pm.response.json()).to.be.an('array'));

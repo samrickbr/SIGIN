@@ -1,0 +1,11 @@
+{
+  "name": "sigin-postman-tools",
+  "version": "1.0.0",
+  "description": "Scripts auxiliares para manutenção da coleção Postman do SIGIN",
+  "scripts": {
+    "sync-check": "node postman/scripts/sync-check.js"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}

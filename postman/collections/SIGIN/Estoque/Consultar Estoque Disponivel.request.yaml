@@ -1,0 +1,14 @@
+$kind: http-request
+name: Consultar Estoque Disponivel
+method: GET
+url: '{{baseUrl}}/estoque/disponivel/{{materialId}}'
+order: 2000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("Retorna valor numérico", () => {
+        const val = pm.response.json();
+        pm.expect(val).to.be.a('number');
+      });

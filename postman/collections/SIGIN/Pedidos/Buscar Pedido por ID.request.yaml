@@ -1,0 +1,11 @@
+$kind: http-request
+name: Buscar Pedido por ID
+method: GET
+url: '{{baseUrl}}/pedidos/{{pedidoId}}'
+order: 3000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("Pedido tem ID", () => pm.expect(pm.response.json()).to.have.property('id'));

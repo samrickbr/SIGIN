@@ -1,0 +1,26 @@
+$kind: http-request
+name: Adicionar Item ao Pedido
+method: POST
+url: '{{baseUrl}}/pedidos/{{pedidoId}}/itens'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "produtoId": 1,
+      "quantidade": 5.0,
+      "valorUnitario": 100.00
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("Item criado com ID", () => {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('id');
+        pm.environment.set("pedidoItemId", json.id);
+      });

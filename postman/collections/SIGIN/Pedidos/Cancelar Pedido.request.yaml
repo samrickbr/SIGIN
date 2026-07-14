@@ -1,0 +1,10 @@
+$kind: http-request
+name: Cancelar Pedido
+method: PATCH
+url: '{{baseUrl}}/pedidos/{{pedidoId}}/cancelar'
+order: 4000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));

@@ -1,0 +1,26 @@
+$kind: http-request
+name: Criar Pedido
+method: POST
+url: '{{baseUrl}}/pedidos'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "clienteId": 1,
+      "valorTotal": 500.00,
+      "observacao": "Pedido de teste"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
+      pm.test("Pedido criado com ID", () => {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('id');
+        pm.environment.set("pedidoId", json.id);
+      });

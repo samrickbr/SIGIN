@@ -10,9 +10,6 @@ import java.math.BigDecimal;
 @Data
 public class OrdemProducaoRequest {
 
-    @NotBlank
-    private String numero;
-
     @NotNull
     private Long produtoId;
 

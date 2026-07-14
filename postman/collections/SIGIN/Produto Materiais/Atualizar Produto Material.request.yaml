@@ -1,0 +1,20 @@
+$kind: http-request
+name: Atualizar Produto Material
+method: PUT
+url: '{{baseUrl}}/produto-materiais/{{produtoMaterialId}}'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "quantidade": 3.0,
+      "ativo": true
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));

@@ -1,0 +1,10 @@
+$kind: http-request
+name: Enviar Pedido para Producao
+method: PATCH
+url: '{{baseUrl}}/pedidos/{{pedidoId}}/producao'
+order: 5000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));

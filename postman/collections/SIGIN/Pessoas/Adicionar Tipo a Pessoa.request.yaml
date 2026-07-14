@@ -1,0 +1,19 @@
+$kind: http-request
+name: Adicionar Tipo a Pessoa
+method: POST
+url: '{{baseUrl}}/pessoas/{{pessoaId}}/tipos'
+order: 6000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "tipoPessoaId": 1
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));

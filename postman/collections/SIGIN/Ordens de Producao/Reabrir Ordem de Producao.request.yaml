@@ -1,0 +1,10 @@
+$kind: http-request
+name: Reabrir Ordem de Producao
+method: POST
+url: '{{baseUrl}}/ordens-producao/{{ordemProducaoId}}/reabrir'
+order: 8000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => pm.response.to.have.status(200));
