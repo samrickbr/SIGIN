@@ -372,3 +372,84 @@ Sprint concluída
 
 ✅ Integração Pedido → Produção
 
+# Sprint 19 - Testes e preparação de automação
+
+## Objetivo
+Criar uma base inicial para testes automatizados e melhorar a validação dos fluxos principais do SIGIN.
+
+## Entregas
+
+- Configuração da estrutura de testes com Spring Boot Test.
+- Validação inicial do contexto da aplicação.
+- Criação da base para testes de integração.
+- Identificação da necessidade de automatização dos fluxos completos do sistema.
+
+## Observações
+
+Durante a validação foi identificado que testes manuais estavam consumindo muito tempo devido à quantidade de etapas necessárias para validar pedidos, produção e materiais.
+
+A estratégia foi direcionada para criação de ferramentas DEV para simulação dos fluxos.
+
+# Sprint 20 - Fluxo DEV automatizado de Pedido e Produção
+
+## Objetivo
+Criar uma ferramenta interna para executar o fluxo completo de pedido até produção sem necessidade de múltiplos testes manuais.
+
+## Entregas
+
+### Novo módulo Fluxo
+
+Criado:
+
+- FluxoPedidoService
+- FluxoPedidoResponse
+
+Responsável por orquestrar:
+
+Pedido → Item → Ordem de Produção → OP Materiais
+
+---
+
+### Endpoint DEV
+
+Criado:
+
+POST `/dev/fluxo/pedido`
+
+Executa automaticamente:
+
+1. Criação de pedido teste.
+2. Inclusão de item.
+3. Geração da Ordem de Produção.
+4. Geração automática dos materiais necessários.
+
+---
+
+### Validações realizadas
+
+Fluxo validado com sucesso:
+
+Pedido criado:
+- ID: 14
+
+Ordem de Produção:
+- ID: 11
+- Número: OP000009
+
+Material gerado:
+
+- Material: PLA Preto
+- Quantidade planejada: 0.8 KG
+
+---
+
+## Ajustes realizados
+
+- Inicialização da lista de itens da entidade Pedido.
+- Correção do fluxo de persistência entre Pedido e PedidoItem.
+- Melhoria da ferramenta DEV para testes rápidos.
+
+## Resultado
+
+Fluxo principal de venda até produção automatizado com sucesso.
+

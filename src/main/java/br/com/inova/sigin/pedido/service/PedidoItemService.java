@@ -66,7 +66,7 @@ public class PedidoItemService {
 
 
         PedidoItem salvo = repository.save(item);
-
+        pedido.getItens().add(salvo);
         atualizarValorPedido(pedido);
 
         return mapper.toResponse(salvo);

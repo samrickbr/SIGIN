@@ -111,3 +111,13 @@
 - Relacionamento Pedido x Produto
 - Preparação estrutural para integração com Produção
 
+## Última evolução
+
+Sprint 20 concluída.
+
+O SIGIN possui agora um fluxo DEV automatizado para validar o processo:
+
+Pedido → Produção → Materiais.
+
+Essa estrutura reduz a necessidade de testes manuais durante o desenvolvimento.
+
