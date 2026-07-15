@@ -12,4 +12,8 @@ public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
     List<Pessoa> findAll();
     @EntityGraph(attributePaths = {"tipos", "tipos.tipoPessoa"})
     Optional<Pessoa> findById(Long id);
+
+    boolean existsByNomeIgnoreCase(String nome);
+    Optional<Pessoa> findByNomeIgnoreCase(String nome);
+
 }
