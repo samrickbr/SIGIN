@@ -80,19 +80,39 @@ public class ApontamentoProducaoService {
                 ordemProducao,
                 salvo
         );
+        gerarEntradaProduto(
+                ordemProducao,
+                salvo
+        );
         return mapper.toResponse(salvo);
     }
-
-    private void atualizarQuantidadeProduzida(
+    private void gerarEntradaProduto(
             OrdemProducao ordemProducao,
-            BigDecimal quantidade) {
-        BigDecimal atual =
-                ordemProducao.getQuantidadeProduzida();
-        ordemProducao.setQuantidadeProduzida(
-                atual.add(quantidade)
+            ApontamentoProducao apontamento) {
+
+        Local local = localRepository.findById(
+                ordemProducao.getLocalDestino().getId()
+        ).orElseThrow(() ->
+                new RegraNegocioException(
+                        "Local não encontrado"
+                ));
+
+        movimentacaoEstoqueService.registrarMovimentacao(
+                null,
+                ordemProducao.getProduto(),
+                local,
+                "PRODUCAO",
+                "ENTRADA",
+                apontamento.getQuantidadeProduzida(),
+                "OP",
+                ordemProducao.getId(),
+                apontamento.getResponsavel(),
+                "Entrada automática produção OP "
+                        + ordemProducao.getNumero()
         );
-        ordemProducaoRepository.save(ordemProducao);
     }
+
+
     public List<ApontamentoProducaoResponse> listarPorOp(
             Long ordemProducaoId) {
         return repository.findByOrdemProducaoId(ordemProducaoId)
@@ -154,6 +174,17 @@ public class ApontamentoProducaoService {
                                 ));
         entity.setAtivo(false);
         repository.save(entity);
+    }
+
+    private void atualizarQuantidadeProduzida(
+            OrdemProducao ordemProducao,
+            BigDecimal quantidade) {
+        BigDecimal atual =
+                ordemProducao.getQuantidadeProduzida();
+        ordemProducao.setQuantidadeProduzida(
+                atual.add(quantidade)
+        );
+        ordemProducaoRepository.save(ordemProducao);
     }
 
     private void gerarConsumoMateriais(

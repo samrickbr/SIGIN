@@ -453,3 +453,53 @@ Material gerado:
 
 Fluxo principal de venda até produção automatizado com sucesso.
 
+# Sprint 21 - Fluxo DEV de Produção e Estoque
+
+## Objetivo
+
+Automatizar o ciclo de produção para validação rápida do sistema.
+
+## Entregas
+
+Criado fluxo:
+
+Pedido → Ordem de Produção → Apontamento → Estoque
+
+### Produção automatizada
+
+Implementado:
+
+- Geração de apontamento de produção via fluxo DEV.
+- Consumo automático dos materiais conforme ficha técnica.
+- Entrada automática do produto acabado no estoque.
+
+### Endpoint DEV
+
+Criado:
+
+POST `/dev/fluxo/producao/{ordemProducaoId}`
+
+Executa:
+
+- Apontamento da quantidade produzida.
+- Baixa de materiais utilizados.
+- Entrada do produto finalizado.
+
+## Validação
+
+Fluxo testado com sucesso:
+
+OP:
+- OP000010
+
+Movimentações geradas:
+
+- PLA Preto: saída 0.8 KG
+- Caixa 3D Porta Figurinhas: entrada 10 unidades
+
+## Resultado
+
+SIGIN possui agora o fluxo básico completo:
+
+Venda → Produção → Estoque
+

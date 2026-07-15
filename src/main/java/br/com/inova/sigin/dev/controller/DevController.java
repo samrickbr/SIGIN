@@ -4,13 +4,14 @@ import br.com.inova.sigin.dev.dto.FluxoPedidoResponse;
 import br.com.inova.sigin.dev.service.DevService;
 import br.com.inova.sigin.fluxo.service.FluxoPedidoService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+
 @RestController
 @RequestMapping("/dev")
 @RequiredArgsConstructor
@@ -29,5 +30,12 @@ public class DevController {
         return ResponseEntity.ok(
                 fluxoPedidoService.executar()
         );
+    }
+
+    @PostMapping("/fluxo/producao/{ordemProducaoId}")
+    public ResponseEntity<Void> produzir(
+            @PathVariable Long ordemProducaoId) {
+        fluxoPedidoService.produzir(ordemProducaoId);
+        return ResponseEntity.ok().build();
     }
 }

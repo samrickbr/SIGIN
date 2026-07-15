@@ -1,5 +1,7 @@
 package br.com.inova.sigin.fluxo.service;
 
+import br.com.inova.sigin.apontamentoproducao.dto.ApontamentoProducaoRequest;
+import br.com.inova.sigin.apontamentoproducao.service.ApontamentoProducaoService;
 import br.com.inova.sigin.dev.dto.FluxoPedidoResponse;
 import br.com.inova.sigin.ordemproducao.dto.OrdemProducaoResponse;
 import br.com.inova.sigin.ordemproducao.service.OrdemProducaoService;
@@ -22,6 +24,7 @@ public class FluxoPedidoService {
     private final PedidoService pedidoService;
     private final PedidoItemService pedidoItemService;
     private final OrdemProducaoService ordemProducaoService;
+    private final ApontamentoProducaoService apontamentoProducaoService;
 
     @Transactional
     public FluxoPedidoResponse executar() {
@@ -56,5 +59,24 @@ public class FluxoPedidoService {
                 )
                 .status("OK")
                 .build();
+    }
+    @Transactional
+    public void produzir(Long ordemProducaoId) {
+
+        ApontamentoProducaoRequest request =
+                new ApontamentoProducaoRequest();
+
+        request.setOrdemProducaoId(ordemProducaoId);
+        request.setQuantidadeProduzida(
+                new BigDecimal("10")
+        );
+        request.setQuantidadePerda(
+                BigDecimal.ZERO
+        );
+        request.setObservacao(
+                "Produção automática DEV"
+        );
+
+        apontamentoProducaoService.criar(request);
     }
 }
