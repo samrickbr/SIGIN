@@ -503,3 +503,39 @@ SIGIN possui agora o fluxo básico completo:
 
 Venda → Produção → Estoque
 
+## Sprint 21 - Controle de Status da Ordem de Produção
+
+### Objetivo
+Implementar controle de evolução da OP através dos apontamentos de produção.
+
+### Implementado
+
+- Criação de testes de fluxo de produção.
+- Validação de geração de OP através de pedido.
+- Controle de transição de status:
+    - ABERTA
+    - EM_PRODUCAO
+    - CONCLUIDA
+
+### Regras definidas
+
+- Primeiro apontamento inicia a produção.
+- OP não deve ser concluída automaticamente.
+- Produção pode ultrapassar a quantidade do pedido.
+- Excedente deve permanecer disponível para estoque.
+- Encerramento da OP depende de confirmação do usuário.
+
+### Testes criados
+
+- StatusOrdemProducaoTest
+- InicioProducaoTest
+- ConclusaoOrdemProducaoTest
+
+### Observações futuras
+
+Implementar:
+- múltiplos apontamentos por OP;
+- produção acumulada;
+- encerramento manual da OP;
+- controle de excedente para estoque.
+

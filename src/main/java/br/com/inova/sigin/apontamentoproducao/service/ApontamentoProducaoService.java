@@ -10,6 +10,7 @@ import br.com.inova.sigin.local.entity.Local;
 import br.com.inova.sigin.local.repository.LocalRepository;
 import br.com.inova.sigin.movimentacaoestoque.service.MovimentacaoEstoqueService;
 import br.com.inova.sigin.ordemproducao.entity.OrdemProducao;
+import br.com.inova.sigin.ordemproducao.enums.StatusOrdemProducao;
 import br.com.inova.sigin.ordemproducao.repository.OrdemProducaoRepository;
 import br.com.inova.sigin.pessoa.entity.Pessoa;
 import br.com.inova.sigin.pessoa.repository.PessoaRepository;
@@ -80,6 +81,14 @@ public class ApontamentoProducaoService {
                 ordemProducao,
                 salvo
         );
+        if (ordemProducao.getStatus() == StatusOrdemProducao.ABERTA) {
+
+            ordemProducao.setStatus(
+                    StatusOrdemProducao.EM_PRODUCAO
+            );
+
+        }
+        atualizarStatusOrdemProducao(ordemProducao);
         gerarEntradaProduto(
                 ordemProducao,
                 salvo
@@ -225,5 +234,14 @@ public class ApontamentoProducaoService {
                     "Consumo automático da OP " + ordemProducao.getNumero()
             );
         }
+    }
+    private void atualizarStatusOrdemProducao(OrdemProducao ordemProducao) {
+
+        if (ordemProducao.getStatus() == StatusOrdemProducao.ABERTA) {
+            ordemProducao.setStatus(
+                    StatusOrdemProducao.EM_PRODUCAO
+            );
+        }
+        ordemProducaoRepository.save(ordemProducao);
     }
 }

@@ -1,43 +1,35 @@
 package br.com.inova.sigin.fluxo;
 
-import br.com.inova.sigin.dev.service.DevService;
+import br.com.inova.sigin.dev.dto.FluxoPedidoResponse;
+import br.com.inova.sigin.fluxo.service.FluxoPedidoService;
+import br.com.inova.sigin.ordemproducao.dto.OrdemProducaoResponse;
+import br.com.inova.sigin.pedido.entity.Pedido;
+import br.com.inova.sigin.pedido.service.PedidoService;
+import br.com.inova.sigin.shared.BaseIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-class PedidoProducaoFluxoTest {
+class PedidoProducaoFluxoTest extends BaseIntegrationTest {
 
     @Autowired
-    private DevService devService;
+    private FluxoPedidoService fluxoPedidoService;
 
     @Autowired
-    private MockMvc mockMvc;
+    private PedidoService pedidoService;
 
     @Test
-    void devePopularAmbienteDev() {
+    void deveGerarPedidoEOrdemProducao() {
 
-        List<String> resultado = devService.popular();
+        Pedido pedido = testFactory.criarPedidoComItens();
 
-        assertTrue(resultado.contains("Produto"));
-        assertTrue(resultado.contains("Material"));
+        List<OrdemProducaoResponse> ordens =
+                pedidoService.gerarOrdemProducao(pedido.getId());
+
+        assertEquals(1, ordens.size());
+        assertEquals("ABERTA", ordens.getFirst().getStatus());
     }
-
-    @Test
-    void deveResponderEndpointPedidos() throws Exception {
-
-        mockMvc.perform(get("/pedidos"))
-                .andExpect(status().isOk());
-
-    }
-
 }

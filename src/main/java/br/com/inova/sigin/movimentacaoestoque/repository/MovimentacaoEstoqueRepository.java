@@ -45,4 +45,8 @@ public interface MovimentacaoEstoqueRepository extends JpaRepository<Movimentaca
     })
     List<MovimentacaoEstoque> findByMaterialId(Long materialId);
 
+    List<MovimentacaoEstoque> findByOrigemAndReferenciaId(
+            String origem,
+            Long referenciaId
+    );
 }
