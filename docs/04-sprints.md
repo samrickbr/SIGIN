@@ -539,3 +539,17 @@ Implementar:
 - encerramento manual da OP;
 - controle de excedente para estoque.
 
+## Evolução - Controle de apontamentos múltiplos
+
+Implementado controle acumulado de produção por OP.
+
+Regras:
+
+- Uma OP pode possuir múltiplos apontamentos.
+- Cada apontamento soma na quantidade produzida da OP.
+- A OP permanece EM_PRODUCAO mesmo atingindo ou ultrapassando a quantidade planejada.
+- Encerramento da OP será realizado manualmente pelo usuário.
+
+Teste criado:
+
+- ProducaoAcumuladaTest

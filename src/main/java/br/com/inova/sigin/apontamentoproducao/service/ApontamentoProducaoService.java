@@ -67,10 +67,7 @@ public class ApontamentoProducaoService {
                         .dataApontamento(LocalDateTime.now())
                         .ativo(true)
                         .build();
-        atualizarQuantidadeProduzida(
-                ordemProducao,
-                request.getQuantidadeProduzida()
-        );
+
         ApontamentoProducao salvo = repository.save(entity);
 
         atualizarQuantidadeProduzida(
