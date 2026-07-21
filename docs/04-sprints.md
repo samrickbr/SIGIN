@@ -553,3 +553,56 @@ Regras:
 Teste criado:
 
 - ProducaoAcumuladaTest
+
+## Sprint 22 - Refatoração e Consolidação da Produção
+
+### Objetivo
+Consolidar o fluxo de produção, melhorar a organização do código e garantir a estabilidade das regras de negócio.
+
+### Implementado
+
+- Refatoração do OrdemProducaoService.
+- Refatoração do ApontamentoProducaoService.
+- Extração de métodos privados para reduzir duplicação.
+- Centralização das validações de status da OP.
+- Separação da geração de consumo de materiais.
+- Separação da entrada automática do produto acabado.
+- Padronização dos métodos de busca e persistência.
+- Organização dos testes de integração.
+
+### Regras consolidadas
+
+- OP não encerra automaticamente.
+- Produção acumulada em múltiplos apontamentos.
+- Bloqueio de apontamentos em OP concluída.
+- Bloqueio de apontamentos em OP cancelada.
+- Consumo automático de materiais.
+- Entrada automática do produto acabado.
+- Produção acima da quantidade planejada é permitida.
+
+### Testes
+
+Todos os testes da produção executando com sucesso.
+
+## Sprint 23 - Compras
+
+### Objetivo
+
+Implementar o módulo de Compras.
+
+### Escopo
+
+- Cadastro de fornecedor.
+- Pedido de compra.
+- Itens do pedido.
+- Aprovação.
+- Recebimento (integração com Sprint 24).
+
+* Sprint 24 — Recebimento 
+* Sprint 25 — Inventário 
+* Sprint 26 — Movimentações internas 
+* Sprint 27 — Vendas 
+* Sprint 28 — Financeiro básico 
+* Sprint 29 — Dashboard 
+* Sprint 30 — API pública / Integrações 
+* Sprint 31+ — Front-end React

@@ -40,47 +40,50 @@ public class OrdemProducaoService {
     private final ConfiguracaoSistemaService configuracaoSistemaService;
     private final OpMaterialService opMaterialService;
 
-    @Transactional
-    public OrdemProducaoResponse criar(OrdemProducaoRequest request) {
 
-        Produto produto = produtoRepository.findById(request.getProdutoId())
+    private Produto buscarProduto(Long id) {
+
+        return produtoRepository.findById(id)
                 .orElseThrow(() ->
                         new RegraNegocioException("Produto não encontrado"));
-
-
-        Local local = localRepository.findById(request.getLocalDestinoId())
-                .orElseThrow(() ->
-                        new RegraNegocioException("Local não encontrado"));
-
-
-        Pessoa responsavel = null;
-
-        if (request.getResponsavelId() != null) {
-            responsavel = pessoaRepository.findById(request.getResponsavelId())
-                    .orElseThrow(() ->
-                            new RegraNegocioException("Responsável não encontrado"));
-        }
-
-
-        OrdemProducao op = OrdemProducao.builder()
-                .numero(configuracaoSistemaService.gerarProximoNumeroOp())
-                .produto(produto)
-                .quantidadePlanejada(request.getQuantidadePlanejada())
-                .localDestino(local)
-                .responsavel(responsavel)
-                .status(StatusOrdemProducao.ABERTA)
-                .origem(request.getOrigem().toUpperCase())
-                .observacao(request.getObservacao())
-                .quantidadeProduzida(BigDecimal.ZERO)
-                .ativo(true)
-                .dataAbertura(LocalDateTime.now())
-                .build();
-
-        OrdemProducao ordemSalva = repository.save(op);
-
-        return mapper.toResponse(ordemSalva);
     }
 
+    private Local buscarLocal(Long id) {
+
+        return localRepository.findById(id)
+                .orElseThrow(() ->
+                        new RegraNegocioException("Local não encontrado"));
+    }
+
+    private Pessoa buscarResponsavel(Long id) {
+
+        if (id == null) {
+            return null;
+        }
+
+        return pessoaRepository.findById(id)
+                .orElseThrow(() ->
+                        new RegraNegocioException("Responsável não encontrado"));
+    }
+
+    @Transactional
+    public OrdemProducaoResponse criar(OrdemProducaoRequest request) {
+        Produto produto = buscarProduto(request.getProdutoId());
+
+        Local local = buscarLocal(request.getLocalDestinoId());
+
+        Pessoa responsavel = buscarResponsavel(request.getResponsavelId());
+
+        OrdemProducao op =
+                montarOrdemProducao(
+                        produto,
+                        local,
+                        responsavel,
+                        request
+                );
+
+        return salvar(op);
+    }
 
     public List<OrdemProducaoResponse> listar() {
 
@@ -93,9 +96,7 @@ public class OrdemProducaoService {
 
     public OrdemProducaoResponse buscarPorId(Long id) {
 
-        OrdemProducao op = repository.findById(id)
-                .orElseThrow(() ->
-                        new RegraNegocioException("Ordem de produção não encontrada"));
+        OrdemProducao op = buscarEntidadePorId(id);
 
         return mapper.toResponse(op);
     }
@@ -105,10 +106,7 @@ public class OrdemProducaoService {
             Long id,
             OrdemProducaoUpdateRequest request) {
 
-        OrdemProducao op = repository.findById(id)
-                .orElseThrow(() ->
-                        new RegraNegocioException("Ordem de produção não encontrada"));
-
+        OrdemProducao op = buscarEntidadePorId(id);
 
         if (request.getQuantidadePlanejada() != null) {
             op.setQuantidadePlanejada(request.getQuantidadePlanejada());
@@ -130,8 +128,7 @@ public class OrdemProducaoService {
             op.setAtivo(request.getAtivo());
         }
 
-
-        return mapper.toResponse(repository.save(op));
+        return salvar(op);
     }
 
 
@@ -149,16 +146,13 @@ public class OrdemProducaoService {
 
         OrdemProducao op = buscarEntidadePorId(id);
 
-        if (op.getStatus() != StatusOrdemProducao.ABERTA) {
-            throw new RegraNegocioException(
-                    "Apenas OPs abertas podem ser reservadas.");
-        }
+        validarReserva(op);
 
         reservaEstoqueService.reservarMateriais(op);
 
         op.setStatus(StatusOrdemProducao.RESERVADA);
 
-        return mapper.toResponse(repository.save(op));
+        return salvar(op);
     }
 
     @Transactional
@@ -166,16 +160,11 @@ public class OrdemProducaoService {
 
         OrdemProducao op = buscarEntidadePorId(id);
 
-        if (op.getStatus() != StatusOrdemProducao.RESERVADA) {
-            throw new RegraNegocioException(
-                    "Apenas OPs reservadas podem iniciar a produção.");
-        }
+        validarInicio(op);
 
         op.setStatus(StatusOrdemProducao.EM_PRODUCAO);
 
-        return mapper.toResponse(
-                repository.save(op)
-        );
+        return salvar(op);
     }
 
     @Transactional
@@ -183,16 +172,11 @@ public class OrdemProducaoService {
 
         OrdemProducao op = buscarEntidadePorId(id);
 
-        if (op.getStatus() != StatusOrdemProducao.EM_PRODUCAO) {
-            throw new RegraNegocioException(
-                    "Apenas OPs em produção podem ser concluídas.");
-        }
+        validarConclusao(op);
 
         op.setStatus(StatusOrdemProducao.CONCLUIDA);
 
-        return mapper.toResponse(
-                repository.save(op)
-        );
+        return salvar(op);
     }
 
     @Transactional
@@ -200,16 +184,11 @@ public class OrdemProducaoService {
 
         OrdemProducao op = buscarEntidadePorId(id);
 
-        if (op.getStatus() == StatusOrdemProducao.CONCLUIDA) {
-            throw new RegraNegocioException(
-                    "Não é possível cancelar uma OP concluída.");
-        }
+        validarCancelamento(op);
 
         op.setStatus(StatusOrdemProducao.CANCELADA);
 
-        return mapper.toResponse(
-                repository.save(op)
-        );
+        return salvar(op);
     }
 
     @Transactional
@@ -217,16 +196,11 @@ public class OrdemProducaoService {
 
         OrdemProducao op = buscarEntidadePorId(id);
 
-        if (op.getStatus() != StatusOrdemProducao.EM_PRODUCAO) {
-            throw new RegraNegocioException(
-                    "Apenas OPs em produção podem falhar.");
-        }
+        validarFalha(op);
 
         op.setStatus(StatusOrdemProducao.FALHA_PRODUCAO);
 
-        return mapper.toResponse(
-                repository.save(op)
-        );
+        return salvar(op);
     }
 
     @Transactional
@@ -234,16 +208,11 @@ public class OrdemProducaoService {
 
         OrdemProducao op = buscarEntidadePorId(id);
 
-        if (op.getStatus() != StatusOrdemProducao.FALHA_PRODUCAO) {
-            throw new RegraNegocioException(
-                    "Apenas OPs com falha podem ser reabertas.");
-        }
+        validarReabertura(op);
 
         op.setStatus(StatusOrdemProducao.RESERVADA);
 
-        return mapper.toResponse(
-                repository.save(op)
-        );
+        return salvar(op);
     }
 
     private OrdemProducao buscarEntidadePorId(Long id) {
@@ -257,25 +226,52 @@ public class OrdemProducaoService {
     public OrdemProducaoResponse criarAPartirPedidoItem(
             Pedido pedido,
             PedidoItem item) {
-
         Produto produto = item.getProduto();
-
-        Local local = localRepository.findById(
-                        configuracaoSistemaService.getLocalProducaoPadraoId()
+        Local local = buscarLocal(
+                configuracaoSistemaService.getLocalProducaoPadraoId()
+        );
+        OrdemProducao salva = salvarEntidade(
+                montarOrdemPedido(
+                        pedido,
+                        item,
+                        local
                 )
-                .orElseThrow(() ->
-                        new RegraNegocioException(
-                                "Local de produção padrão não encontrado."
-                        ));
+        );
+        opMaterialService.gerarMateriaisDaOP(salva);
+        return mapper.toResponse(salva);
+    }
 
-        Pessoa responsavel = null;
-
-        OrdemProducao op = OrdemProducao.builder()
+    private OrdemProducao montarOrdemProducao(
+            Produto produto,
+            Local local,
+            Pessoa responsavel,
+            OrdemProducaoRequest request) {
+        return OrdemProducao.builder()
                 .numero(configuracaoSistemaService.gerarProximoNumeroOp())
                 .produto(produto)
-                .quantidadePlanejada(item.getQuantidade())
+                .quantidadePlanejada(request.getQuantidadePlanejada())
                 .localDestino(local)
                 .responsavel(responsavel)
+                .status(StatusOrdemProducao.ABERTA)
+                .origem(request.getOrigem().toUpperCase())
+                .observacao(request.getObservacao())
+                .quantidadeProduzida(BigDecimal.ZERO)
+                .ativo(true)
+                .dataAbertura(LocalDateTime.now())
+                .build();
+    }
+
+    private OrdemProducao montarOrdemPedido(
+            Pedido pedido,
+            PedidoItem item,
+            Local local) {
+
+        return OrdemProducao.builder()
+                .numero(configuracaoSistemaService.gerarProximoNumeroOp())
+                .produto(item.getProduto())
+                .quantidadePlanejada(item.getQuantidade())
+                .localDestino(local)
+                .responsavel(null)
                 .pedido(pedido)
                 .status(StatusOrdemProducao.ABERTA)
                 .origem("PEDIDO")
@@ -287,11 +283,54 @@ public class OrdemProducaoService {
                 .ativo(true)
                 .dataAbertura(LocalDateTime.now())
                 .build();
+    }
 
-        OrdemProducao salva = repository.save(op);
+    private void validarReserva(OrdemProducao op) {
+        if (op.getStatus() != StatusOrdemProducao.ABERTA) {
+            throw new RegraNegocioException(
+                    "Apenas OPs abertas podem ser reservadas.");
+        }
+    }
 
-        opMaterialService.gerarMateriaisDaOP(salva);
+    private void validarInicio(OrdemProducao op) {
+        if (op.getStatus() != StatusOrdemProducao.RESERVADA) {
+            throw new RegraNegocioException(
+                    "Apenas OPs reservadas podem iniciar a produção.");
+        }
+    }
 
-        return mapper.toResponse(salva);
+    private void validarConclusao(OrdemProducao op) {
+        if (op.getStatus() != StatusOrdemProducao.EM_PRODUCAO) {
+            throw new RegraNegocioException(
+                    "Apenas OPs em produção podem ser concluídas.");
+        }
+    }
+    private void validarCancelamento(OrdemProducao op) {
+        if (op.getStatus() == StatusOrdemProducao.CONCLUIDA) {
+            throw new RegraNegocioException(
+                    "Não é possível cancelar uma OP concluída.");
+        }
+    }
+
+    private void validarFalha(OrdemProducao op) {
+        if (op.getStatus() != StatusOrdemProducao.EM_PRODUCAO) {
+            throw new RegraNegocioException(
+                    "Apenas OPs em produção podem falhar.");
+        }
+    }
+
+    private void validarReabertura(OrdemProducao op) {
+        if (op.getStatus() != StatusOrdemProducao.FALHA_PRODUCAO) {
+            throw new RegraNegocioException(
+                    "Apenas OPs com falha podem ser reabertas.");
+        }
+    }
+    private OrdemProducaoResponse salvar(OrdemProducao op) {
+        return mapper.toResponse(
+                salvarEntidade(op)
+        );
+    }
+    private OrdemProducao salvarEntidade(OrdemProducao op) {
+        return repository.save(op);
     }
 }

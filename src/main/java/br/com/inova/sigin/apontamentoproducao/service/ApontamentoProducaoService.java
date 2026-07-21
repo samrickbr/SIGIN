@@ -6,16 +6,14 @@ import br.com.inova.sigin.apontamentoproducao.dto.ApontamentoProducaoUpdateReque
 import br.com.inova.sigin.apontamentoproducao.entity.ApontamentoProducao;
 import br.com.inova.sigin.apontamentoproducao.mapper.ApontamentoProducaoMapper;
 import br.com.inova.sigin.apontamentoproducao.repository.ApontamentoProducaoRepository;
-import br.com.inova.sigin.local.entity.Local;
-import br.com.inova.sigin.local.repository.LocalRepository;
-import br.com.inova.sigin.movimentacaoestoque.service.MovimentacaoEstoqueService;
+import br.com.inova.sigin.opmaterial.service.ConsumoMaterialProducaoService;
 import br.com.inova.sigin.ordemproducao.entity.OrdemProducao;
 import br.com.inova.sigin.ordemproducao.enums.StatusOrdemProducao;
 import br.com.inova.sigin.ordemproducao.repository.OrdemProducaoRepository;
+import br.com.inova.sigin.ordemproducao.service.StatusOrdemProducaoService;
 import br.com.inova.sigin.pessoa.entity.Pessoa;
 import br.com.inova.sigin.pessoa.repository.PessoaRepository;
-import br.com.inova.sigin.produtomaterial.entity.ProdutoMaterial;
-import br.com.inova.sigin.produtomaterial.repository.ProdutoMaterialRepository;
+import br.com.inova.sigin.producao.service.EntradaProdutoProducaoService;
 import br.com.inova.sigin.shared.exception.RegraNegocioException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,92 +30,67 @@ public class ApontamentoProducaoService {
     private final OrdemProducaoRepository ordemProducaoRepository;
     private final PessoaRepository pessoaRepository;
     private final ApontamentoProducaoMapper mapper;
-    private final ProdutoMaterialRepository produtoMaterialRepository;
-    private final LocalRepository localRepository;
-    private final MovimentacaoEstoqueService movimentacaoEstoqueService;
+    private final ConsumoMaterialProducaoService consumoMaterialService;
+    private final EntradaProdutoProducaoService entradaProdutoService;
+    private final StatusOrdemProducaoService statusService;
+
 
     public ApontamentoProducaoResponse criar(
             ApontamentoProducaoRequest request) {
-        OrdemProducao ordemProducao =
-                ordemProducaoRepository.findById(request.getOrdemProducaoId())
-                        .orElseThrow(() ->
-                                new RegraNegocioException(
-                                        "Ordem de produção não encontrada"
-                                ));
-        Pessoa responsavel = null;
-        if (request.getResponsavelId() != null) {
-            responsavel = pessoaRepository.findById(
-                    request.getResponsavelId()
-            ).orElseThrow(() ->
-                    new RegraNegocioException(
-                            "Responsável não encontrado"
-                    ));
-        }
+
+        OrdemProducao ordemProducao = buscarOrdem(request);
+
+        validarStatus(ordemProducao);
+
+        validarQuantidades(request);
+
+        Pessoa responsavel = buscarResponsavel(request);
+
+        ApontamentoProducao salvo =
+                salvarApontamento(
+                        request,
+                        ordemProducao,
+                        responsavel
+                );
+
+        atualizarQuantidadeProduzida(
+                ordemProducao,
+                salvo.getQuantidadeProduzida()
+        );
+
+        consumoMaterialService.gerarConsumo(
+                ordemProducao,
+                salvo
+        );
+
+        statusService.atualizar(ordemProducao);
+
+        entradaProdutoService.gerarEntrada(
+                ordemProducao,
+                salvo
+        );
+
+        return mapper.toResponse(salvo);
+    }
+
+    private ApontamentoProducao salvarApontamento(
+            ApontamentoProducaoRequest request,
+            OrdemProducao ordemProducao,
+            Pessoa responsavel) {
+
         ApontamentoProducao entity =
                 ApontamentoProducao.builder()
                         .ordemProducao(ordemProducao)
-                        .quantidadeProduzida(
-                                request.getQuantidadeProduzida()
-                        )
-                        .quantidadePerda(
-                                request.getQuantidadePerda()
-                        )
+                        .quantidadeProduzida(request.getQuantidadeProduzida())
+                        .quantidadePerda(request.getQuantidadePerda())
                         .responsavel(responsavel)
                         .observacao(request.getObservacao())
                         .dataApontamento(LocalDateTime.now())
                         .ativo(true)
                         .build();
 
-        ApontamentoProducao salvo = repository.save(entity);
-
-        atualizarQuantidadeProduzida(
-                ordemProducao,
-                salvo.getQuantidadeProduzida()
-        );
-        gerarConsumoMateriais(
-                ordemProducao,
-                salvo
-        );
-        if (ordemProducao.getStatus() == StatusOrdemProducao.ABERTA) {
-
-            ordemProducao.setStatus(
-                    StatusOrdemProducao.EM_PRODUCAO
-            );
-
-        }
-        atualizarStatusOrdemProducao(ordemProducao);
-        gerarEntradaProduto(
-                ordemProducao,
-                salvo
-        );
-        return mapper.toResponse(salvo);
+        return repository.save(entity);
     }
-    private void gerarEntradaProduto(
-            OrdemProducao ordemProducao,
-            ApontamentoProducao apontamento) {
-
-        Local local = localRepository.findById(
-                ordemProducao.getLocalDestino().getId()
-        ).orElseThrow(() ->
-                new RegraNegocioException(
-                        "Local não encontrado"
-                ));
-
-        movimentacaoEstoqueService.registrarMovimentacao(
-                null,
-                ordemProducao.getProduto(),
-                local,
-                "PRODUCAO",
-                "ENTRADA",
-                apontamento.getQuantidadeProduzida(),
-                "OP",
-                ordemProducao.getId(),
-                apontamento.getResponsavel(),
-                "Entrada automática produção OP "
-                        + ordemProducao.getNumero()
-        );
-    }
-
 
     public List<ApontamentoProducaoResponse> listarPorOp(
             Long ordemProducaoId) {
@@ -128,23 +101,18 @@ public class ApontamentoProducaoService {
     }
 
     public ApontamentoProducaoResponse buscarPorId(Long id) {
-        ApontamentoProducao entity =
-                repository.findById(id)
-                        .orElseThrow(() ->
-                                new RegraNegocioException(
-                                        "Apontamento não encontrado"
-                                ));
+
+        ApontamentoProducao entity = buscarApontamento(id);
+
         return mapper.toResponse(entity);
     }
+
     public ApontamentoProducaoResponse atualizar(
             Long id,
             ApontamentoProducaoUpdateRequest request) {
-        ApontamentoProducao entity =
-                repository.findById(id)
-                        .orElseThrow(() ->
-                                new RegraNegocioException(
-                                        "Apontamento não encontrado"
-                                ));
+
+        ApontamentoProducao entity = buscarApontamento(id);
+
         if (request.getQuantidadeProduzida() != null) {
             entity.setQuantidadeProduzida(
                     request.getQuantidadeProduzida()
@@ -172,13 +140,8 @@ public class ApontamentoProducaoService {
 
     public void excluir(Long id) {
 
-        ApontamentoProducao entity =
-                repository.findById(id)
-                        .orElseThrow(() ->
-                                new RegraNegocioException(
-                                        "Apontamento não encontrado"
-                                ));
-        entity.setAtivo(false);
+        ApontamentoProducao entity = buscarApontamento(id);
+
         repository.save(entity);
     }
 
@@ -193,52 +156,61 @@ public class ApontamentoProducaoService {
         ordemProducaoRepository.save(ordemProducao);
     }
 
-    private void gerarConsumoMateriais(
-            OrdemProducao ordemProducao,
-            ApontamentoProducao apontamento) {
+    private OrdemProducao buscarOrdem(
+            ApontamentoProducaoRequest request) {
 
-        BigDecimal quantidadeProduzida =
-                apontamento.getQuantidadeProduzida();
+        return ordemProducaoRepository
+                .findById(request.getOrdemProducaoId())
+                .orElseThrow(() ->
+                        new RegraNegocioException(
+                                "Ordem de produção não encontrada"
+                        ));
+    }
 
-        List<ProdutoMaterial> materiais =
-                produtoMaterialRepository.findByProdutoId(
-                        ordemProducao.getProduto().getId()
-                );
+    private Pessoa buscarResponsavel(
+            ApontamentoProducaoRequest request) {
 
-        Local local = localRepository.findById(
-                ordemProducao.getLocalDestino().getId()
+        if (request.getResponsavelId() == null) {
+            return null;
+        }
+
+        return pessoaRepository.findById(
+                request.getResponsavelId()
         ).orElseThrow(() ->
                 new RegraNegocioException(
-                        "Local não encontrado"
+                        "Responsável não encontrado"
                 ));
+    }
 
-        for (ProdutoMaterial produtoMaterial : materiais) {
+    private void validarStatus(
+            OrdemProducao ordemProducao) {
 
-            BigDecimal consumo =
-                    produtoMaterial.getQuantidade()
-                            .multiply(quantidadeProduzida);
-
-            movimentacaoEstoqueService.registrarMovimentacao(
-                    produtoMaterial.getMaterial(),
-                    null,
-                    local,
-                    "CONSUMO_PRODUCAO",
-                    "SAIDA",
-                    consumo,
-                    "OP",
-                    ordemProducao.getId(),
-                    apontamento.getResponsavel(),
-                    "Consumo automático da OP " + ordemProducao.getNumero()
+        if (ordemProducao.getStatus() == StatusOrdemProducao.CONCLUIDA
+                || ordemProducao.getStatus() == StatusOrdemProducao.CANCELADA) {
+            throw new RegraNegocioException(
+                    "Não é permitido apontar produção para esta ordem."
             );
         }
     }
-    private void atualizarStatusOrdemProducao(OrdemProducao ordemProducao) {
 
-        if (ordemProducao.getStatus() == StatusOrdemProducao.ABERTA) {
-            ordemProducao.setStatus(
-                    StatusOrdemProducao.EM_PRODUCAO
+    private void validarQuantidades(
+            ApontamentoProducaoRequest request) {
+
+        if (request.getQuantidadeProduzida().compareTo(BigDecimal.ZERO) <= 0
+                && request.getQuantidadePerda().compareTo(BigDecimal.ZERO) <= 0) {
+
+            throw new RegraNegocioException(
+                    "Informe quantidade produzida ou quantidade de perda."
             );
         }
-        ordemProducaoRepository.save(ordemProducao);
+    }
+
+
+    private ApontamentoProducao buscarApontamento(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() ->
+                        new RegraNegocioException(
+                                "Apontamento não encontrado"
+                        ));
     }
 }
