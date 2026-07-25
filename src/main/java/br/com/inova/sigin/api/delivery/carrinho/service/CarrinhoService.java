@@ -8,6 +8,12 @@ import br.com.inova.sigin.api.delivery.carrinho.entity.CarrinhoItem;
 import br.com.inova.sigin.api.delivery.carrinho.entity.CarrinhoStatus;
 import br.com.inova.sigin.api.delivery.carrinho.repository.CarrinhoItemRepository;
 import br.com.inova.sigin.api.delivery.carrinho.repository.CarrinhoRepository;
+import br.com.inova.sigin.pedido.dto.PedidoResponse;
+import br.com.inova.sigin.pedido.entity.Pedido;
+import br.com.inova.sigin.pedido.entity.PedidoItem;
+import br.com.inova.sigin.pedido.enums.StatusPedido;
+import br.com.inova.sigin.pedido.repository.PedidoItemRepository;
+import br.com.inova.sigin.pedido.repository.PedidoRepository;
 import br.com.inova.sigin.pessoa.entity.Pessoa;
 import br.com.inova.sigin.pessoa.repository.PessoaRepository;
 import br.com.inova.sigin.produtovenda.entity.ProdutoVenda;
@@ -20,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +36,8 @@ public class CarrinhoService {
     private final ProdutoVendaRepository produtoVendaRepository;
     private final CarrinhoItemRepository carrinhoItemRepository;
     private final PessoaRepository pessoaRepository;
+    private final PedidoRepository pedidoRepository;
+    private final PedidoItemRepository pedidoItemRepository;
     @Transactional
     public CarrinhoResponse criar(
             Long clienteId
@@ -223,5 +232,62 @@ public class CarrinhoService {
         carrinhoRepository.save(carrinho);
 
         return converter(carrinho);
+    }
+
+    @Transactional
+    public PedidoResponse finalizar(Long carrinhoId) {
+
+        Carrinho carrinho = carrinhoRepository.findById(carrinhoId)
+                .orElseThrow(() ->
+                        new RegraNegocioException("Carrinho não encontrado"));
+
+        if (carrinho.getItens().isEmpty()) {
+            throw new RegraNegocioException("Carrinho vazio");
+        }
+
+        Pedido pedido = Pedido.builder()
+                .numero(UUID.randomUUID().toString().substring(0, 8).toUpperCase())
+                .cliente(carrinho.getCliente())
+                .dataPedido(LocalDateTime.now())
+                .status(StatusPedido.ABERTO)
+                .valorTotal(carrinho.getValorTotal())
+                .ativo(true)
+                .build();
+
+        pedidoRepository.save(pedido);
+
+        for (CarrinhoItem item : carrinho.getItens()) {
+
+            PedidoItem pedidoItem = PedidoItem.builder()
+                    .pedido(pedido)
+                    .produto(item.getProdutoVenda().getProduto())
+                    .quantidade(item.getQuantidade())
+                    .valorUnitario(item.getValorUnitario())
+                    .valorTotal(item.getValorTotal())
+                    .ativo(true)
+                    .build();
+
+            pedidoItemRepository.save(pedidoItem);
+        }
+
+        carrinhoItemRepository.deleteAll(carrinho.getItens());
+
+        carrinho.getItens().clear();
+        carrinho.setValorTotal(BigDecimal.ZERO);
+        carrinho.setStatus(CarrinhoStatus.FINALIZADO);
+
+        carrinhoRepository.save(carrinho);
+
+        return PedidoResponse.builder()
+                .id(pedido.getId())
+                .numero(pedido.getNumero())
+                .clienteId(pedido.getCliente().getId())
+                .cliente(pedido.getCliente().getNome())
+                .dataPedido(pedido.getDataPedido())
+                .valorTotal(pedido.getValorTotal())
+                .status(pedido.getStatus().name())
+                .ativo(pedido.getAtivo())
+                .observacao(pedido.getObservacao())
+                .build();
     }
 }

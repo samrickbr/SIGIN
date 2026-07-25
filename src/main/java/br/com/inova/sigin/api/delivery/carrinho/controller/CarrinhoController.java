@@ -4,6 +4,7 @@ import br.com.inova.sigin.api.delivery.carrinho.dto.AdicionarItemRequest;
 import br.com.inova.sigin.api.delivery.carrinho.dto.CarrinhoResponse;
 import br.com.inova.sigin.api.delivery.carrinho.dto.CriarCarrinhoRequest;
 import br.com.inova.sigin.api.delivery.carrinho.service.CarrinhoService;
+import br.com.inova.sigin.pedido.dto.PedidoResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -60,5 +61,11 @@ public class CarrinhoController {
             @PathVariable Long carrinhoId
     ) {
         return service.limparCarrinho(carrinhoId);
+    }
+    @PostMapping("/{id}/finalizar")
+    public PedidoResponse finalizar(
+            @PathVariable Long id
+    ) {
+        return service.finalizar(id);
     }
 }
