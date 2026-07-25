@@ -26,8 +26,8 @@ import java.util.List;
 public class CarrinhoService {
 
     private final CarrinhoRepository carrinhoRepository;
-    private final CarrinhoItemRepository itemRepository;
     private final ProdutoVendaRepository produtoVendaRepository;
+    private final CarrinhoItemRepository carrinhoItemRepository;
     private final PessoaRepository pessoaRepository;
     @Transactional
     public CarrinhoResponse criar(
@@ -65,6 +65,7 @@ public class CarrinhoService {
                         .orElseThrow(() ->
                                 new RegraNegocioException("Produto não encontrado")
                         );
+        BigDecimal valorUnitario = produtoVenda.getPrecoVenda();
         BigDecimal valorTotal =
                 produtoVenda.getPrecoVenda()
                         .multiply(request.getQuantidade());
@@ -73,13 +74,15 @@ public class CarrinhoService {
                 .carrinho(carrinho)
                 .produtoVenda(produtoVenda)
                 .quantidade(request.getQuantidade())
-                .valorUnitario(produtoVenda.getPrecoVenda())
+                .valorUnitario(valorUnitario)
                 .valorTotal(valorTotal)
                 .build();
 
-        itemRepository.save(item);
+        carrinhoItemRepository.save(item);
 
-        recalcularTotal(carrinho);
+        carrinho.setValorTotal(
+                carrinho.getValorTotal().add(valorTotal)
+        );
 
         return converter(carrinho);
     }
