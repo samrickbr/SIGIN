@@ -8,6 +8,8 @@ import br.com.inova.sigin.api.delivery.carrinho.entity.CarrinhoItem;
 import br.com.inova.sigin.api.delivery.carrinho.entity.CarrinhoStatus;
 import br.com.inova.sigin.api.delivery.carrinho.repository.CarrinhoItemRepository;
 import br.com.inova.sigin.api.delivery.carrinho.repository.CarrinhoRepository;
+import br.com.inova.sigin.pessoa.entity.Pessoa;
+import br.com.inova.sigin.pessoa.repository.PessoaRepository;
 import br.com.inova.sigin.produtovenda.entity.ProdutoVenda;
 import br.com.inova.sigin.produtovenda.repository.ProdutoVendaRepository;
 import br.com.inova.sigin.shared.exception.RegraNegocioException;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -25,15 +28,25 @@ public class CarrinhoService {
     private final CarrinhoRepository carrinhoRepository;
     private final CarrinhoItemRepository itemRepository;
     private final ProdutoVendaRepository produtoVendaRepository;
-
+    private final PessoaRepository pessoaRepository;
     @Transactional
-    public CarrinhoResponse criar() {
+    public CarrinhoResponse criar(
+            Long clienteId
+    ) {
 
+        Pessoa cliente = pessoaRepository.findById(clienteId)
+                .orElseThrow(() ->
+                        new RegraNegocioException("Cliente não encontrado")
+                );
         Carrinho carrinho = Carrinho.builder()
+                .cliente(cliente)
                 .status(CarrinhoStatus.ABERTO)
                 .valorTotal(BigDecimal.ZERO)
+                .dataCriacao(LocalDateTime.now())
                 .build();
-        return converter(carrinhoRepository.save(carrinho));
+        return converter(
+                carrinhoRepository.save(carrinho)
+        );
     }
 
     @Transactional
