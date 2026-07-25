@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+
 @RestController
 @RequestMapping("/api/delivery/carrinho")
 @RequiredArgsConstructor
@@ -36,4 +38,27 @@ public class CarrinhoController {
         return service.adicionarItem(id, request);
     }
 
+    @PutMapping("/{carrinhoId}/itens/{itemId}")
+    public CarrinhoResponse atualizarQuantidade(
+            @PathVariable Long carrinhoId,
+            @PathVariable Long itemId,
+            @RequestParam BigDecimal quantidade
+    ) {
+        return service.atualizarQuantidade(carrinhoId, itemId, quantidade);
+    }
+
+    @DeleteMapping("/{carrinhoId}/itens/{itemId}")
+    public CarrinhoResponse removerItem(
+            @PathVariable Long carrinhoId,
+            @PathVariable Long itemId
+    ) {
+        return service.removerItem(carrinhoId, itemId);
+    }
+
+    @DeleteMapping("/{carrinhoId}")
+    public CarrinhoResponse limpar(
+            @PathVariable Long carrinhoId
+    ) {
+        return service.limparCarrinho(carrinhoId);
+    }
 }

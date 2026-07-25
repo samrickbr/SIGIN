@@ -145,4 +145,83 @@ public class CarrinhoService {
                 .itens(itens)
                 .build();
     }
+    @Transactional
+    public CarrinhoResponse atualizarQuantidade(
+            Long carrinhoId,
+            Long itemId,
+            BigDecimal quantidade
+    ) {
+
+        Carrinho carrinho = carrinhoRepository.findById(carrinhoId)
+                .orElseThrow(() ->
+                        new RegraNegocioException("Carrinho não encontrado"));
+
+        CarrinhoItem item = carrinhoItemRepository.findById(itemId)
+                .orElseThrow(() ->
+                        new RegraNegocioException("Item não encontrado"));
+
+        if (!item.getCarrinho().getId().equals(carrinhoId)) {
+            throw new RegraNegocioException("Item não pertence ao carrinho");
+        }
+
+        item.setQuantidade(quantidade);
+
+        item.setValorTotal(
+                item.getValorUnitario().multiply(quantidade)
+        );
+
+        carrinhoItemRepository.save(item);
+
+        recalcularTotal(carrinho);
+
+        carrinhoRepository.save(carrinho);
+
+        return converter(carrinho);
+    }
+
+    @Transactional
+    public CarrinhoResponse removerItem(
+            Long carrinhoId,
+            Long itemId
+    ) {
+
+        Carrinho carrinho = carrinhoRepository.findById(carrinhoId)
+                .orElseThrow(() ->
+                        new RegraNegocioException("Carrinho não encontrado"));
+
+        CarrinhoItem item = carrinhoItemRepository.findById(itemId)
+                .orElseThrow(() ->
+                        new RegraNegocioException("Item não encontrado"));
+
+        if (!item.getCarrinho().getId().equals(carrinhoId)) {
+            throw new RegraNegocioException("Item não pertence ao carrinho");
+        }
+
+        carrinhoItemRepository.delete(item);
+
+        carrinho.getItens().removeIf(i -> i.getId().equals(itemId));
+
+        recalcularTotal(carrinho);
+
+        carrinhoRepository.save(carrinho);
+
+        return converter(carrinho);
+    }
+    @Transactional
+    public CarrinhoResponse limparCarrinho(Long carrinhoId) {
+
+        Carrinho carrinho = carrinhoRepository.findById(carrinhoId)
+                .orElseThrow(() ->
+                        new RegraNegocioException("Carrinho não encontrado"));
+
+        carrinhoItemRepository.deleteAll(carrinho.getItens());
+
+        carrinho.getItens().clear();
+
+        carrinho.setValorTotal(BigDecimal.ZERO);
+
+        carrinhoRepository.save(carrinho);
+
+        return converter(carrinho);
+    }
 }
