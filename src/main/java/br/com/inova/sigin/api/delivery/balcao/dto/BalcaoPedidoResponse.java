@@ -1,0 +1,20 @@
+package br.com.inova.sigin.api.delivery.balcao.dto;
+
+import lombok.Builder;
+import lombok.Getter;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+@Getter
+@Builder
+public class BalcaoPedidoResponse {
+
+    private Long id;
+    private String numero;
+    private String cliente;
+    private String status;
+    private BigDecimal valorTotal;
+    private LocalDateTime dataPedido;
+
+}

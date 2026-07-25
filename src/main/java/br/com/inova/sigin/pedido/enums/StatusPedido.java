@@ -4,6 +4,9 @@ public enum StatusPedido {
 
     ABERTO,
     AGUARDANDO_PRODUCAO,
+    RECEBIDO,
+    EM_PREPARO,
+
     EM_PRODUCAO,
     PRONTO,
     FATURADO,
