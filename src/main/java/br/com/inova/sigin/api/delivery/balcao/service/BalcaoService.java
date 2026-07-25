@@ -1,11 +1,11 @@
 package br.com.inova.sigin.api.delivery.balcao.service;
 
+import br.com.inova.sigin.api.delivery.balcao.dto.BalcaoItemResponse;
 import br.com.inova.sigin.api.delivery.balcao.dto.BalcaoPedidoResponse;
 import br.com.inova.sigin.pedido.entity.Pedido;
 import br.com.inova.sigin.pedido.enums.StatusPedido;
 import br.com.inova.sigin.pedido.repository.PedidoRepository;
 import br.com.inova.sigin.shared.exception.RegraNegocioException;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,13 +21,38 @@ public class BalcaoService {
     @Transactional(readOnly = true)
     public List<BalcaoPedidoResponse> listar() {
 
-        return repository.findByStatus(StatusPedido.ABERTO).stream().map(p -> BalcaoPedidoResponse.builder().id(p.getId()).numero(p.getNumero()).cliente(p.getCliente().getNome()).status(p.getStatus().name()).valorTotal(p.getValorTotal()).dataPedido(p.getDataPedido()).build()).toList();
+        return repository.findByStatus(StatusPedido.ABERTO)
+                .stream()
+                .map(p -> BalcaoPedidoResponse.builder()
+                        .id(p.getId())
+                        .numero(p.getNumero())
+                        .cliente(p.getCliente().getNome())
+                        .status(p.getStatus().name())
+                        .valorTotal(p.getValorTotal())
+                        .dataPedido(p.getDataPedido())
+
+                        .itens(
+                                p.getItens()
+                                        .stream()
+                                        .map(item ->
+                                                BalcaoItemResponse.builder()
+                                                        .id(item.getId())
+                                                        .produto(item.getProduto().getNome())
+                                                        .quantidade(item.getQuantidade())
+                                                        .build()
+                                        )
+                                        .toList()
+                        )
+
+                        .build())
+                .toList();
     }
 
     @Transactional
     public void aceitar(Long id) {
 
-        Pedido pedido = repository.findById(id).orElseThrow(() -> new RegraNegocioException("Pedido não encontrado"));
+        Pedido pedido = repository.findById(id).orElseThrow(()
+                -> new RegraNegocioException("Pedido não encontrado"));
 
         pedido.setStatus(StatusPedido.RECEBIDO);
 
@@ -37,7 +62,8 @@ public class BalcaoService {
     @Transactional
     public void cancelar(Long id) {
 
-        Pedido pedido = repository.findById(id).orElseThrow(() -> new RegraNegocioException("Pedido não encontrado"));
+        Pedido pedido = repository.findById(id).orElseThrow(()
+                -> new RegraNegocioException("Pedido não encontrado"));
 
         pedido.setStatus(StatusPedido.CANCELADO);
 
@@ -47,7 +73,8 @@ public class BalcaoService {
     @Transactional
     public void enviarParaCozinha(Long id) {
 
-        Pedido pedido = repository.findById(id).orElseThrow(() -> new RegraNegocioException("Pedido não encontrado"));
+        Pedido pedido = repository.findById(id).orElseThrow(()
+                -> new RegraNegocioException("Pedido não encontrado"));
 
         pedido.setStatus(StatusPedido.EM_PREPARO);
 
