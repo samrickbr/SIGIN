@@ -38,6 +38,9 @@ public class ProdutoService {
         Produto produto = Produto.builder()
                 .nome(request.getNome())
                 .descricao(request.getDescricao())
+                .precoVenda(request.getPrecoVenda())
+                .disponivelVenda(request.getDisponivelVenda())
+                .imagem(request.getImagem())
                 .categoria(categoria)
                 .build();
 
@@ -56,6 +59,9 @@ public class ProdutoService {
                 .codigo(salvo.getCodigo())
                 .nome(salvo.getNome())
                 .descricao(salvo.getDescricao())
+                .precoVenda(salvo.getPrecoVenda())
+                .disponivelVenda(salvo.getDisponivelVenda())
+                .imagem(salvo.getImagem())
                 .categoria(
                         salvo.getCategoria() != null
                                 ? salvo.getCategoria().getNome()
@@ -77,6 +83,9 @@ public class ProdutoService {
                 .codigo(produto.getCodigo())
                 .nome(produto.getNome())
                 .descricao(produto.getDescricao())
+                .precoVenda(produto.getPrecoVenda())
+                .disponivelVenda(produto.getDisponivelVenda())
+                .imagem(produto.getImagem())
                 .categoria(
                         produto.getCategoria() != null
                                 ? produto.getCategoria().getNome()
@@ -96,6 +105,9 @@ public class ProdutoService {
 
         produto.setNome(request.getNome());
         produto.setDescricao(request.getDescricao());
+        produto.setPrecoVenda(request.getPrecoVenda());
+        produto.setDisponivelVenda(request.getDisponivelVenda());
+        produto.setImagem(request.getImagem());
 
         if (request.getCategoriaId() != null) {
 
@@ -114,6 +126,9 @@ public class ProdutoService {
                 .codigo(atualizado.getCodigo())
                 .nome(atualizado.getNome())
                 .descricao(atualizado.getDescricao())
+                .precoVenda(atualizado.getPrecoVenda())
+                .disponivelVenda(atualizado.getDisponivelVenda())
+                .imagem(atualizado.getImagem())
                 .categoria(
                         atualizado.getCategoria() != null
                                 ? atualizado.getCategoria().getNome()
@@ -145,6 +160,9 @@ public class ProdutoService {
                         .codigo(produto.getCodigo())
                         .nome(produto.getNome())
                         .descricao(produto.getDescricao())
+                        .precoVenda(produto.getPrecoVenda())
+                        .disponivelVenda(produto.getDisponivelVenda())
+                        .imagem(produto.getImagem())
                         .categoria(
                                 produto.getCategoria() != null
                                         ? produto.getCategoria().getNome()
@@ -165,6 +183,9 @@ public class ProdutoService {
                         .codigo(produto.getCodigo())
                         .nome(produto.getNome())
                         .descricao(produto.getDescricao())
+                        .precoVenda(produto.getPrecoVenda())
+                        .disponivelVenda(produto.getDisponivelVenda())
+                        .imagem(produto.getImagem())
                         .categoria(
                                 produto.getCategoria() != null
                                         ? produto.getCategoria().getNome()

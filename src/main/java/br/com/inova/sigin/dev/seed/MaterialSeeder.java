@@ -3,12 +3,14 @@ package br.com.inova.sigin.dev.seed;
 import br.com.inova.sigin.material.entity.Material;
 import br.com.inova.sigin.material.repository.MaterialRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Component
+@Order(4)
 @RequiredArgsConstructor
 public class MaterialSeeder implements Seeder {
 

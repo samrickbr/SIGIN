@@ -1,0 +1,8 @@
+ALTER TABLE produtos
+ADD COLUMN preco_venda NUMERIC(10,2);
+
+ALTER TABLE produtos
+ADD COLUMN disponivel_venda BOOLEAN NOT NULL DEFAULT TRUE;
+
+ALTER TABLE produtos
+ADD COLUMN imagem VARCHAR(500);

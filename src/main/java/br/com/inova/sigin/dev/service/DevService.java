@@ -6,6 +6,7 @@ import br.com.inova.sigin.pedido.service.PedidoService;
 import br.com.inova.sigin.pessoa.repository.PessoaRepository;
 import br.com.inova.sigin.produto.repository.ProdutoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,6 +23,10 @@ public class DevService {
     private final PedidoItemService pedidoItemService;
 
     public List<String> popular() {
+
+        seeders.sort(
+                AnnotationAwareOrderComparator.INSTANCE
+        );
 
         List<String> executados = new ArrayList<>();
 

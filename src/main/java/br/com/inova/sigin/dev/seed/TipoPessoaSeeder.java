@@ -3,11 +3,13 @@ package br.com.inova.sigin.dev.seed;
 import br.com.inova.sigin.pessoa.entity.TipoPessoa;
 import br.com.inova.sigin.pessoa.repository.TipoPessoaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 @Component
+@Order(1)
 @RequiredArgsConstructor
 public class TipoPessoaSeeder implements Seeder {
 

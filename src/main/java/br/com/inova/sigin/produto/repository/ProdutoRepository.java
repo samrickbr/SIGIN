@@ -1,7 +1,9 @@
 package br.com.inova.sigin.produto.repository;
 
 import br.com.inova.sigin.produto.entity.Produto;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,5 +17,20 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
     List<Produto> findByAtivoTrue();
 
     List<Produto> findByAtivoFalse();
+
+    @EntityGraph(attributePaths = "categoria")
+    List<Produto> findByAtivoTrueAndDisponivelVendaTrue();
+
+    @Query("""
+        select p 
+        from Produto p
+        left join fetch p.categoria
+        left join fetch p.venda
+        where p.ativo = true
+        and p.venda.disponivelVenda = true
+        """)
+    List<Produto> buscarCardapio();
+
+    Optional<Produto> findByNome(String nome);
 
 }

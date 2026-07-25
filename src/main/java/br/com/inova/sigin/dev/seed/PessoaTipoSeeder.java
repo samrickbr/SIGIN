@@ -7,11 +7,13 @@ import br.com.inova.sigin.pessoa.repository.PessoaRepository;
 import br.com.inova.sigin.pessoa.repository.PessoaTipoRepository;
 import br.com.inova.sigin.pessoa.repository.TipoPessoaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 @Component
+@Order(3)
 @RequiredArgsConstructor
 public class PessoaTipoSeeder implements Seeder {
 

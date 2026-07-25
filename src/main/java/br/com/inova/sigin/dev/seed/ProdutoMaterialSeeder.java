@@ -7,12 +7,14 @@ import br.com.inova.sigin.produto.repository.ProdutoRepository;
 import br.com.inova.sigin.produtomaterial.entity.ProdutoMaterial;
 import br.com.inova.sigin.produtomaterial.repository.ProdutoMaterialRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Component
+@Order(7)
 @RequiredArgsConstructor
 public class ProdutoMaterialSeeder implements Seeder {
 

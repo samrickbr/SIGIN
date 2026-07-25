@@ -1,10 +1,13 @@
 package br.com.inova.sigin.produto.entity;
 
+import br.com.inova.sigin.produtovenda.entity.ProdutoVenda;
 import jakarta.persistence.*;
 import lombok.*;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -32,6 +35,22 @@ public class Produto {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
+
+    @Column(name = "preco_venda", precision = 10, scale = 2)
+    private BigDecimal precoVenda;
+
+    @Builder.Default
+    @Column(name = "disponivel_venda", nullable = false)
+    private Boolean disponivelVenda = true;
+
+    @OneToOne(
+            mappedBy = "produto",
+            fetch = FetchType.LAZY
+    )
+    private ProdutoVenda venda;
+
+    @Column(length = 500)
+    private String imagem;
 
     @Builder.Default
     @Column(nullable = false)

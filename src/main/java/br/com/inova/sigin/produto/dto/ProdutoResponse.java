@@ -2,6 +2,8 @@ package br.com.inova.sigin.produto.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import java.math.BigDecimal;
+
 
 @Getter
 @Builder
@@ -12,6 +14,9 @@ public class ProdutoResponse {
     private String nome;
     private String descricao;
     private String categoria;
+    private BigDecimal precoVenda;
+    private Boolean disponivelVenda;
+    private String imagem;
     private Boolean ativo;
 
 }
