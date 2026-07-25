@@ -1,0 +1,2 @@
+ALTER TABLE carrinho_itens
+ADD COLUMN valor_total NUMERIC(10,2) NOT NULL DEFAULT 0;

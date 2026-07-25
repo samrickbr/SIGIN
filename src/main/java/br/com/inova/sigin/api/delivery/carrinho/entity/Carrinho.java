@@ -4,6 +4,7 @@ import br.com.inova.sigin.pessoa.entity.Pessoa;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,5 +44,8 @@ public class Carrinho {
     )
     @Builder.Default
     private List<CarrinhoItem> itens = new ArrayList<>();
+
+    @Column(name = "valor_total", nullable = false, precision = 10, scale = 2)
+    private BigDecimal valorTotal = BigDecimal.ZERO;
 
 }

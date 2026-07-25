@@ -1,5 +1,6 @@
 package br.com.inova.sigin.api.delivery.carrinho.dto;
 
+import br.com.inova.sigin.api.delivery.carrinho.entity.CarrinhoStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,7 +13,7 @@ public class CarrinhoResponse {
 
     private Long id;
 
-    private String status;
+    private CarrinhoStatus status;
 
     private BigDecimal valorTotal;
 
