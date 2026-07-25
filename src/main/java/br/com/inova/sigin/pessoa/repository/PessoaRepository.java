@@ -15,5 +15,6 @@ public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
 
     boolean existsByNomeIgnoreCase(String nome);
     Optional<Pessoa> findByNomeIgnoreCase(String nome);
+    Optional<Pessoa> findByTelefone(String telefone);
 
 }

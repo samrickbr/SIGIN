@@ -23,32 +23,35 @@ public class PessoaTipoService {
 
 
     public void adicionarTipo(Long pessoaId, PessoaTipoRequest request) {
-
         Pessoa pessoa = pessoaRepository.findById(pessoaId)
                 .orElseThrow(() ->
                         new RegraNegocioException("Pessoa não encontrada")
                 );
-
-
         TipoPessoa tipoPessoa = tipoPessoaRepository.findById(request.getTipoPessoaId())
                 .orElseThrow(() ->
                         new RegraNegocioException("Tipo de pessoa não encontrada")
                 );
-
-
         PessoaTipo pessoaTipo = PessoaTipo.builder()
                 .pessoa(pessoa)
                 .tipoPessoa(tipoPessoa)
                 .dataCriacao(LocalDateTime.now())
                 .build();
-
         if (pessoaTipoRepository.existsByPessoaIdAndTipoPessoaId(
                 pessoaId,
                 request.getTipoPessoaId())) {
-
             throw new RegraNegocioException("A pessoa já possui esse tipo.");
         }
-
         pessoaTipoRepository.save(pessoaTipo);
+    }
+
+    public void adicionarTipoCliente(Long pessoaId) {
+        TipoPessoa cliente = tipoPessoaRepository
+                .findByNomeIgnoreCase("CLIENTE")
+                .orElseThrow(() ->
+                        new RegraNegocioException("Tipo CLIENTE não encontrado")
+                );
+        PessoaTipoRequest request = new PessoaTipoRequest();
+        request.setTipoPessoaId(cliente.getId());
+        adicionarTipo(pessoaId, request);
     }
 }
