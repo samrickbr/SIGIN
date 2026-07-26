@@ -33,4 +33,11 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
     Optional<Produto> findByNome(String nome);
 
+    @Query("""
+                SELECT pv.produto
+                FROM ProdutoVenda pv
+                WHERE pv.disponivelVenda = true
+                AND pv.produto.ativo = true
+            """)
+    List<Produto> findProdutosDisponiveisVenda();
 }

@@ -19,7 +19,6 @@ public class ProdutoVenda {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "produto_id",
@@ -28,7 +27,6 @@ public class ProdutoVenda {
     )
     private Produto produto;
 
-
     @Column(
             name = "preco_venda",
             precision = 10,
@@ -36,10 +34,8 @@ public class ProdutoVenda {
     )
     private BigDecimal precoVenda;
 
-
     @Column(length = 500)
     private String imagem;
-
 
     @Column(
             name = "disponivel_venda",

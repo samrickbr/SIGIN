@@ -49,4 +49,8 @@ public class ProdutoController {
     public List<ProdutoResponse> listarInativos() {
         return produtoService.listarInativos();
     }
+    @GetMapping("/cardapio")
+    public List<ProdutoResponse> cardapio() {
+        return produtoService.listarDisponiveisVenda();
+    }
 }

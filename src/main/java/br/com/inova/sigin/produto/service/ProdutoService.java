@@ -196,4 +196,18 @@ public class ProdutoService {
                 )
                 .toList();
     }
+    public List<ProdutoResponse> listarDisponiveisVenda() {
+
+        return produtoRepository
+                .findProdutosDisponiveisVenda()
+                .stream()
+                .map(produto -> ProdutoResponse.builder()
+                        .id(produto.getId())
+                        .nome(produto.getNome())
+                        .descricao(produto.getDescricao())
+                        .ativo(produto.getAtivo())
+                        .build()
+                )
+                .toList();
+    }
 }
