@@ -16,7 +16,7 @@ public class CardapioService {
     public List<CardapioResponse> listar() {
 
         return produtoVendaService
-                .listarDisponiveis()
+                .listarDisponiveisEntity()
                 .stream()
                 .map(produtoVenda -> {
 

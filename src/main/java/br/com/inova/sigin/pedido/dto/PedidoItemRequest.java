@@ -14,5 +14,4 @@ public class PedidoItemRequest {
     @NotNull
     private BigDecimal quantidade;
 
-    private BigDecimal valorUnitario;
 }

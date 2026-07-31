@@ -9,6 +9,9 @@ import br.com.inova.sigin.pedido.repository.PedidoItemRepository;
 import br.com.inova.sigin.pedido.repository.PedidoRepository;
 import br.com.inova.sigin.produto.entity.Produto;
 import br.com.inova.sigin.produto.repository.ProdutoRepository;
+import br.com.inova.sigin.produtovenda.entity.ProdutoVenda;
+import br.com.inova.sigin.produtovenda.repository.ProdutoVendaRepository;
+import br.com.inova.sigin.produtovenda.service.ProdutoVendaService;
 import br.com.inova.sigin.shared.exception.RegraNegocioException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,7 +27,7 @@ public class PedidoItemService {
     private final PedidoRepository pedidoRepository;
     private final ProdutoRepository produtoRepository;
     private final PedidoItemMapper mapper;
-
+    private final ProdutoVendaService produtoVendaService;
 
     public PedidoItemResponse adicionar(
             Long pedidoId,
@@ -43,13 +46,13 @@ public class PedidoItemService {
                         new RegraNegocioException(
                                 "Produto não encontrado."
                         ));
+        ProdutoVenda produtoVenda =
+                produtoVendaService.obterProdutoDisponivel(
+                        produto.getId(),
+                        pedido.getCanalVenda().getId()
+                );
 
-
-        BigDecimal valorUnitario =
-                request.getValorUnitario() != null
-                        ? request.getValorUnitario()
-                        : BigDecimal.ZERO;
-
+        BigDecimal valorUnitario = produtoVenda.getPrecoVenda();
 
         PedidoItem item = PedidoItem.builder()
                 .pedido(pedido)

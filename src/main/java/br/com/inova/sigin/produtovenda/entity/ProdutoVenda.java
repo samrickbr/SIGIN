@@ -1,5 +1,6 @@
 package br.com.inova.sigin.produtovenda.entity;
 
+import br.com.inova.sigin.canalvenda.entity.CanalVenda;
 import br.com.inova.sigin.produto.entity.Produto;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,13 +20,16 @@ public class ProdutoVenda {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "produto_id",
-            nullable = false,
-            unique = true
-    )
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "produto_id", nullable = false)
     private Produto produto;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "canal_venda_id", nullable = false)
+    private CanalVenda canalVenda;
+
 
     @Column(
             name = "preco_venda",
@@ -34,8 +38,10 @@ public class ProdutoVenda {
     )
     private BigDecimal precoVenda;
 
+
     @Column(length = 500)
     private String imagem;
+
 
     @Column(
             name = "disponivel_venda",

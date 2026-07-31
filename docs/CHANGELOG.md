@@ -121,3 +121,126 @@ Pedido → Produção → Materiais.
 
 Essa estrutura reduz a necessidade de testes manuais durante o desenvolvimento.
 
+# Changelog SIGIN
+
+Todas as alterações relevantes do projeto serão documentadas neste arquivo.
+
+---
+
+# [0.4.0] — Sprint 04 — Fundação Comercial (Core)
+
+## Adicionado
+
+### Canal de Venda
+
+* Criado módulo `CanalVenda`.
+* Implementado cadastro de canais de venda.
+* Criados endpoints CRUD.
+* Adicionada estrutura para múltiplos canais comerciais.
+
+### Produto x Canal
+
+* Criado relacionamento `ProdutoCanal`.
+* Implementada disponibilidade de produtos por canal.
+* Criadas validações de duplicidade Produto x Canal.
+* Adicionada validação de produto disponível antes da venda.
+
+### Produto Comercial
+
+* Evoluído módulo `ProdutoVenda`.
+* Adicionado relacionamento com canal de venda.
+* Permitido controle de preço por canal.
+* Permitido controle de disponibilidade comercial por canal.
+* Atualizados DTOs, Mapper, Repository e Service.
+
+### Pedidos
+
+* Adicionado canal de origem no pedido.
+* Pedido agora registra o canal responsável pela venda.
+* Removida dependência de preço informado pelo cliente.
+* Valor dos itens passa a ser obtido automaticamente pelo Core.
+* Valor total do pedido passa a ser calculado pelo sistema.
+
+---
+
+## Alterado
+
+### Regras Comerciais
+
+Antes:
+
+```text
+Cliente/Frontend
+        |
+        └── Enviava preço do produto
+```
+
+Depois:
+
+```text
+Pedido
+   |
+   ▼
+ProdutoVendaService
+   |
+   ├── Valida ProdutoCanal
+   └── Busca preço comercial
+```
+
+---
+
+## Refatorado
+
+* Centralizada regra comercial no `ProdutoVendaService`.
+* Centralizada validação de disponibilidade no `ProdutoCanalService`.
+* Removidas regras duplicadas dos serviços de Pedido.
+* Preparada arquitetura para múltiplos canais.
+
+---
+
+## Banco de Dados
+
+Novas migrations:
+
+* `V26__create_table_canal_venda.sql`
+* `V27__create_table_produto_canal.sql`
+* `V28__alter_produto_venda_add_canal.sql`
+* `V29__add_canal_origem_pedidos.sql`
+
+---
+
+## Documentação
+
+Atualizado:
+
+* Integração Delivery.
+* Roadmap de Sprints.
+* Tasks Sprint 04.
+* Documentação de Seeders.
+
+---
+
+# Impacto da versão
+
+O Core Comercial do SIGIN passa a controlar:
+
+* onde um produto pode ser vendido;
+* por qual canal;
+* qual preço deve ser aplicado;
+* se o produto está disponível;
+* origem dos pedidos.
+
+A arquitetura passa a suportar expansão para:
+
+* Delivery;
+* PDV;
+* Marketplace;
+* WhatsApp;
+* E-commerce;
+* API Pública.
+
+---
+
+# Próximas etapas
+
+Sprint 05 será definida no Roadmap do projeto.

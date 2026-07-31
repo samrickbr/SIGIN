@@ -18,6 +18,10 @@ public class PedidoResponse {
 
     private String cliente;
 
+    private Long canalVendaId;
+
+    private String canalVenda;
+
     private LocalDateTime dataPedido;
 
     private BigDecimal valorTotal;

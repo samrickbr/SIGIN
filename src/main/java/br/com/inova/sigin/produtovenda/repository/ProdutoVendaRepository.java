@@ -7,17 +7,28 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface ProdutoVendaRepository
-        extends JpaRepository<ProdutoVenda, Long> {
-    Optional<ProdutoVenda> findByProdutoId(Long produtoId);
-    @Query("""
-    SELECT pv
-    FROM ProdutoVenda pv
-    JOIN FETCH pv.produto p
-    LEFT JOIN FETCH p.categoria
-    WHERE pv.disponivelVenda = true
-    AND p.ativo = true
-""")
-    List<ProdutoVenda> findProdutosDisponiveis();
+public interface ProdutoVendaRepository extends JpaRepository<ProdutoVenda, Long> {
 
+    List<ProdutoVenda> findByProdutoId(Long produtoId);
+
+    Optional<ProdutoVenda> findByProdutoIdAndCanalVendaId(
+            Long produtoId,
+            Long canalVendaId
+    );
+
+    boolean existsByProdutoIdAndCanalVendaId(
+            Long produtoId,
+            Long canalVendaId
+    );
+
+    List<ProdutoVenda> findByCanalVendaIdAndDisponivelVendaTrue(
+            Long canalVendaId
+    );
+
+    @Query("""
+            SELECT pv
+            FROM ProdutoVenda pv
+            WHERE pv.disponivelVenda = true
+            """)
+    List<ProdutoVenda> findProdutosDisponiveis();
 }

@@ -1,6 +1,10 @@
 package br.com.inova.sigin.pedido.service;
 
+import br.com.inova.sigin.canalvenda.entity.CanalVenda;
+import br.com.inova.sigin.canalvenda.repository.CanalVendaRepository;
 import br.com.inova.sigin.configuracao.service.ConfiguracaoSistemaService;
+import br.com.inova.sigin.ordemproducao.dto.OrdemProducaoResponse;
+import br.com.inova.sigin.ordemproducao.service.OrdemProducaoService;
 import br.com.inova.sigin.pedido.dto.PedidoRequest;
 import br.com.inova.sigin.pedido.dto.PedidoResponse;
 import br.com.inova.sigin.pedido.entity.Pedido;
@@ -10,12 +14,15 @@ import br.com.inova.sigin.pedido.mapper.PedidoMapper;
 import br.com.inova.sigin.pedido.repository.PedidoRepository;
 import br.com.inova.sigin.pessoa.entity.Pessoa;
 import br.com.inova.sigin.pessoa.repository.PessoaRepository;
+import br.com.inova.sigin.produto.entity.Produto;
+import br.com.inova.sigin.produto.repository.ProdutoRepository;
+import br.com.inova.sigin.produtovenda.entity.ProdutoVenda;
+import br.com.inova.sigin.produtovenda.repository.ProdutoVendaRepository;
+import br.com.inova.sigin.produtovenda.service.ProdutoVendaService;
 import br.com.inova.sigin.shared.exception.RegraNegocioException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import br.com.inova.sigin.ordemproducao.dto.OrdemProducaoResponse;
-import br.com.inova.sigin.ordemproducao.service.OrdemProducaoService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -30,29 +37,36 @@ public class PedidoService {
     private final PedidoMapper mapper;
     private final ConfiguracaoSistemaService configuracaoSistemaService;
     private final OrdemProducaoService ordemProducaoService;
-
+    private final ProdutoRepository produtoRepository;
+    private final CanalVendaRepository canalVendaRepository;
+    private final ProdutoVendaService produtoVendaService;
+    @Transactional
     public PedidoResponse criar(PedidoRequest request) {
 
         Pessoa cliente = pessoaRepository.findById(request.getClienteId())
-                .orElseThrow(() ->
-                        new RegraNegocioException(
-                                "Cliente não encontrado."
-                        ));
+                .orElseThrow(() -> new RegraNegocioException("Cliente não encontrado."));
+
+        CanalVenda canalVenda = canalVendaRepository.findById(request.getCanalVendaId()).orElseThrow(() -> new RegraNegocioException("Canal de venda não encontrado."));
 
         Pedido pedido = Pedido.builder()
                 .numero(configuracaoSistemaService.gerarProximoNumeroPedido())
-                .cliente(cliente)
+                .cliente(cliente).canalVenda(canalVenda)
                 .dataPedido(LocalDateTime.now())
-                .valorTotal(
-                        request.getValorTotal() != null
-                                ? request.getValorTotal()
-                                : BigDecimal.ZERO
-                )
                 .status(StatusPedido.ABERTO)
                 .ativo(true)
                 .observacao(request.getObservacao())
                 .build();
 
+        List<PedidoItem> itens = request.getItens().stream().map(itemRequest -> {
+            Produto produto = produtoRepository.findById(itemRequest.getProdutoId()).orElseThrow(() -> new RegraNegocioException("Produto não encontrado."));
+            ProdutoVenda produtoVenda = produtoVendaService.obterProdutoDisponivel(produto.getId(), canalVenda.getId());
+
+            BigDecimal valorUnitario = produtoVenda.getPrecoVenda();
+            BigDecimal valorTotal = valorUnitario.multiply(itemRequest.getQuantidade());
+            return PedidoItem.builder().pedido(pedido).produto(produto).quantidade(itemRequest.getQuantidade()).valorUnitario(valorUnitario).valorTotal(valorTotal).ativo(true).build();
+        }).toList();
+        pedido.getItens().addAll(itens);
+        atualizarValorTotal(pedido);
 
         return mapper.toResponse(repository.save(pedido));
     }

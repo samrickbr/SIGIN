@@ -17,11 +17,13 @@ import java.util.List;
 public class BalcaoService {
 
     private final PedidoRepository repository;
-
     @Transactional(readOnly = true)
     public List<BalcaoPedidoResponse> listar() {
-
-        return repository.findByStatus(StatusPedido.ABERTO)
+        return repository.findByStatusIn(List.of(
+                                StatusPedido.ABERTO,
+                                StatusPedido.RECEBIDO
+                        )
+                )
                 .stream()
                 .map(p -> BalcaoPedidoResponse.builder()
                         .id(p.getId())
@@ -43,30 +45,23 @@ public class BalcaoService {
                                         )
                                         .toList()
                         )
-
                         .build())
                 .toList();
     }
 
     @Transactional
     public void aceitar(Long id) {
-
         Pedido pedido = repository.findById(id).orElseThrow(()
                 -> new RegraNegocioException("Pedido não encontrado"));
-
         pedido.setStatus(StatusPedido.RECEBIDO);
-
         repository.save(pedido);
     }
 
     @Transactional
     public void cancelar(Long id) {
-
         Pedido pedido = repository.findById(id).orElseThrow(()
                 -> new RegraNegocioException("Pedido não encontrado"));
-
         pedido.setStatus(StatusPedido.CANCELADO);
-
         repository.save(pedido);
     }
 
@@ -75,10 +70,7 @@ public class BalcaoService {
 
         Pedido pedido = repository.findById(id).orElseThrow(()
                 -> new RegraNegocioException("Pedido não encontrado"));
-
         pedido.setStatus(StatusPedido.EM_PREPARO);
-
         repository.save(pedido);
     }
-
 }

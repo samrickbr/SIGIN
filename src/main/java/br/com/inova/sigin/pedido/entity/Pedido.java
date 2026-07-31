@@ -1,5 +1,6 @@
 package br.com.inova.sigin.pedido.entity;
 
+import br.com.inova.sigin.canalvenda.entity.CanalVenda;
 import br.com.inova.sigin.pedido.enums.StatusPedido;
 import br.com.inova.sigin.pessoa.entity.Pessoa;
 import jakarta.persistence.*;
@@ -28,10 +29,18 @@ public class Pedido {
     @ManyToOne(optional = false)
     private Pessoa cliente;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "canal_venda_id")
+    private CanalVenda canalVenda;
+
     @Column(nullable = false)
     private LocalDateTime dataPedido;
 
-    @OneToMany(mappedBy = "pedido")
+    @OneToMany(
+            mappedBy = "pedido",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     @Builder.Default
     private List<PedidoItem> itens = new ArrayList<>();
 

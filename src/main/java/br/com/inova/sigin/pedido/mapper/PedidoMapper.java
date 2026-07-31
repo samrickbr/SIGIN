@@ -14,6 +14,8 @@ public class PedidoMapper {
                 .numero(pedido.getNumero())
                 .clienteId(pedido.getCliente().getId())
                 .cliente(pedido.getCliente().getNome())
+                .canalVendaId(pedido.getCanalVenda().getId())
+                .canalVenda(pedido.getCanalVenda().getNome())
                 .dataPedido(pedido.getDataPedido())
                 .valorTotal(pedido.getValorTotal())
                 .status(pedido.getStatus().name())

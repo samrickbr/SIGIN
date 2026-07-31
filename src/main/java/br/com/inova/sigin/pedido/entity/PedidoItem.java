@@ -19,28 +19,22 @@ public class PedidoItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @ManyToOne(optional = false)
     @JoinColumn(name = "pedido_id", nullable = false)
     private Pedido pedido;
-
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "produto_id", nullable = false)
     private Produto produto;
 
-
     @Column(nullable = false)
     private BigDecimal quantidade;
-
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal valorUnitario;
 
-
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal valorTotal;
-
 
     @Column(nullable = false)
     private Boolean ativo;
