@@ -1,0 +1,2 @@
+ALTER TABLE formas_pagamento
+ADD COLUMN baixa_automatica BOOLEAN NOT NULL DEFAULT FALSE;

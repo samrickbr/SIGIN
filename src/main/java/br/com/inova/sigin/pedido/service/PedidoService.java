@@ -3,6 +3,9 @@ package br.com.inova.sigin.pedido.service;
 import br.com.inova.sigin.canalvenda.entity.CanalVenda;
 import br.com.inova.sigin.canalvenda.repository.CanalVendaRepository;
 import br.com.inova.sigin.configuracao.service.ConfiguracaoSistemaService;
+import br.com.inova.sigin.financeiro.entity.FormaPagamento;
+import br.com.inova.sigin.financeiro.repository.FormaPagamentoRepository;
+import br.com.inova.sigin.financeiro.service.FinanceiroPedidoService;
 import br.com.inova.sigin.ordemproducao.dto.OrdemProducaoResponse;
 import br.com.inova.sigin.ordemproducao.service.OrdemProducaoService;
 import br.com.inova.sigin.pedido.dto.PedidoRequest;
@@ -17,7 +20,6 @@ import br.com.inova.sigin.pessoa.repository.PessoaRepository;
 import br.com.inova.sigin.produto.entity.Produto;
 import br.com.inova.sigin.produto.repository.ProdutoRepository;
 import br.com.inova.sigin.produtovenda.entity.ProdutoVenda;
-import br.com.inova.sigin.produtovenda.repository.ProdutoVendaRepository;
 import br.com.inova.sigin.produtovenda.service.ProdutoVendaService;
 import br.com.inova.sigin.shared.exception.RegraNegocioException;
 import jakarta.transaction.Transactional;
@@ -40,6 +42,9 @@ public class PedidoService {
     private final ProdutoRepository produtoRepository;
     private final CanalVendaRepository canalVendaRepository;
     private final ProdutoVendaService produtoVendaService;
+    private final FormaPagamentoRepository formaPagamentoRepository;
+    private final FinanceiroPedidoService financeiroPedidoService;
+
     @Transactional
     public PedidoResponse criar(PedidoRequest request) {
 
@@ -48,9 +53,17 @@ public class PedidoService {
 
         CanalVenda canalVenda = canalVendaRepository.findById(request.getCanalVendaId()).orElseThrow(() -> new RegraNegocioException("Canal de venda não encontrado."));
 
+        FormaPagamento formaPagamento =
+                formaPagamentoRepository.findById(request.getFormaPagamentoId())
+                        .orElseThrow(() ->
+                                new RegraNegocioException("Forma de pagamento não encontrada.")
+                        );
+
         Pedido pedido = Pedido.builder()
                 .numero(configuracaoSistemaService.gerarProximoNumeroPedido())
-                .cliente(cliente).canalVenda(canalVenda)
+                .cliente(cliente)
+                .canalVenda(canalVenda)
+                .formaPagamento(formaPagamento)
                 .dataPedido(LocalDateTime.now())
                 .status(StatusPedido.ABERTO)
                 .ativo(true)
@@ -74,7 +87,7 @@ public class PedidoService {
 
     public List<PedidoResponse> listar() {
 
-        return repository.findAll()
+        return repository.listarCompleto()
                 .stream()
                 .map(mapper::toResponse)
                 .toList();
@@ -146,6 +159,7 @@ public class PedidoService {
 
         pedido.setValorTotal(total);
     }
+
     @Transactional
     public List<OrdemProducaoResponse> gerarOrdemProducao(Long pedidoId) {
 
@@ -180,5 +194,24 @@ public class PedidoService {
         repository.save(pedido);
 
         return ordens;
+    }
+    @Transactional
+    public PedidoResponse faturar(Long id) {
+
+        Pedido pedido = buscarEntidadePorId(id);
+
+        if (pedido.getStatus() != StatusPedido.ABERTO) {
+            throw new RegraNegocioException(
+                    "Somente pedidos abertos podem ser faturados."
+            );
+        }
+
+        pedido.setStatus(StatusPedido.FATURADO);
+
+        repository.save(pedido);
+
+        financeiroPedidoService.gerarFinanceiro(pedido);
+
+        return mapper.toResponse(pedido);
     }
 }

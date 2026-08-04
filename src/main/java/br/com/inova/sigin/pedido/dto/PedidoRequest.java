@@ -17,9 +17,12 @@ public class PedidoRequest {
     @NotNull
     private Long canalVendaId;
 
+    private Long formaPagamentoId;
+
     private BigDecimal valorTotal;
 
     private String observacao;
 
     private List<PedidoItemRequest> itens;
+
 }

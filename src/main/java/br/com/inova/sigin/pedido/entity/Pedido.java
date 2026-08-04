@@ -1,6 +1,7 @@
 package br.com.inova.sigin.pedido.entity;
 
 import br.com.inova.sigin.canalvenda.entity.CanalVenda;
+import br.com.inova.sigin.financeiro.entity.FormaPagamento;
 import br.com.inova.sigin.pedido.enums.StatusPedido;
 import br.com.inova.sigin.pessoa.entity.Pessoa;
 import jakarta.persistence.*;
@@ -46,6 +47,10 @@ public class Pedido {
 
     @Column(nullable = false)
     private BigDecimal valorTotal;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "forma_pagamento_id")
+    private FormaPagamento formaPagamento;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

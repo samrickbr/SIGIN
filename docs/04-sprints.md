@@ -91,20 +91,170 @@ Os módulos consumidores deixam de conhecer regras de preço, disponibilidade e 
 
 ---
 
-# Sprint 05
+## Sprint 05 — Financeiro Inicial (v0.6.0)
 
-**Status:** ⏳ Planejada
+Status: ✅ Concluída
 
-A definir no Roadmap.
+Objetivo:
+Criar a base financeira integrada ao fluxo comercial do Core.
 
+Entregas:
+
+- Contas a Receber
+- Caixa (movimentações financeiras)
+- Integração Pedido x Financeiro
+- Faturamento de pedidos
+- Baixa automática conforme forma de pagamento
+
+Decisões arquiteturais:
+
+- O Pedido continua sendo responsável pelo fluxo comercial.
+- O Financeiro recebe eventos do Pedido através de serviços de integração.
+- Faturamento é o momento em que o financeiro é gerado.
+- Forma de pagamento define comportamento de baixa automática.
+- Caixa registra entradas originadas de vendas.
+
+Implementações:
+
+✅ ContaReceber
+✅ CaixaMovimento
+✅ StatusContaReceber
+✅ TipoMovimentoCaixa
+✅ OrigemMovimentoCaixa
+✅ FinanceiroPedidoService
+✅ Endpoint POST /api/pedidos/{id}/faturar
+
+Validações realizadas:
+
+- Pedido faturado corretamente.
+- Conta a receber criada.
+- PIX com baixa automática gera movimento no caixa.
+- Movimento de caixa vinculado ao pedido através de referencia_id.
+
+Migration:
+
+V36__ajustar_pedidos_legados.sql
+
+Ajustes:
+
+- Preenchimento de canal de venda em pedidos antigos.
+- Preenchimento de forma de pagamento em pedidos antigos.
+- Aplicação de NOT NULL após saneamento dos dados.
 ---
 
 # Evolução do Core
 
-| Sprint    | Status | Principal entrega  |
-| --------- | :----: | ------------------ |
-| Sprint 01 |    ✅   | Fundação do Core   |
-| Sprint 02 |    ✅   | Produção           |
-| Sprint 03 |    ✅   | Comercial Inicial  |
-| Sprint 04 |    ✅   | Fundação Comercial |
-| Sprint 05 |    ⏳   | Planejamento       |
+| Sprint    | Status | Principal entrega        |
+|-----------|:------:|--------------------------|
+| Sprint 01 |   ✅   | Fundação do Core         |
+| Sprint 02 |   ✅   | Produção                 |
+| Sprint 03 |   ✅   | Comercial Inicial        |
+| Sprint 04 |   ✅   | Fundação Comercial       |
+| Sprint 05 |   ✅   | Financeiro Inicial       |
+| Sprint 06 |   🔜   | Refatoração Delivery     |
+| Sprint 07 |   ⏳   | PDV                      |
+| Sprint 08 |   ⏳   | Comanda                  |
+| Sprint 09 |   ⏳   | Financeiro Avançado      |
+| Sprint 10 |   ⏳   | Usuários e Permissões    |
+
+
+---
+
+definido :
+
+Sprint 06 — Integração Delivery com Core
+
+Objetivo:
+Remover regras comerciais duplicadas do Delivery e utilizar o Core como fonte oficial de produtos, pedidos e produção.
+
+Hoje:
+
+Delivery-back possui:
+
+produto
+setor
+pedido
+fluxo
+
+Futuro:
+
+Delivery:
+
+Cliente
+|
+Carrinho
+|
+Core API
+|
+Pedido Core
+
+Delivery vira uma camada de experiência.
+
+Sprint 07 — PDV
+
+Aqui eu concordo com sua observação:
+
+Precisamos pensar antes.
+
+Eu não faria:
+
+"balcão = delivery"
+
+Eu criaria:
+
+Módulo PDV
+
+Com:
+
+abertura de caixa
+operador
+venda rápida
+impressão
+pagamento
+fechamento
+
+Mas usando:
+
+Pedido Core
+
+como motor.
+
+Sprint 08 — Comanda
+
+Comanda provavelmente será outro canal:
+
+CANAL_COMANDA
+
+Fluxo:
+
+Mesa
+↓
+Comanda aberta
+↓
+Itens adicionados
+↓
+Pedido
+↓
+Produção
+↓
+Pagamento
+
+Sprint 09 — Financeiro Avançado
+
+contas a pagar
+fornecedores
+despesas
+fechamento de caixa
+relatórios
+conciliação
+
+Sprint 10 — Usuários e Permissões
+
+Porque agora teremos:
+
+cozinha
+pizzaria
+lanchonete
+PDV
+administração
+cliente

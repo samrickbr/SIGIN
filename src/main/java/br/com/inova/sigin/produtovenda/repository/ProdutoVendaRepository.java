@@ -3,6 +3,7 @@ package br.com.inova.sigin.produtovenda.repository;
 import br.com.inova.sigin.produtovenda.entity.ProdutoVenda;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,4 +32,17 @@ public interface ProdutoVendaRepository extends JpaRepository<ProdutoVenda, Long
             WHERE pv.disponivelVenda = true
             """)
     List<ProdutoVenda> findProdutosDisponiveis();
+
+    @Query("""
+        SELECT pv
+        FROM ProdutoVenda pv
+        JOIN FETCH pv.produto p
+        JOIN FETCH pv.canalVenda c
+        WHERE c.id = :canalVendaId
+        AND pv.disponivelVenda = true
+        AND c.ativo = true
+        """)
+    List<ProdutoVenda> findCatalogoPorCanal(
+            Long canalVendaId
+    );
 }

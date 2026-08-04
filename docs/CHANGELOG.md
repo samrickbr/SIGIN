@@ -127,7 +127,7 @@ Todas as alterações relevantes do projeto serão documentadas neste arquivo.
 
 ---
 
-# [0.4.0] — Sprint 04 — Fundação Comercial (Core)
+# [0.5.0] — Sprint 04 — Fundação Comercial (Core)
 
 ## Adicionado
 
@@ -244,3 +244,31 @@ A arquitetura passa a suportar expansão para:
 # Próximas etapas
 
 Sprint 05 será definida no Roadmap do projeto.
+
+## v0.6.0 - Sprint 05
+
+### Added
+
+- Implementado módulo financeiro inicial.
+- Criada estrutura de contas a receber.
+- Criado controle de movimentação de caixa.
+- Integrado faturamento de pedidos ao financeiro.
+- Implementada baixa automática por forma de pagamento.
+- Criado registro de entradas no caixa originadas por pedidos.
+
+### Changed
+
+- Pedidos passaram a exigir canal de venda.
+- Pedidos passaram a exigir forma de pagamento.
+- Criado saneamento de dados legados via migration.
+
+### Technical
+
+- Novas entidades:
+    - ContaReceber
+    - CaixaMovimento
+
+- Novos serviços:
+    - FinanceiroPedidoService
+
+- Novas migrations financeiras.

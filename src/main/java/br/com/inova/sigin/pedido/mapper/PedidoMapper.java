@@ -19,6 +19,8 @@ public class PedidoMapper {
                 .dataPedido(pedido.getDataPedido())
                 .valorTotal(pedido.getValorTotal())
                 .status(pedido.getStatus().name())
+                .formaPagamentoId(pedido.getFormaPagamento().getId())
+                .formaPagamento(pedido.getFormaPagamento().getDescricao())
                 .ativo(pedido.getAtivo())
                 .observacao(pedido.getObservacao())
                 .build();

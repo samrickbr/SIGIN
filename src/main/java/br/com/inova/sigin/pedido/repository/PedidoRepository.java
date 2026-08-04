@@ -26,4 +26,13 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     List<Pedido> findByStatus(@Param("status") StatusPedido status);
 
     List<Pedido> findByStatusIn(List<StatusPedido> status);
+
+    @Query("""
+    SELECT p
+    FROM Pedido p
+    LEFT JOIN FETCH p.cliente
+    LEFT JOIN FETCH p.canalVenda
+    LEFT JOIN FETCH p.formaPagamento
+    """)
+    List<Pedido> listarCompleto();
 }

@@ -28,6 +28,10 @@ public class PedidoResponse {
 
     private String status;
 
+    private Long formaPagamentoId;
+
+    private String formaPagamento;
+
     private Boolean ativo;
 
     private String observacao;

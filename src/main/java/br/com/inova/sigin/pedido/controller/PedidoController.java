@@ -77,4 +77,10 @@ public class PedidoController {
                 service.gerarOrdemProducao(id)
         );
     }
+    @PostMapping("/{id}/faturar")
+    public PedidoResponse faturar(
+            @PathVariable Long id) {
+
+        return service.faturar(id);
+    }
 }
