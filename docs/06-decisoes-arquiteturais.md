@@ -22,3 +22,24 @@ O Pedido não cria automaticamente uma Ordem de Produção.
 
 A integração será realizada na Sprint 17 através de um serviço específico de conversão Pedido → Ordem de Produção, preservando o desacoplamento entre os módulos Comercial e Produção.
 
+
+**Data:** 05/08/2026
+# Decisão Arquitetural — Módulo Usuario / IAM
+
+O SIGIN utiliza Pessoa como identidade de negócio
+e Usuario como identidade de acesso.
+
+Usuários possuem Perfis.
+Perfis possuem Permissões.
+
+Não são permitidas permissões diretamente em usuários.
+
+O módulo Usuario é independente dos domínios comerciais
+e será utilizado por todos os futuros canais:
+
+- Web Administrativo
+- PDV
+- Delivery
+- Comanda
+- APIs
+

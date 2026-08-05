@@ -1,0 +1,9 @@
+CREATE TABLE permissoes (
+    id BIGSERIAL PRIMARY KEY,
+
+    codigo VARCHAR(100) NOT NULL UNIQUE,
+
+    descricao VARCHAR(255),
+
+    ativo BOOLEAN NOT NULL DEFAULT TRUE
+);

@@ -272,3 +272,13 @@ Sprint 05 será definida no Roadmap do projeto.
     - FinanceiroPedidoService
 
 - Novas migrations financeiras.
+
+## Sprint 06
+
+### Added
+
+- Implementação do módulo Usuario
+- Autenticação JWT
+- Controle de acesso por Perfil e Permissão
+- Integração Usuario com Pessoa
+- Proteção de endpoints via Spring Security
