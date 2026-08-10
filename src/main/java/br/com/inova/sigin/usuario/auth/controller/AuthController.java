@@ -1,5 +1,6 @@
 package br.com.inova.sigin.usuario.auth.controller;
 
+import br.com.inova.sigin.usuario.auth.dto.AuthMeResponse;
 import br.com.inova.sigin.usuario.auth.dto.LoginRequest;
 import br.com.inova.sigin.usuario.auth.dto.LoginResponse;
 import br.com.inova.sigin.usuario.auth.service.AuthService;
@@ -15,7 +16,14 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
+    public LoginResponse login(
+            @Valid @RequestBody LoginRequest request
+    ) {
         return authService.login(request);
+    }
+
+    @GetMapping("/me")
+    public AuthMeResponse me() {
+        return authService.me();
     }
 }

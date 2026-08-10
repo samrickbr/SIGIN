@@ -282,3 +282,16 @@ Sprint 05 será definida no Roadmap do projeto.
 - Controle de acesso por Perfil e Permissão
 - Integração Usuario com Pessoa
 - Proteção de endpoints via Spring Security
+
+### Autenticação — contrato `/auth/me`
+
+* Implementado/confirmado o endpoint `GET /auth/me`.
+* Endpoint utiliza a autenticação JWT existente.
+* Retorna a identidade do usuário autenticado.
+* Retorna pessoa vinculada ao usuário.
+* Retorna perfis associados.
+* Retorna permissões associadas.
+* Contrato validado manualmente através do Swagger.
+* Validado comportamento de acesso sem token e com token inválido.
+* Não foram criados novos mecanismos de autenticação ou autorização.
+* Não foram adicionados endpoints de CRUD de usuários, perfis ou permissões nesta evolução.
