@@ -9,6 +9,7 @@ import br.com.inova.sigin.shared.exception.RegraNegocioException;
 import br.com.inova.sigin.shared.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,9 +17,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PessoaService {
-
     private final PessoaRepository repository;
-
 
     public PessoaResponse criar(PessoaRequest request) {
 
@@ -35,7 +34,6 @@ public class PessoaService {
 
         return converter(repository.save(pessoa));
     }
-
 
     public List<PessoaResponse> listar() {
 
@@ -57,13 +55,13 @@ public class PessoaService {
     }
 
 
+    @Transactional
     public PessoaResponse atualizar(Long id, PessoaUpdateRequest request) {
 
         Pessoa pessoa = repository.findById(id)
                 .orElseThrow(() ->
                         new RegraNegocioException("Pessoa não encontrada")
                 );
-
 
         if (request.getNome() != null) {
             pessoa.setNome(
@@ -87,10 +85,10 @@ public class PessoaService {
             pessoa.setAtivo(request.getAtivo());
         }
 
+        repository.save(pessoa);
 
-        return converter(repository.save(pessoa));
+        return converter(pessoa);
     }
-
 
     public void excluir(Long id) {
 

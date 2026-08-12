@@ -21,8 +21,12 @@ public class GlobalExceptionHandler {
                 ex.getMessage()
         );
 
+        HttpStatus status = "Pessoa já possui usuário.".equals(ex.getMessage())
+                ? HttpStatus.CONFLICT
+                : HttpStatus.BAD_REQUEST;
+
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(status)
                 .body(erro);
     }
 
