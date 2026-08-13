@@ -18,5 +18,6 @@ public class ProdutoResponse {
     private Boolean disponivelVenda;
     private String imagem;
     private Boolean ativo;
+    private Long categoriaId;
 
 }

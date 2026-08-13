@@ -1,0 +1,491 @@
+﻿===== AUDITORIA 02 — USUÁRIOS =====
+
+===== src/main/java/br/com/inova/sigin/usuario/controller/UsuarioController.java =====
+package br.com.inova.sigin.usuario.controller;
+
+import br.com.inova.sigin.usuario.dto.UsuarioRequest;
+import br.com.inova.sigin.usuario.dto.UsuarioResponse;
+import br.com.inova.sigin.usuario.service.UsuarioService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/usuarios")
+@RequiredArgsConstructor
+public class UsuarioController {
+
+    private final UsuarioService service;
+
+    @PostMapping
+    public UsuarioResponse criar(@Valid @RequestBody UsuarioRequest request) {
+        return service.criar(request);
+    }
+
+    @GetMapping
+    public List<UsuarioResponse> listar() {
+        return service.listar();
+    }
+
+    @GetMapping("/{id}")
+    public UsuarioResponse buscar(@PathVariable Long id) {
+        return service.buscar(id);
+    }
+
+    @PutMapping("/{id}")
+    public UsuarioResponse atualizar(@PathVariable Long id,
+                                     @Valid @RequestBody UsuarioRequest request) {
+        return service.atualizar(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    public void excluir(@PathVariable Long id) {
+        service.excluir(id);
+    }
+}
+
+===== src/main/java/br/com/inova/sigin/usuario/controller/UsuarioPerfilController.java =====
+package br.com.inova.sigin.usuario.controller;
+
+import br.com.inova.sigin.usuario.dto.PerfilResponse;
+import br.com.inova.sigin.usuario.service.UsuarioPerfilService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/usuarios")
+@RequiredArgsConstructor
+public class UsuarioPerfilController {
+
+    private final UsuarioPerfilService service;
+
+    @PostMapping("/{usuarioId}/perfis/{perfilId}")
+    public void adicionarPerfil(@PathVariable Long usuarioId,
+                                @PathVariable Long perfilId) {
+
+        service.adicionarPerfil(usuarioId, perfilId);
+    }
+
+    @GetMapping("/{usuarioId}/perfis")
+    public List<PerfilResponse> listarPerfis(@PathVariable Long usuarioId) {
+
+        return service.listarPerfis(usuarioId);
+    }
+
+    @DeleteMapping("/{usuarioId}/perfis/{perfilId}")
+    public void removerPerfil(@PathVariable Long usuarioId,
+                              @PathVariable Long perfilId) {
+
+        service.removerPerfil(usuarioId, perfilId);
+    }
+}
+
+===== src/main/java/br/com/inova/sigin/usuario/dto/UsuarioRequest.java =====
+package br.com.inova.sigin.usuario.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class UsuarioRequest {
+
+    @NotNull
+    private Long pessoaId;
+
+    @NotBlank
+    private String login;
+
+    @NotBlank
+    private String senha;
+
+    private Boolean ativo = true;
+}
+
+===== src/main/java/br/com/inova/sigin/usuario/dto/UsuarioResponse.java =====
+package br.com.inova.sigin.usuario.dto;
+
+import lombok.Builder;
+import lombok.Getter;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Builder
+public class UsuarioResponse {
+
+    private Long id;
+
+    private Long pessoaId;
+
+    private String login;
+
+    private Boolean ativo;
+
+    private LocalDateTime ultimoLogin;
+
+    private LocalDateTime dataCriacao;
+}
+
+===== src/main/java/br/com/inova/sigin/usuario/entity/Usuario.java =====
+package br.com.inova.sigin.usuario.entity;
+
+import br.com.inova.sigin.pessoa.entity.Pessoa;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "usuarios")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Usuario {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "pessoa_id", nullable = false, unique = true)
+    private Pessoa pessoa;
+
+    @Column(nullable = false, unique = true, length = 150)
+    private String login;
+
+    @Column(nullable = false, length = 255)
+    private String senha;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean ativo = true;
+
+    @Column(name = "ultimo_login")
+    private LocalDateTime ultimoLogin;
+
+    @Builder.Default
+    @Column(name = "data_criacao", nullable = false, updatable = false)
+    private LocalDateTime dataCriacao = LocalDateTime.now();
+}
+
+===== src/main/java/br/com/inova/sigin/usuario/entity/UsuarioPerfil.java =====
+package br.com.inova.sigin.usuario.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Table(
+        name = "usuarios_perfis",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"usuario_id", "perfil_id"})
+        }
+)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UsuarioPerfil {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "perfil_id", nullable = false)
+    private Perfil perfil;
+}
+
+===== src/main/java/br/com/inova/sigin/usuario/service/UsuarioService.java =====
+package br.com.inova.sigin.usuario.service;
+
+import br.com.inova.sigin.pessoa.entity.Pessoa;
+import br.com.inova.sigin.pessoa.repository.PessoaRepository;
+import br.com.inova.sigin.shared.exception.RegraNegocioException;
+import br.com.inova.sigin.usuario.dto.UsuarioRequest;
+import br.com.inova.sigin.usuario.dto.UsuarioResponse;
+import br.com.inova.sigin.usuario.entity.Usuario;
+import br.com.inova.sigin.usuario.mapper.UsuarioMapper;
+import br.com.inova.sigin.usuario.repository.UsuarioRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class UsuarioService {
+
+    private final UsuarioRepository repository;
+    private final PessoaRepository pessoaRepository;
+    private final UsuarioMapper mapper;
+    private final PasswordEncoder passwordEncoder;
+
+    public UsuarioResponse criar(UsuarioRequest request) {
+
+        if (repository.existsByLogin(request.getLogin())) {
+            throw new RegraNegocioException("Login jÃ¡ cadastrado.");
+        }
+
+        if (repository.existsByPessoaId(request.getPessoaId())) {
+            throw new RegraNegocioException("Pessoa jÃ¡ possui usuÃ¡rio.");
+        }
+
+        Pessoa pessoa = pessoaRepository.findById(request.getPessoaId()).orElseThrow(() -> new RegraNegocioException("Pessoa nÃ£o encontrada."));
+
+        Usuario usuario = Usuario.builder().pessoa(pessoa).login(request.getLogin()).senha(passwordEncoder.encode(request.getSenha())).ativo(request.getAtivo()).dataCriacao(LocalDateTime.now()).build();
+
+        return mapper.toResponse(repository.save(usuario));
+    }
+
+    public List<UsuarioResponse> listar() {
+        return repository.findByAtivoTrue().stream().map(mapper::toResponse).toList();
+    }
+
+    public UsuarioResponse buscar(Long id) {
+        return mapper.toResponse(buscaUsuario(id));
+    }
+
+    public UsuarioResponse atualizar(Long id, UsuarioRequest request) {
+
+        Usuario usuario = buscaUsuario(id);
+
+        if (!usuario.getLogin().equals(request.getLogin()) && repository.existsByLogin(request.getLogin())) {
+            throw new RegraNegocioException("Login jÃ¡ cadastrado.");
+        }
+
+        if (!usuario.getPessoa().getId().equals(request.getPessoaId()) && repository.existsByPessoaId(request.getPessoaId())) {
+            throw new RegraNegocioException("Pessoa jÃ¡ possui usuÃ¡rio.");
+        }
+
+        Pessoa pessoa = pessoaRepository.findById(request.getPessoaId()).orElseThrow(() -> new RegraNegocioException("Pessoa nÃ£o encontrada."));
+
+        usuario.setPessoa(pessoa);
+        usuario.setLogin(request.getLogin());
+        usuario.setSenha(passwordEncoder.encode(request.getSenha()));
+        usuario.setAtivo(request.getAtivo());
+
+        return mapper.toResponse(repository.save(usuario));
+    }
+
+    public void excluir(Long id) {
+
+        Usuario usuario = buscaUsuario(id);
+
+        usuario.setAtivo(false);
+
+        repository.save(usuario);
+    }
+
+    private Usuario buscaUsuario(Long id) {
+
+        return repository.findByIdAndAtivoTrue(id).orElseThrow(() -> new RegraNegocioException("UsuÃ¡rio nÃ£o encontrado."));
+    }
+}
+
+===== src/main/java/br/com/inova/sigin/usuario/service/UsuarioPerfilService.java =====
+package br.com.inova.sigin.usuario.service;
+
+import br.com.inova.sigin.shared.exception.RegraNegocioException;
+import br.com.inova.sigin.usuario.dto.PerfilResponse;
+import br.com.inova.sigin.usuario.entity.Perfil;
+import br.com.inova.sigin.usuario.entity.Usuario;
+import br.com.inova.sigin.usuario.entity.UsuarioPerfil;
+import br.com.inova.sigin.usuario.mapper.PerfilMapper;
+import br.com.inova.sigin.usuario.repository.PerfilRepository;
+import br.com.inova.sigin.usuario.repository.UsuarioPerfilRepository;
+import br.com.inova.sigin.usuario.repository.UsuarioRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class UsuarioPerfilService {
+
+    private final UsuarioRepository usuarioRepository;
+    private final PerfilRepository perfilRepository;
+    private final UsuarioPerfilRepository usuarioPerfilRepository;
+    private final PerfilMapper perfilMapper;
+
+    public void adicionarPerfil(Long usuarioId, Long perfilId) {
+
+        Usuario usuario = usuarioRepository.findByIdAndAtivoTrue(usuarioId)
+                .orElseThrow(() -> new RegraNegocioException("UsuÃ¡rio nÃ£o encontrado."));
+
+        Perfil perfil = perfilRepository.findByIdAndAtivoTrue(perfilId)
+                .orElseThrow(() -> new RegraNegocioException("Perfil nÃ£o encontrado."));
+
+        if (usuarioPerfilRepository.existsByUsuarioIdAndPerfilId(usuarioId, perfilId)) {
+            throw new RegraNegocioException("Perfil jÃ¡ vinculado ao usuÃ¡rio.");
+        }
+
+        UsuarioPerfil usuarioPerfil = UsuarioPerfil.builder()
+                .usuario(usuario)
+                .perfil(perfil)
+                .build();
+
+        usuarioPerfilRepository.save(usuarioPerfil);
+    }
+
+    public List<PerfilResponse> listarPerfis(Long usuarioId) {
+
+        if (!usuarioRepository.existsById(usuarioId)) {
+            throw new RegraNegocioException("UsuÃ¡rio nÃ£o encontrado.");
+        }
+
+        return usuarioPerfilRepository.buscarComPermissoesPorUsuario(usuarioId)
+                .stream()
+                .map(UsuarioPerfil::getPerfil)
+                .map(perfilMapper::toResponse)
+                .toList();
+    }
+
+    public void removerPerfil(Long usuarioId, Long perfilId) {
+
+        UsuarioPerfil usuarioPerfil = usuarioPerfilRepository
+                .buscarComPermissoesPorUsuario(usuarioId)
+                .stream()
+                .filter(up -> up.getPerfil().getId().equals(perfilId))
+                .findFirst()
+                .orElseThrow(() -> new RegraNegocioException("VÃ­nculo nÃ£o encontrado."));
+
+        usuarioPerfilRepository.delete(usuarioPerfil);
+    }
+}
+
+===== src/main/java/br/com/inova/sigin/usuario/repository/UsuarioRepository.java =====
+package br.com.inova.sigin.usuario.repository;
+
+import br.com.inova.sigin.usuario.entity.Usuario;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+
+    Optional<Usuario> findByLoginAndAtivoTrue(String login);
+
+    Optional<Usuario> findByPessoaId(Long pessoaId);
+
+    Optional<Usuario> findByIdAndAtivoTrue(Long id);
+
+    List<Usuario> findByAtivoTrue();
+
+    boolean existsByLogin(String login);
+
+    boolean existsByPessoaId(Long pessoaId);
+}
+
+===== src/main/java/br/com/inova/sigin/usuario/repository/UsuarioPerfilRepository.java =====
+package br.com.inova.sigin.usuario.repository;
+
+import br.com.inova.sigin.usuario.entity.UsuarioPerfil;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
+
+public interface UsuarioPerfilRepository
+        extends JpaRepository<UsuarioPerfil, Long> {
+
+    boolean existsByUsuarioIdAndPerfilId(
+            Long usuarioId,
+            Long perfilId
+    );
+
+    @Query("""
+        SELECT up
+        FROM UsuarioPerfil up
+        JOIN FETCH up.perfil p
+        JOIN FETCH p.permissoes pp
+        JOIN FETCH pp.permissao
+        WHERE up.usuario.id = :usuarioId
+    """)
+    List<UsuarioPerfil> buscarComPermissoesPorUsuario(
+            Long usuarioId
+    );
+}
+
+===== REFERÊNCIAS A USUARIO / USUARIOPERFIL =====
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\shared\security\CustomUserDetailsService.java:4: import br.com.inova.sigin.usuario.entity.UsuarioPerfil;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\shared\security\CustomUserDetailsService.java:5: import br.com.inova.sigin.usuario.repository.UsuarioPerfilRepository;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\shared\security\CustomUserDetailsService.java:6: import br.com.inova.sigin.usuario.repository.UsuarioRepository;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\shared\security\CustomUserDetailsService.java:16: private final UsuarioRepository usuarioRepository;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\shared\security\CustomUserDetailsService.java:17: private final UsuarioPerfilRepository usuarioPerfilRepository;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\shared\security\CustomUserDetailsService.java:23: Usuario usuario = usuarioRepository
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\shared\security\CustomUserDetailsService.java:32: var authorities = usuarioPerfilRepository.buscarComPermissoesPorUsuario(
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\shared\security\CustomUserDetailsService.java:36: .flatMap(usuarioPerfil ->
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\shared\security\CustomUserDetailsService.java:37: usuarioPerfil.getPerfil()
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\auth\service\AuthService.java:7: import br.com.inova.sigin.usuario.entity.UsuarioPerfil;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\auth\service\AuthService.java:8: import br.com.inova.sigin.usuario.repository.UsuarioPerfilRepository;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\auth\service\AuthService.java:9: import br.com.inova.sigin.usuario.repository.UsuarioRepository;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\auth\service\AuthService.java:29: private final UsuarioRepository usuarioRepository;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\auth\service\AuthService.java:32: private final UsuarioPerfilRepository usuarioPerfilRepository;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\auth\service\AuthService.java:36: Usuario usuario = usuarioRepository.findByLoginAndAtivoTrue(request.getLogin())
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\auth\service\AuthService.java:48: usuarioRepository.save(usuario);
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\auth\service\AuthService.java:63: Usuario usuario = usuarioRepository
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\auth\service\AuthService.java:71: List<UsuarioPerfil> usuarioPerfis =
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\auth\service\AuthService.java:72: usuarioPerfilRepository
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\auth\service\AuthService.java:76: .map(UsuarioPerfil::getPerfil)
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\auth\service\AuthService.java:87: .flatMap(usuarioPerfil ->
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\auth\service\AuthService.java:88: usuarioPerfil.getPerfil()
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\controller\UsuarioController.java:5: import br.com.inova.sigin.usuario.service.UsuarioService;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\controller\UsuarioController.java:17: private final UsuarioService service;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\controller\UsuarioPerfilController.java:4: import br.com.inova.sigin.usuario.service.UsuarioPerfilService;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\controller\UsuarioPerfilController.java:13: public class UsuarioPerfilController {
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\controller\UsuarioPerfilController.java:15: private final UsuarioPerfilService service;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\entity\Usuario.java:16: public class Usuario {
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\entity\UsuarioPerfil.java:18: public class UsuarioPerfil {
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\entity\UsuarioPerfil.java:26: private Usuario usuario;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\mapper\UsuarioMapper.java:10: public UsuarioResponse toResponse(Usuario usuario) {
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\mapper\UsuarioMapper.java:11: if (usuario == null) {
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\repository\UsuarioPerfilRepository.java:3: import br.com.inova.sigin.usuario.entity.UsuarioPerfil;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\repository\UsuarioPerfilRepository.java:9: public interface UsuarioPerfilRepository
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\repository\UsuarioPerfilRepository.java:10: extends JpaRepository<UsuarioPerfil, Long> {
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\repository\UsuarioPerfilRepository.java:19: FROM UsuarioPerfil up
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\repository\UsuarioPerfilRepository.java:25: List<UsuarioPerfil> buscarComPermissoesPorUsuario(
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\repository\UsuarioRepository.java:10: public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioPerfilService.java:7: import br.com.inova.sigin.usuario.entity.UsuarioPerfil;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioPerfilService.java:10: import br.com.inova.sigin.usuario.repository.UsuarioPerfilRepository;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioPerfilService.java:11: import br.com.inova.sigin.usuario.repository.UsuarioRepository;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioPerfilService.java:19: public class UsuarioPerfilService {
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioPerfilService.java:21: private final UsuarioRepository usuarioRepository;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioPerfilService.java:23: private final UsuarioPerfilRepository usuarioPerfilRepository;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioPerfilService.java:28: Usuario usuario = usuarioRepository.findByIdAndAtivoTrue(usuarioId)
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioPerfilService.java:34: if (usuarioPerfilRepository.existsByUsuarioIdAndPerfilId(usuarioId, perfilId)) {
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioPerfilService.java:38: UsuarioPerfil usuarioPerfil = UsuarioPerfil.builder()
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioPerfilService.java:43: usuarioPerfilRepository.save(usuarioPerfil);
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioPerfilService.java:48: if (!usuarioRepository.existsById(usuarioId)) {
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioPerfilService.java:52: return usuarioPerfilRepository.buscarComPermissoesPorUsuario(usuarioId)
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioPerfilService.java:54: .map(UsuarioPerfil::getPerfil)
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioPerfilService.java:61: UsuarioPerfil usuarioPerfil = usuarioPerfilRepository
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioPerfilService.java:68: usuarioPerfilRepository.delete(usuarioPerfil);
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioService.java:10: import br.com.inova.sigin.usuario.repository.UsuarioRepository;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioService.java:20: public class UsuarioService {
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioService.java:22: private final UsuarioRepository repository;
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioService.java:39: Usuario usuario = Usuario.builder().pessoa(pessoa).login(request.getLogin()).senha(passwordEncoder.encode(request.getSenha())).ativo(request.getAtivo()).dataCriacao(LocalDateTime.now()).build();
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioService.java:54: Usuario usuario = buscaUsuario(id);
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioService.java:76: Usuario usuario = buscaUsuario(id);
+E:\Projetos\SIGIN\src\main\java\br\com\inova\sigin\usuario\service\UsuarioService.java:83: private Usuario buscaUsuario(Long id) {
+
+===== TESTES RELACIONADOS =====

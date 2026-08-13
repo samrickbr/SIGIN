@@ -1,0 +1,682 @@
+﻿===== AUDITORIA 01 — PESSOAS / TIPOS DE PESSOA =====
+
+===== src/main/java/br/com/inova/sigin/pessoa/controller/PessoaController.java =====
+package br.com.inova.sigin.pessoa.controller;
+
+import br.com.inova.sigin.pessoa.dto.PessoaRequest;
+import br.com.inova.sigin.pessoa.dto.PessoaResponse;
+import br.com.inova.sigin.pessoa.dto.PessoaUpdateRequest;
+import br.com.inova.sigin.pessoa.service.PessoaService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/pessoas")
+@RequiredArgsConstructor
+public class PessoaController {
+
+    private final PessoaService service;
+
+
+    @PostMapping
+    public ResponseEntity<PessoaResponse> criar(
+            @RequestBody @Valid PessoaRequest request
+    ) {
+
+        return ResponseEntity.ok(service.criar(request));
+    }
+
+
+    @GetMapping
+    public ResponseEntity<List<PessoaResponse>> listar() {
+
+        return ResponseEntity.ok(service.listar());
+    }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PessoaResponse> buscarPorId(
+            @PathVariable Long id
+    ) {
+
+        return ResponseEntity.ok(service.buscarPorId(id));
+    }
+
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PessoaResponse> atualizar(
+            @PathVariable Long id,
+            @RequestBody PessoaUpdateRequest request
+    ) {
+
+        return ResponseEntity.ok(service.atualizar(id, request));
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(
+            @PathVariable Long id
+    ) {
+
+        service.excluir(id);
+
+        return ResponseEntity.noContent().build();
+    }
+}
+
+===== src/main/java/br/com/inova/sigin/pessoa/controller/PessoaTipoController.java =====
+package br.com.inova.sigin.pessoa.controller;
+
+import br.com.inova.sigin.pessoa.dto.PessoaTipoRequest;
+import br.com.inova.sigin.pessoa.service.PessoaTipoService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/pessoas")
+@RequiredArgsConstructor
+public class PessoaTipoController {
+
+    private final PessoaTipoService service;
+
+
+    @PostMapping("/{id}/tipos")
+    public ResponseEntity<Void> adicionarTipo(
+            @PathVariable Long id,
+            @RequestBody @Valid PessoaTipoRequest request
+    ) {
+
+        service.adicionarTipo(id, request);
+
+        return ResponseEntity.ok().build();
+    }
+}
+
+===== src/main/java/br/com/inova/sigin/pessoa/controller/TipoPessoaController.java =====
+package br.com.inova.sigin.pessoa.controller;
+
+import br.com.inova.sigin.pessoa.dto.TipoPessoaRequest;
+import br.com.inova.sigin.pessoa.dto.TipoPessoaResponse;
+import br.com.inova.sigin.pessoa.service.TipoPessoaService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/tipos-pessoa")
+@RequiredArgsConstructor
+public class TipoPessoaController {
+
+    private final TipoPessoaService service;
+
+
+    @PostMapping
+    public ResponseEntity<TipoPessoaResponse> criar(
+            @RequestBody @Valid TipoPessoaRequest request
+    ) {
+
+        return ResponseEntity.ok(service.criar(request));
+    }
+
+
+    @GetMapping
+    public ResponseEntity<List<TipoPessoaResponse>> listar() {
+
+        return ResponseEntity.ok(service.listar());
+    }
+}
+
+===== src/main/java/br/com/inova/sigin/pessoa/dto/PessoaRequest.java =====
+package br.com.inova.sigin.pessoa.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+
+@Data
+public class PessoaRequest {
+
+    @NotBlank
+    private String nome;
+
+    private String tipoDocumento;
+
+    private String documento;
+
+    private String telefone;
+
+    private String email;
+
+    private String observacao;
+}
+
+===== src/main/java/br/com/inova/sigin/pessoa/dto/PessoaUpdateRequest.java =====
+package br.com.inova.sigin.pessoa.dto;
+
+import lombok.Data;
+
+@Data
+public class PessoaUpdateRequest {
+
+    private String nome;
+
+    private String tipoDocumento;
+
+    private String documento;
+
+    private String telefone;
+
+    private String email;
+
+    private String observacao;
+
+    private Boolean ativo;
+}
+
+===== src/main/java/br/com/inova/sigin/pessoa/dto/PessoaResponse.java =====
+package br.com.inova.sigin.pessoa.dto;
+
+import lombok.Builder;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Data
+@Builder
+public class PessoaResponse {
+
+    private Long id;
+
+    private String nome;
+
+    private String tipoDocumento;
+
+    private String documento;
+
+    private String telefone;
+
+    private String email;
+
+    private String observacao;
+
+    private Boolean ativo;
+
+    private LocalDateTime dataCriacao;
+
+    private List<String> tipos;
+}
+
+===== src/main/java/br/com/inova/sigin/pessoa/dto/PessoaTipoRequest.java =====
+package br.com.inova.sigin.pessoa.dto;
+
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
+@Data
+public class PessoaTipoRequest {
+
+    @NotNull
+    private Long tipoPessoaId;
+}
+
+===== src/main/java/br/com/inova/sigin/pessoa/dto/TipoPessoaRequest.java =====
+package br.com.inova.sigin.pessoa.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+
+@Data
+public class TipoPessoaRequest {
+
+    @NotBlank
+    private String nome;
+
+    private String descricao;
+}
+
+===== src/main/java/br/com/inova/sigin/pessoa/dto/TipoPessoaResponse.java =====
+package br.com.inova.sigin.pessoa.dto;
+
+import lombok.Builder;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+public class TipoPessoaResponse {
+
+    private Long id;
+
+    private String nome;
+
+    private String descricao;
+
+    private Boolean ativo;
+
+    private LocalDateTime dataCriacao;
+}
+
+===== src/main/java/br/com/inova/sigin/pessoa/entity/Pessoa.java =====
+package br.com.inova.sigin.pessoa.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "pessoas")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Pessoa {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 150)
+    private String nome;
+
+    @Column(name = "tipo_documento", length = 20)
+    private String tipoDocumento;
+
+    @Column(length = 30)
+    private String documento;
+
+    @Column(length = 20)
+    private String telefone;
+
+    @Column(length = 150)
+    private String email;
+
+    @Column(length = 500)
+    private String observacao;
+
+    @Column(nullable = false)
+    private Boolean ativo = true;
+
+    @Column(name = "data_criacao", nullable = false)
+    private LocalDateTime dataCriacao;
+
+    @OneToMany(mappedBy = "pessoa")
+    @Builder.Default
+    private Set<PessoaTipo> tipos = new HashSet<>();
+}
+
+===== src/main/java/br/com/inova/sigin/pessoa/entity/PessoaTipo.java =====
+package br.com.inova.sigin.pessoa.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(
+        name = "pessoa_tipos",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_pessoa_tipo",
+                        columnNames = {"pessoa_id", "tipo_pessoa_id"}
+                )
+        }
+)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class PessoaTipo {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "pessoa_id",
+            nullable = false
+    )
+    private Pessoa pessoa;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "tipo_pessoa_id",
+            nullable = false
+    )
+    private TipoPessoa tipoPessoa;
+
+
+    @Column(name = "data_criacao", nullable = false)
+    private LocalDateTime dataCriacao;
+}
+
+===== src/main/java/br/com/inova/sigin/pessoa/entity/TipoPessoa.java =====
+package br.com.inova.sigin.pessoa.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "tipos_pessoa")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class TipoPessoa {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true, length = 50)
+    private String nome;
+
+    @Column(length = 255)
+    private String descricao;
+
+    @Column(nullable = false)
+    private Boolean ativo = true;
+
+    @Column(name = "data_criacao", nullable = false)
+    private LocalDateTime dataCriacao;
+}
+
+===== src/main/java/br/com/inova/sigin/pessoa/service/PessoaService.java =====
+package br.com.inova.sigin.pessoa.service;
+
+import br.com.inova.sigin.pessoa.dto.PessoaRequest;
+import br.com.inova.sigin.pessoa.dto.PessoaResponse;
+import br.com.inova.sigin.pessoa.dto.PessoaUpdateRequest;
+import br.com.inova.sigin.pessoa.entity.Pessoa;
+import br.com.inova.sigin.pessoa.repository.PessoaRepository;
+import br.com.inova.sigin.shared.exception.RegraNegocioException;
+import br.com.inova.sigin.shared.util.StringUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class PessoaService {
+    private final PessoaRepository repository;
+
+    public PessoaResponse criar(PessoaRequest request) {
+
+        Pessoa pessoa = Pessoa.builder()
+                .nome(StringUtil.normalizarNome(request.getNome()))
+                .tipoDocumento(request.getTipoDocumento())
+                .documento(request.getDocumento())
+                .telefone(request.getTelefone())
+                .email(request.getEmail())
+                .observacao(request.getObservacao())
+                .ativo(true)
+                .dataCriacao(LocalDateTime.now())
+                .build();
+
+        return converter(repository.save(pessoa));
+    }
+
+    public List<PessoaResponse> listar() {
+
+        return repository.findAll()
+                .stream()
+                .map(this::converter)
+                .toList();
+    }
+
+
+    public PessoaResponse buscarPorId(Long id) {
+
+        Pessoa pessoa = repository.findById(id)
+                .orElseThrow(() ->
+                        new RegraNegocioException("Pessoa nÃ£o encontrada")
+                );
+
+        return converter(pessoa);
+    }
+
+
+    @Transactional
+    public PessoaResponse atualizar(Long id, PessoaUpdateRequest request) {
+
+        Pessoa pessoa = repository.findById(id)
+                .orElseThrow(() ->
+                        new RegraNegocioException("Pessoa nÃ£o encontrada")
+                );
+
+        if (request.getNome() != null) {
+            pessoa.setNome(
+                    StringUtil.normalizarNome(request.getNome())
+            );
+        }
+
+        if (request.getTelefone() != null) {
+            pessoa.setTelefone(request.getTelefone());
+        }
+
+        if (request.getEmail() != null) {
+            pessoa.setEmail(request.getEmail());
+        }
+
+        if (request.getObservacao() != null) {
+            pessoa.setObservacao(request.getObservacao());
+        }
+
+        if (request.getAtivo() != null) {
+            pessoa.setAtivo(request.getAtivo());
+        }
+
+        repository.save(pessoa);
+
+        return converter(pessoa);
+    }
+
+    public void excluir(Long id) {
+
+        Pessoa pessoa = repository.findById(id)
+                .orElseThrow(() ->
+                        new RegraNegocioException("Pessoa nÃ£o encontrada")
+                );
+
+        pessoa.setAtivo(false);
+
+        repository.save(pessoa);
+    }
+
+    private PessoaResponse converter(Pessoa pessoa) {
+
+        return PessoaResponse.builder()
+                .id(pessoa.getId())
+                .nome(pessoa.getNome())
+                .tipoDocumento(pessoa.getTipoDocumento())
+                .documento(pessoa.getDocumento())
+                .telefone(pessoa.getTelefone())
+                .email(pessoa.getEmail())
+                .observacao(pessoa.getObservacao())
+                .ativo(pessoa.getAtivo())
+                .dataCriacao(pessoa.getDataCriacao())
+                .tipos(
+                        pessoa.getTipos()
+                                .stream()
+                                .map(pt -> pt.getTipoPessoa().getNome())
+                                .toList()
+                )
+                .build();
+    }
+}
+
+===== src/main/java/br/com/inova/sigin/pessoa/service/PessoaTipoService.java =====
+package br.com.inova.sigin.pessoa.service;
+
+import br.com.inova.sigin.pessoa.dto.PessoaTipoRequest;
+import br.com.inova.sigin.pessoa.entity.Pessoa;
+import br.com.inova.sigin.pessoa.entity.PessoaTipo;
+import br.com.inova.sigin.pessoa.entity.TipoPessoa;
+import br.com.inova.sigin.pessoa.repository.PessoaRepository;
+import br.com.inova.sigin.pessoa.repository.PessoaTipoRepository;
+import br.com.inova.sigin.pessoa.repository.TipoPessoaRepository;
+import br.com.inova.sigin.shared.exception.RegraNegocioException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+
+@Service
+@RequiredArgsConstructor
+public class PessoaTipoService {
+
+    private final PessoaRepository pessoaRepository;
+    private final TipoPessoaRepository tipoPessoaRepository;
+    private final PessoaTipoRepository pessoaTipoRepository;
+
+
+    public void adicionarTipo(Long pessoaId, PessoaTipoRequest request) {
+        Pessoa pessoa = pessoaRepository.findById(pessoaId)
+                .orElseThrow(() ->
+                        new RegraNegocioException("Pessoa nÃ£o encontrada")
+                );
+        TipoPessoa tipoPessoa = tipoPessoaRepository.findById(request.getTipoPessoaId())
+                .orElseThrow(() ->
+                        new RegraNegocioException("Tipo de pessoa nÃ£o encontrada")
+                );
+        PessoaTipo pessoaTipo = PessoaTipo.builder()
+                .pessoa(pessoa)
+                .tipoPessoa(tipoPessoa)
+                .dataCriacao(LocalDateTime.now())
+                .build();
+        if (pessoaTipoRepository.existsByPessoaIdAndTipoPessoaId(
+                pessoaId,
+                request.getTipoPessoaId())) {
+            throw new RegraNegocioException("A pessoa jÃ¡ possui esse tipo.");
+        }
+        pessoaTipoRepository.save(pessoaTipo);
+    }
+
+    public void adicionarTipoCliente(Long pessoaId) {
+        TipoPessoa cliente = tipoPessoaRepository
+                .findByNomeIgnoreCase("CLIENTE")
+                .orElseThrow(() ->
+                        new RegraNegocioException("Tipo CLIENTE nÃ£o encontrado")
+                );
+        PessoaTipoRequest request = new PessoaTipoRequest();
+        request.setTipoPessoaId(cliente.getId());
+        adicionarTipo(pessoaId, request);
+    }
+}
+
+===== src/main/java/br/com/inova/sigin/pessoa/service/TipoPessoaService.java =====
+package br.com.inova.sigin.pessoa.service;
+
+import br.com.inova.sigin.pessoa.dto.TipoPessoaRequest;
+import br.com.inova.sigin.pessoa.dto.TipoPessoaResponse;
+import br.com.inova.sigin.pessoa.entity.TipoPessoa;
+import br.com.inova.sigin.pessoa.repository.TipoPessoaRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class TipoPessoaService {
+
+    private final TipoPessoaRepository repository;
+    public TipoPessoaResponse criar(TipoPessoaRequest request) {
+        TipoPessoa tipo = TipoPessoa.builder()
+                .nome(request.getNome().toUpperCase())
+                .descricao(request.getDescricao())
+                .ativo(true)
+                .dataCriacao(LocalDateTime.now())
+                .build();
+        return converter(repository.save(tipo));
+    }
+    public List<TipoPessoaResponse> listar() {
+        return repository.findAll()
+                .stream()
+                .map(this::converter)
+                .toList();
+    }
+    private TipoPessoaResponse converter(TipoPessoa tipo) {
+        return TipoPessoaResponse.builder()
+                .id(tipo.getId())
+                .nome(tipo.getNome())
+                .descricao(tipo.getDescricao())
+                .ativo(tipo.getAtivo())
+                .dataCriacao(tipo.getDataCriacao())
+                .build();
+    }
+}
+
+===== src/main/java/br/com/inova/sigin/pessoa/repository/PessoaRepository.java =====
+package br.com.inova.sigin.pessoa.repository;
+
+import br.com.inova.sigin.pessoa.entity.Pessoa;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.EntityGraph;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
+    @EntityGraph(attributePaths = {"tipos", "tipos.tipoPessoa"})
+    List<Pessoa> findAll();
+    @EntityGraph(attributePaths = {"tipos", "tipos.tipoPessoa"})
+    Optional<Pessoa> findById(Long id);
+
+    boolean existsByNomeIgnoreCase(String nome);
+    Optional<Pessoa> findByNomeIgnoreCase(String nome);
+    Optional<Pessoa> findByTelefone(String telefone);
+
+}
+
+===== src/main/java/br/com/inova/sigin/pessoa/repository/PessoaTipoRepository.java =====
+package br.com.inova.sigin.pessoa.repository;
+
+import br.com.inova.sigin.pessoa.entity.PessoaTipo;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface PessoaTipoRepository extends JpaRepository<PessoaTipo, Long> {
+    boolean existsByPessoaIdAndTipoPessoaId(Long pessoaId, Long tipoPessoaId);
+
+}
+
+===== src/main/java/br/com/inova/sigin/pessoa/repository/TipoPessoaRepository.java =====
+package br.com.inova.sigin.pessoa.repository;
+
+import br.com.inova.sigin.pessoa.entity.TipoPessoa;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface TipoPessoaRepository extends JpaRepository<TipoPessoa, Long> {
+
+    boolean existsByNomeIgnoreCase(String nome);
+    Optional<TipoPessoa> findByNomeIgnoreCase(String nome);
+}
+
+===== TESTES RELACIONADOS =====

@@ -62,6 +62,11 @@ public class ProdutoService {
                 .precoVenda(salvo.getPrecoVenda())
                 .disponivelVenda(salvo.getDisponivelVenda())
                 .imagem(salvo.getImagem())
+                .categoriaId(
+                        salvo.getCategoria() != null
+                                ? salvo.getCategoria().getId()
+                                : null
+                )
                 .categoria(
                         salvo.getCategoria() != null
                                 ? salvo.getCategoria().getNome()
@@ -86,6 +91,11 @@ public class ProdutoService {
                 .precoVenda(produto.getPrecoVenda())
                 .disponivelVenda(produto.getDisponivelVenda())
                 .imagem(produto.getImagem())
+                .categoriaId(
+                        produto.getCategoria() != null
+                                ? produto.getCategoria().getId()
+                                : null
+                )
                 .categoria(
                         produto.getCategoria() != null
                                 ? produto.getCategoria().getNome()
@@ -129,6 +139,11 @@ public class ProdutoService {
                 .precoVenda(atualizado.getPrecoVenda())
                 .disponivelVenda(atualizado.getDisponivelVenda())
                 .imagem(atualizado.getImagem())
+                .categoriaId(
+                        atualizado.getCategoria() != null
+                                ? atualizado.getCategoria().getId()
+                                : null
+                )
                 .categoria(
                         atualizado.getCategoria() != null
                                 ? atualizado.getCategoria().getNome()
@@ -163,6 +178,11 @@ public class ProdutoService {
                         .precoVenda(produto.getPrecoVenda())
                         .disponivelVenda(produto.getDisponivelVenda())
                         .imagem(produto.getImagem())
+                        .categoriaId(
+                                produto.getCategoria() != null
+                                        ? produto.getCategoria().getId()
+                                        : null
+                        )
                         .categoria(
                                 produto.getCategoria() != null
                                         ? produto.getCategoria().getNome()
@@ -186,6 +206,11 @@ public class ProdutoService {
                         .precoVenda(produto.getPrecoVenda())
                         .disponivelVenda(produto.getDisponivelVenda())
                         .imagem(produto.getImagem())
+                        .categoriaId(
+                                produto.getCategoria() != null
+                                        ? produto.getCategoria().getId()
+                                        : null
+                        )
                         .categoria(
                                 produto.getCategoria() != null
                                         ? produto.getCategoria().getNome()

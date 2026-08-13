@@ -21,6 +21,9 @@ public class Categoria {
     @Column(nullable = false, unique = true)
     private String nome;
 
+    @Column(length = 500)
+    private String descricao;
+
     @Builder.Default
     @Column(nullable = false)
     private Boolean ativo = true;
