@@ -17,4 +17,6 @@ Cada Sprint deve, quando aplicável, registrar:
 - commit ou tag;
 - pendências.
 
-Não criar retrospectivamente documentos de Sprints nesta execução.
+## Sprints documentadas
+
+- [Sprint 06 — Usuario IAM, JWT e Controle de Acesso](S06-IAM.md)

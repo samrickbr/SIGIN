@@ -13,4 +13,8 @@ Uma decisão arquitetural deve conter:
 - consequências;
 - status.
 
-Não criar arquivos de decisões históricas nesta execução.
+## Decisões consolidadas
+
+- [IAM / Usuario](DECISAO-IAM-USUARIO.md)
+- [Ativo / Inativo](DECISAO-ATIVO-INATIVO.md)
+- [Produto x Canal x Preço](DECISAO-PRODUTO-CANAL-PRECO.md)
