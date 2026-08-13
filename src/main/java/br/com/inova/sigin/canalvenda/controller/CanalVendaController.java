@@ -40,9 +40,10 @@ public class CanalVendaController {
     @Operation(summary = "Listar canais de venda")
     @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
     @GetMapping
-    public ResponseEntity<List<CanalVendaResponse>> listar() {
+    public ResponseEntity<List<CanalVendaResponse>> listar(
+            @RequestParam(required = false) Boolean ativo) {
 
-        return ResponseEntity.ok(service.listar());
+        return ResponseEntity.ok(service.listar(ativo));
     }
 
     @Operation(summary = "Buscar canal de venda por ID")

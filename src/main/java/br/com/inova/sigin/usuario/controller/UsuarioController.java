@@ -22,8 +22,10 @@ public class UsuarioController {
     }
 
     @GetMapping
-    public List<UsuarioResponse> listar() {
-        return service.listar();
+    public List<UsuarioResponse> listar(
+            @RequestParam(required = false) Boolean ativo
+    ) {
+        return service.listar(ativo);
     }
 
     @GetMapping("/{id}")

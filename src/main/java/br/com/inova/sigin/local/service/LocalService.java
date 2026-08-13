@@ -38,8 +38,16 @@ public class LocalService {
         return toResponse(local);
     }
 
-    public List<LocalResponse> listar() {
-        return repository.findByAtivoTrue()
+    public List<LocalResponse> listar(Boolean ativo) {
+
+        if (ativo == null || ativo) {
+            return repository.findByAtivoTrue()
+                    .stream()
+                    .map(this::toResponse)
+                    .toList();
+        }
+
+        return repository.findByAtivoFalse()
                 .stream()
                 .map(this::toResponse)
                 .toList();

@@ -22,8 +22,10 @@ public class PerfilController {
     }
 
     @GetMapping
-    public List<PerfilResponse> listar() {
-        return service.listar();
+    public List<PerfilResponse> listar(
+            @RequestParam(required = false) Boolean ativo
+    ) {
+        return service.listar(ativo);
     }
 
     @GetMapping("/{id}")

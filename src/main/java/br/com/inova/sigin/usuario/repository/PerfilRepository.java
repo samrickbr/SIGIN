@@ -10,6 +10,8 @@ public interface PerfilRepository extends JpaRepository<Perfil, Long> {
 
     List<Perfil> findByAtivoTrue();
 
+    List<Perfil> findByAtivoFalse();
+
     Optional<Perfil> findByIdAndAtivoTrue(Long id);
 
     boolean existsByNome(String nome);

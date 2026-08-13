@@ -54,4 +54,13 @@ public class PessoaTipoService {
         request.setTipoPessoaId(cliente.getId());
         adicionarTipo(pessoaId, request);
     }
+    public void removerTipo(Long pessoaId, Long tipoPessoaId) {
+        PessoaTipo pessoaTipo = pessoaTipoRepository
+                .findByPessoaIdAndTipoPessoaId(pessoaId, tipoPessoaId)
+                .orElseThrow(() ->
+                        new RegraNegocioException("A pessoa não possui esse tipo.")
+                );
+
+        pessoaTipoRepository.delete(pessoaTipo);
+    }
 }

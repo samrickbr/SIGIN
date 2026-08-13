@@ -33,8 +33,15 @@ public class PerfilService {
         return mapper.toResponse(repository.save(perfil));
     }
 
-    public List<PerfilResponse> listar() {
-        return repository.findByAtivoTrue()
+    public List<PerfilResponse> listar(Boolean ativo) {
+        if (ativo == null || ativo) {
+            return repository.findByAtivoTrue()
+                    .stream()
+                    .map(mapper::toResponse)
+                    .toList();
+        }
+
+        return repository.findByAtivoFalse()
                 .stream()
                 .map(mapper::toResponse)
                 .toList();
@@ -46,7 +53,10 @@ public class PerfilService {
 
     public PerfilResponse atualizar(Long id, PerfilRequest request) {
 
-        Perfil perfil = buscaPerfil(id);
+        Perfil perfil = repository.findById(id)
+                .orElseThrow(() ->
+                        new RegraNegocioException("Perfil não encontrado.")
+                );
 
         if (!perfil.getNome().equals(request.getNome())
                 && repository.existsByNome(request.getNome())) {

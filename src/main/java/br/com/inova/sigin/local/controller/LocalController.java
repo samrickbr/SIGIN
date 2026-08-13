@@ -23,8 +23,10 @@ public class LocalController {
     }
 
     @GetMapping
-    public List<LocalResponse> listar() {
-        return service.listar();
+    public List<LocalResponse> listar(
+            @RequestParam(required = false) Boolean ativo
+    ) {
+        return service.listar(ativo);
     }
 
     @GetMapping("/{id}")

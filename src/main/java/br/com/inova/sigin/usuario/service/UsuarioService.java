@@ -41,8 +41,18 @@ public class UsuarioService {
         return mapper.toResponse(repository.save(usuario));
     }
 
-    public List<UsuarioResponse> listar() {
-        return repository.findByAtivoTrue().stream().map(mapper::toResponse).toList();
+    public List<UsuarioResponse> listar(Boolean ativo) {
+        if (ativo == null || ativo) {
+            return repository.findByAtivoTrue()
+                    .stream()
+                    .map(mapper::toResponse)
+                    .toList();
+        }
+
+        return repository.findByAtivoFalse()
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     public UsuarioResponse buscar(Long id) {
@@ -51,7 +61,10 @@ public class UsuarioService {
 
     public UsuarioResponse atualizar(Long id, UsuarioRequest request) {
 
-        Usuario usuario = buscaUsuario(id);
+        Usuario usuario = repository.findById(id)
+                .orElseThrow(() ->
+                        new RegraNegocioException("Usuário não encontrado.")
+                );
 
         if (!usuario.getLogin().equals(request.getLogin()) && repository.existsByLogin(request.getLogin())) {
             throw new RegraNegocioException("Login já cadastrado.");
@@ -82,6 +95,7 @@ public class UsuarioService {
 
     private Usuario buscaUsuario(Long id) {
 
-        return repository.findByIdAndAtivoTrue(id).orElseThrow(() -> new RegraNegocioException("Usuário não encontrado."));
+        return repository.findByIdAndAtivoTrue(id)
+                .orElseThrow(() -> new RegraNegocioException("Usuário não encontrado."));
     }
 }

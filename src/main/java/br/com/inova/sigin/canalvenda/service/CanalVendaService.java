@@ -31,10 +31,19 @@ public class CanalVendaService {
     }
 
     @Transactional(readOnly = true)
-    public List<CanalVendaResponse> listar() {
+    public List<CanalVendaResponse> listar(Boolean ativo) {
 
-        return repository.findAll()
-                .stream()
+        List<CanalVenda> canais;
+
+        if (ativo == null) {
+            canais = repository.findAll();
+        } else if (ativo) {
+            canais = repository.findByAtivoTrue();
+        } else {
+            canais = repository.findByAtivoFalse();
+        }
+
+        return canais.stream()
                 .map(CanalVendaMapper::toResponse)
                 .toList();
     }
@@ -68,7 +77,9 @@ public class CanalVendaService {
 
         CanalVenda canal = buscarEntidade(id);
 
-        repository.delete(canal);
+        canal.setAtivo(false);
+
+        repository.save(canal);
     }
 
     private CanalVenda buscarEntidade(Long id) {

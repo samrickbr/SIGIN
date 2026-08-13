@@ -25,4 +25,12 @@ public class PessoaTipoController {
 
         return ResponseEntity.ok().build();
     }
+    @DeleteMapping("/{id}/tipos/{tipoPessoaId}")
+    public ResponseEntity<Void> removerTipo(
+            @PathVariable Long id,
+            @PathVariable Long tipoPessoaId
+    ) {
+        service.removerTipo(id, tipoPessoaId);
+        return ResponseEntity.noContent().build();
+    }
 }
