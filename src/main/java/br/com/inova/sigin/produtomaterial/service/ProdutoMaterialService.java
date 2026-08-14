@@ -13,6 +13,7 @@ import br.com.inova.sigin.produtomaterial.repository.ProdutoMaterialRepository;
 import br.com.inova.sigin.shared.exception.RegraNegocioException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,15 +27,28 @@ public class ProdutoMaterialService {
     private final MaterialRepository materialRepository;
     private final ProdutoMaterialMapper mapper;
 
+    @Transactional
     public ProdutoMaterialResponse criar(ProdutoMaterialRequest request) {
 
-        if (repository.existsByProduto_IdAndMaterial_Id(
-                request.getProdutoId(),
-                request.getMaterialId())) {
+        ProdutoMaterial existente = repository
+                .findByProdutoIdAndMaterialId(
+                        request.getProdutoId(),
+                        request.getMaterialId()
+                )
+                .orElse(null);
 
-            throw new RegraNegocioException(
-                    "Este material já está vinculado ao produto."
-            );
+        if (existente != null) {
+
+            if (Boolean.TRUE.equals(existente.getAtivo())) {
+                throw new RegraNegocioException(
+                        "Este material já está vinculado ao produto."
+                );
+            }
+
+            existente.setAtivo(true);
+            existente.setQuantidade(request.getQuantidade());
+
+            return mapper.toResponse(repository.save(existente));
         }
 
         Produto produto = produtoRepository.findById(request.getProdutoId())
@@ -56,14 +70,7 @@ public class ProdutoMaterialService {
         return mapper.toResponse(repository.save(entity));
     }
 
-    public List<ProdutoMaterialResponse> listarPorProduto(Long produtoId) {
-
-        return repository.findByProdutoId(produtoId)
-                .stream()
-                .map(mapper::toResponse)
-                .toList();
-    }
-
+    @Transactional
     public ProdutoMaterialResponse atualizar(Long id, ProdutoMaterialUpdateRequest request) {
 
         ProdutoMaterial entity = repository.findById(id)
@@ -81,6 +88,7 @@ public class ProdutoMaterialService {
         return mapper.toResponse(repository.save(entity));
     }
 
+    @Transactional
     public void excluir(Long id) {
 
         ProdutoMaterial entity = repository.findById(id)
@@ -90,5 +98,14 @@ public class ProdutoMaterialService {
         entity.setAtivo(false);
 
         repository.save(entity);
+    }
+
+    @Transactional
+    public List<ProdutoMaterialResponse> listarPorProduto(Long produtoId) {
+
+        return repository.findByProdutoId(produtoId)
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 }

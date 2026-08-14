@@ -16,5 +16,16 @@ public interface ProdutoMaterialRepository extends JpaRepository<ProdutoMaterial
     @EntityGraph(attributePaths = {"produto", "material"})
     Optional<ProdutoMaterial> findById(Long id);
 
+    Optional<ProdutoMaterial> findByProduto_IdAndMaterial_Id(
+            Long produtoId,
+            Long materialId
+    );
+
+    @EntityGraph(attributePaths = {"produto", "material"})
+    Optional<ProdutoMaterial> findByProdutoIdAndMaterialId(
+            Long produtoId,
+            Long materialId
+    );
+
     boolean existsByProduto_IdAndMaterial_Id(Long produtoId, Long materialId);
 }
