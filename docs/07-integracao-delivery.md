@@ -97,6 +97,7 @@ PedidoItem
     │
     ▼
 Pedido
+
 ```
 
 O Core executa automaticamente:
@@ -175,3 +176,209 @@ Todos utilizam exatamente as mesmas regras comerciais disponibilizadas pelo Core
 # Situação atual
 
 A partir da Sprint 04, o Delivery passa a consumir integralmente as regras comerciais do Core, deixando de possuir qualquer responsabilidade sobre preços ou disponibilidade de produtos.
+
+---
+
+# Sprint P0 — Integração Delivery × Core
+
+## Objetivo
+
+Integrar o Delivery existente ao SIGIN Core preservando seu fluxo operacional.
+
+O Core permanece como autoridade dos conceitos comerciais compartilhados.
+
+Arquitetura:
+
+```
+SIGIN Core
+    ↓
+Delivery Back
+    ↓
+Delivery Front
+
+```
+O SIGIN Admin continua administrando os dados do Core.
+
+Responsabilidades
+SIGIN Core
+
+Responsável por:
+
+Produto;
+Categoria;
+Canal de Venda;
+ProdutoCanal;
+ProdutoVenda;
+preço;
+disponibilidade comercial;
+Pessoa/cliente;
+forma de pagamento;
+Pedido;
+PedidoItem;
+produção;
+estoque;
+regras comerciais.
+Delivery Back
+
+Responsável por:
+
+adaptar os contratos do Core;
+orquestrar o fluxo do canal Delivery;
+manter a operação específica do Delivery;
+receber e validar dados do Front;
+resolver cliente no Core;
+criar pedido no Core;
+manter vínculo entre pedido Delivery e pedido Core;
+preservar o fluxo operacional existente.
+Delivery Front
+
+Responsável por:
+
+catálogo;
+carrinho;
+checkout;
+identificação do cliente;
+endereço;
+seleção da forma de pagamento;
+acompanhamento do pedido.
+
+O Front nunca é autoridade de preço, disponibilidade ou total comercial.
+
+Catálogo
+
+O catálogo comercial deve ser obtido do Core respeitando:
+
+Produto
+↓
+ProdutoCanal
+↓
+ProdutoVenda
+↓
+CanalVenda
+
+O Delivery não mantém catálogo comercial paralelo.
+
+Preço e disponibilidade devem ser obtidos do Core.
+
+Checkout
+
+O Front pode apresentar valores calculados para fins de experiência.
+
+Na finalização, o Delivery Back deve utilizar os dados oficiais do Core.
+
+Não são confiáveis:
+
+preço enviado pelo navegador;
+subtotal enviado pelo navegador;
+total enviado pelo navegador.
+
+O Core deve validar e determinar os valores comerciais oficiais.
+
+Cliente
+
+O Core é autoridade da identidade do cliente.
+
+Fluxo:
+
+Cliente existente
+↓
+Localizar no Core
+↓
+Reutilizar
+
+
+Cliente inexistente
+↓
+Cadastrar no Core
+↓
+Utilizar identificação retornada
+
+A integração deve evitar duplicação de pessoas.
+
+Pedido
+
+O pedido comercial deve ser criado no Core.
+
+O Delivery pode manter uma representação operacional própria quando necessária para preservar o fluxo existente.
+
+A relação deve ser persistente e rastreável:
+
+Pedido Delivery
+↓
+Pedido Core
+
+O Delivery não deve criar uma segunda autoridade comercial para pedido, preço ou total.
+
+Estados
+
+Os estados comerciais do Core e os estados operacionais do Delivery não precisam ser idênticos.
+
+O Delivery preserva seus estados específicos de operação, incluindo:
+
+recebimento;
+aprovação;
+produção;
+separação;
+saída para entrega;
+entrega.
+
+A sincronização entre Core e Delivery deve ocorrer somente quando necessária.
+
+Estoque
+
+O estoque permanece sob autoridade do Core.
+
+Esta Sprint não cria estoque paralelo no Delivery nem define uma regra exclusiva de movimentação de estoque para Delivery.
+
+Decisões globais sobre movimentação de estoque permanecem no domínio do Core.
+
+Ambiente
+
+O SIGIN Core possui configuração separada por ambiente:
+
+application.yml
+application-dev.yml
+application-prod.yml
+Desenvolvimento
+
+O profile dev utiliza o PostgreSQL local.
+
+Produção
+
+O profile prod utiliza variáveis de ambiente para conexão com o PostgreSQL.
+
+Credenciais de produção não devem ser armazenadas no repositório.
+
+Objetivo operacional
+
+A integração P0 busca permitir o fluxo:
+
+Admin
+↓
+Configuração comercial no Core
+↓
+Catálogo Delivery
+↓
+Carrinho
+↓
+Cliente
+↓
+Checkout
+↓
+Pedido Core
+↓
+Pedido Delivery
+↓
+Balcão
+↓
+Aprovação
+↓
+Produção
+↓
+Separação
+↓
+Entrega
+↓
+Conclusão
+
+A prioridade é tornar o Delivery funcional utilizando o Core como autoridade, sem reconstruir o Delivery e sem duplicar regras comerciais.

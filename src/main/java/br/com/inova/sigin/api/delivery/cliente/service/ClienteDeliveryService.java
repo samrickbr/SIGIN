@@ -19,11 +19,56 @@ public class ClienteDeliveryService {
     private final PessoaService pessoaService;
     private final PessoaTipoService pessoaTipoService;
 
-
     public ClienteResponse buscarPorTelefone(String telefone) {
 
         Pessoa pessoa = pessoaRepository.findByTelefone(telefone)
                 .orElseThrow();
+
+        pessoaTipoService.adicionarTipoCliente(pessoa.getId());
+
+        return converter(pessoa);
+    }
+
+    public ClienteResponse buscarPorDocumento(String documento) {
+
+        Pessoa pessoa = pessoaRepository.findByDocumento(documento)
+                .orElseThrow();
+
+        pessoaTipoService.adicionarTipoCliente(pessoa.getId());
+
+        return converter(pessoa);
+    }
+
+    public ClienteResponse criar(ClienteRequest request) {
+
+        Pessoa pessoaExistente = pessoaRepository
+                .findByDocumento(request.getDocumento())
+                .orElseGet(() ->
+                        pessoaRepository
+                                .findByTelefone(request.getTelefone())
+                                .orElse(null)
+                );
+
+        if (pessoaExistente != null) {
+
+            pessoaTipoService.adicionarTipoCliente(
+                    pessoaExistente.getId()
+            );
+
+            return converter(pessoaExistente);
+        }
+
+        PessoaRequest pessoaRequest = new PessoaRequest();
+
+        pessoaRequest.setNome(request.getNome());
+        pessoaRequest.setTipoDocumento("CPF");
+        pessoaRequest.setDocumento(request.getDocumento());
+        pessoaRequest.setTelefone(request.getTelefone());
+        pessoaRequest.setEmail(request.getEmail());
+
+        PessoaResponse pessoa = pessoaService.criar(pessoaRequest);
+
+        pessoaTipoService.adicionarTipoCliente(pessoa.getId());
 
         return ClienteResponse.builder()
                 .id(pessoa.getId())
@@ -33,18 +78,7 @@ public class ClienteDeliveryService {
                 .build();
     }
 
-
-    public ClienteResponse criar(ClienteRequest request) {
-
-        PessoaRequest pessoaRequest = new PessoaRequest();
-
-        pessoaRequest.setNome(request.getNome());
-        pessoaRequest.setTelefone(request.getTelefone());
-        pessoaRequest.setEmail(request.getEmail());
-
-        PessoaResponse pessoa = pessoaService.criar(pessoaRequest);
-
-        pessoaTipoService.adicionarTipoCliente(pessoa.getId());
+    private ClienteResponse converter(Pessoa pessoa) {
 
         return ClienteResponse.builder()
                 .id(pessoa.getId())

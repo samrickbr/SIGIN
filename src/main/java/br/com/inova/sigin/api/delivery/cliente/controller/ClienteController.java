@@ -25,4 +25,10 @@ public class ClienteController {
     ) {
         return service.buscarPorTelefone(telefone);
     }
+    @GetMapping("/documento/{documento}")
+    public ClienteResponse buscarPorDocumento(
+            @PathVariable String documento
+    ) {
+        return service.buscarPorDocumento(documento);
+    }
 }

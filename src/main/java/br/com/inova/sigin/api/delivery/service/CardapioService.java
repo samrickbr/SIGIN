@@ -5,6 +5,7 @@ import br.com.inova.sigin.produto.entity.Produto;
 import br.com.inova.sigin.produtovenda.service.ProdutoVendaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -13,10 +14,11 @@ import java.util.List;
 public class CardapioService {
 
     private final ProdutoVendaService produtoVendaService;
-    public List<CardapioResponse> listar() {
+    @Transactional(readOnly = true)
+    public List<CardapioResponse> listar(Long canalVendaId) {
 
         return produtoVendaService
-                .listarDisponiveisEntity()
+                .listarDisponiveisPorCanal(canalVendaId)
                 .stream()
                 .map(produtoVenda -> {
 

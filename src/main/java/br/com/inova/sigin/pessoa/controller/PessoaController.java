@@ -18,7 +18,6 @@ public class PessoaController {
 
     private final PessoaService service;
 
-
     @PostMapping
     public ResponseEntity<PessoaResponse> criar(
             @RequestBody @Valid PessoaRequest request
@@ -27,13 +26,11 @@ public class PessoaController {
         return ResponseEntity.ok(service.criar(request));
     }
 
-
     @GetMapping
     public ResponseEntity<List<PessoaResponse>> listar() {
 
         return ResponseEntity.ok(service.listar());
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<PessoaResponse> buscarPorId(
@@ -42,7 +39,6 @@ public class PessoaController {
 
         return ResponseEntity.ok(service.buscarPorId(id));
     }
-
 
     @PutMapping("/{id}")
     public ResponseEntity<PessoaResponse> atualizar(
@@ -53,7 +49,6 @@ public class PessoaController {
         return ResponseEntity.ok(service.atualizar(id, request));
     }
 
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(
             @PathVariable Long id
@@ -62,5 +57,23 @@ public class PessoaController {
         service.excluir(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/por-documento")
+    public ResponseEntity<PessoaResponse> buscarPorDocumento(
+            @RequestParam String documento
+    ) {
+        return ResponseEntity.ok(
+                service.buscarPorDocumento(documento)
+        );
+    }
+
+    @GetMapping("/por-telefone")
+    public ResponseEntity<PessoaResponse> buscarPorTelefone(
+            @RequestParam String telefone
+    ) {
+        return ResponseEntity.ok(
+                service.buscarPorTelefone(telefone)
+        );
     }
 }

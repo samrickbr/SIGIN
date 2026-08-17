@@ -160,35 +160,89 @@ Ajustes:
 
 ---
 
-definido :
+# Sprint 06 — Integração Delivery × Core
 
-Sprint 06 — Integração Delivery com Core
+**Status:** 🔄 Em execução
 
-Objetivo:
-Remover regras comerciais duplicadas do Delivery e utilizar o Core como fonte oficial de produtos, pedidos e produção.
+## Objetivo
 
-Hoje:
+Integrar o Delivery existente ao SIGIN Core, preservando seu fluxo operacional e utilizando o Core como autoridade dos conceitos comerciais compartilhados.
 
-Delivery-back possui:
+## Entregas
 
-produto
-setor
-pedido
-fluxo
+- Catálogo baseado no Core;
+- Produto por canal;
+- preço oficial do Core;
+- disponibilidade comercial do Core;
+- resolução de cliente no Core;
+- formas de pagamento do Core;
+- criação do pedido no Core;
+- vínculo Pedido Delivery × Pedido Core;
+- preservação da operação de balcão;
+- preservação do fluxo de produção;
+- preservação da separação e entrega;
+- preparação do Core para ambiente de produção.
 
-Futuro:
+## Arquitetura
 
-Delivery:
+```text
+SIGIN Core
+    ↓
+Delivery Back
+    ↓
+Delivery Front
 
-Cliente
-|
+```
+O Delivery Back atua como adaptador e orquestrador do canal.
+
+O Delivery Front não acessa diretamente o Core.
+
+Princípio
+
+O objetivo não é reconstruir o Delivery dentro do Core.
+
+O objetivo é integrar o Delivery existente ao Core, eliminando duplicidade de autoridade comercial.
+
+Fora do escopo
+reconstrução do Delivery;
+novo IAM;
+novo gateway de pagamento;
+ERP financeiro completo;
+estoque paralelo;
+reconstrução do estoque;
+regra exclusiva de movimentação de estoque para Delivery;
+refatorações sem impacto direto na integração.
+Critério de conclusão
+
+A Sprint será considerada funcionalmente concluída quando o fluxo real conseguir executar:
+
+Admin
+↓
+Catálogo Core
+↓
+Delivery
+↓
 Carrinho
-|
-Core API
-|
+↓
+Cliente
+↓
+Checkout
+↓
 Pedido Core
+↓
+Pedido Delivery
+↓
+Balcão
+↓
+Produção
+↓
+Separação
+↓
+Entrega
+↓
+Conclusão
 
-Delivery vira uma camada de experiência.
+---
 
 Sprint 07 — PDV
 

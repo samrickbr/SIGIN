@@ -15,8 +15,10 @@ public class CardapioController {
     private final CardapioService service;
 
     @GetMapping
-    public List<CardapioResponse> listar() {
-        return service.listar();
+    public List<CardapioResponse> listar(
+            @RequestParam Long canalVendaId
+    ) {
+        return service.listar(canalVendaId);
     }
 
 }

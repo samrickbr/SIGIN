@@ -16,16 +16,13 @@ public interface ProdutoVendaRepository extends JpaRepository<ProdutoVenda, Long
             Long produtoId,
             Long canalVendaId
     );
-
     boolean existsByProdutoIdAndCanalVendaId(
             Long produtoId,
             Long canalVendaId
     );
-
     List<ProdutoVenda> findByCanalVendaIdAndDisponivelVendaTrue(
             Long canalVendaId
     );
-
     @Query("""
             SELECT pv
             FROM ProdutoVenda pv
@@ -34,15 +31,22 @@ public interface ProdutoVendaRepository extends JpaRepository<ProdutoVenda, Long
     List<ProdutoVenda> findProdutosDisponiveis();
 
     @Query("""
-        SELECT pv
-        FROM ProdutoVenda pv
-        JOIN FETCH pv.produto p
-        JOIN FETCH pv.canalVenda c
-        WHERE c.id = :canalVendaId
-        AND pv.disponivelVenda = true
-        AND c.ativo = true
-        """)
+    SELECT pv
+    FROM ProdutoVenda pv
+    JOIN FETCH pv.produto p
+    JOIN FETCH pv.canalVenda c
+    WHERE c.id = :canalVendaId
+    AND c.ativo = true
+    AND pv.disponivelVenda = true
+    AND EXISTS (
+        SELECT 1
+        FROM ProdutoCanal pc
+        WHERE pc.produto = p
+        AND pc.canalVenda = c
+        AND pc.ativo = true
+    )
+    """)
     List<ProdutoVenda> findCatalogoPorCanal(
-            Long canalVendaId
+            @Param("canalVendaId") Long canalVendaId
     );
 }

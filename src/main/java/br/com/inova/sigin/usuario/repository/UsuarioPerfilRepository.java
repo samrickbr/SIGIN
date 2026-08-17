@@ -15,11 +15,11 @@ public interface UsuarioPerfilRepository
     );
 
     @Query("""
-        SELECT up
+        SELECT DISTINCT up
         FROM UsuarioPerfil up
         JOIN FETCH up.perfil p
-        JOIN FETCH p.permissoes pp
-        JOIN FETCH pp.permissao
+        LEFT JOIN FETCH p.permissoes pp
+        LEFT JOIN FETCH pp.permissao
         WHERE up.usuario.id = :usuarioId
     """)
     List<UsuarioPerfil> buscarComPermissoesPorUsuario(

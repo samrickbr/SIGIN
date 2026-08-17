@@ -55,8 +55,11 @@ public class PedidoService {
 
         FormaPagamento formaPagamento =
                 formaPagamentoRepository.findById(request.getFormaPagamentoId())
+                        .filter(FormaPagamento::getAtivo)
                         .orElseThrow(() ->
-                                new RegraNegocioException("Forma de pagamento não encontrada.")
+                                new RegraNegocioException(
+                                        "Forma de pagamento não encontrada ou inativa."
+                                )
                         );
 
         Pedido pedido = Pedido.builder()

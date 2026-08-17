@@ -192,4 +192,10 @@ public class ProdutoVendaService {
 
         return produtoVenda;
     }
+    @Transactional(readOnly = true)
+    public List<ProdutoVenda> listarDisponiveisPorCanal(
+            Long canalVendaId
+    ) {
+        return repository.findCatalogoPorCanal(canalVendaId);
+    }
 }

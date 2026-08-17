@@ -122,4 +122,25 @@ public class PessoaService {
                 )
                 .build();
     }
+    @Transactional(readOnly = true)
+    public PessoaResponse buscarPorDocumento(String documento) {
+
+        Pessoa pessoa = repository.findByDocumento(documento)
+                .orElseThrow(() ->
+                        new RegraNegocioException("Pessoa não encontrada")
+                );
+
+        return converter(pessoa);
+    }
+
+    @Transactional(readOnly = true)
+    public PessoaResponse buscarPorTelefone(String telefone) {
+
+        Pessoa pessoa = repository.findByTelefone(telefone)
+                .orElseThrow(() ->
+                        new RegraNegocioException("Pessoa não encontrada")
+                );
+
+        return converter(pessoa);
+    }
 }
