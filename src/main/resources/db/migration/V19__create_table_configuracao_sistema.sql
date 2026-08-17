@@ -13,8 +13,12 @@ CREATE TABLE configuracoes_sistema (
         REFERENCES locais(id)
 );
 
+INSERT INTO locais
+(nome, ativo, data_criacao)
+VALUES
+('Inova', true, CURRENT_TIMESTAMP);
+
 INSERT INTO configuracoes_sistema
 (id, proximo_numero_pedido, proximo_numero_op, local_producao_padrao_id)
-
 VALUES
 (1, 3, 3, 1);
