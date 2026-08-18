@@ -6,7 +6,6 @@ import br.com.inova.sigin.produto.repository.ProdutoRepository;
 import br.com.inova.sigin.produto.service.ProdutoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,8 +18,6 @@ public class ProdutoController {
     private final ProdutoRepository produtoRepository;
     private final ProdutoService produtoService;
 
-
-    @PreAuthorize("hasAuthority('PRODUTO_VISUALIZAR')")
     @GetMapping
     public List<ProdutoResponse> listar() {
         return produtoService.listar();
