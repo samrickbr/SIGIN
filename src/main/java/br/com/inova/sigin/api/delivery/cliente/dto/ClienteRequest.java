@@ -15,5 +15,8 @@ public class ClienteRequest {
     @NotBlank
     private String documento;
 
+    @NotBlank
+    private String senha;
+
     private String email;
 }

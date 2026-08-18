@@ -382,3 +382,80 @@ Entrega
 Conclusão
 
 A prioridade é tornar o Delivery funcional utilizando o Core como autoridade, sem reconstruir o Delivery e sem duplicar regras comerciais.
+
+
+## Cliente Delivery — Identidade Autenticável
+
+O cliente do Delivery utiliza a identidade oficial do SIGIN Core.
+
+Fluxo:
+
+Pessoa
+↓
+Usuario
+↓
+Perfil CLIENTE
+↓
+JWT
+
+O Delivery não possui tabela própria de Pessoa, Usuario ou senha.
+
+### Cadastro
+
+O cadastro público do cliente utiliza:
+
+- nome completo;
+- CPF;
+- telefone/WhatsApp;
+- email, quando informado;
+- senha.
+
+O Core materializa:
+
+1. Pessoa;
+2. Usuario vinculado à Pessoa;
+3. Usuario.login = CPF;
+4. senha armazenada utilizando o PasswordEncoder existente;
+5. Perfil CLIENTE associado ao Usuario.
+
+CPF é a identidade de login do cliente.
+
+### Autenticação
+
+O cliente utiliza o mecanismo existente:
+
+CPF + senha
+↓
+POST /auth/login
+↓
+JWT
+
+Não existe autenticação paralela para Delivery.
+
+### Perfil CLIENTE
+
+Foi criado o perfil CLIENTE por migration:
+
+V44__criar_perfil_cliente.sql
+
+O perfil não recebe permissões administrativas.
+
+### Implementação
+
+O fluxo de cadastro foi evoluído em:
+
+ClienteDeliveryService
+
+O DTO de cadastro passou a receber a senha em:
+
+ClienteRequest
+
+A senha permanece exclusivamente no Usuario e é processada pelo mecanismo de senha existente no Core.
+
+### Regra de identidade
+
+Um CPF representa uma identidade de cliente.
+
+Quando a Pessoa já existe, o fluxo verifica a existência de Usuario pelo pessoaId antes de criar uma nova identidade.
+
+O Delivery permanece consumidor da identidade oficial do Core.
