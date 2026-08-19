@@ -251,3 +251,43 @@ Campos:
 - quantidade
 - valorUnitario
 - valorTotal
+
+## Endereço do Pedido
+
+O pedido pode possuir um endereço próprio para representar o endereço
+efetivamente utilizado na operação.
+
+O endereço do pedido é persistido como snapshot dos dados do
+`PessoaEndereco` selecionado no momento da criação.
+
+Relação:
+
+```
+Pessoa
+  ↓
+PessoaEndereco
+  ↓ seleção
+Pedido
+  ↓
+PedidoEndereco
+
+```
+A tabela pedido_enderecos armazena:
+
+pedido_id;
+pessoa_endereco_id como referência de origem;
+cep;
+logradouro;
+numero;
+complemento;
+bairro;
+cidade;
+uf.
+
+O PedidoEndereco não depende dos dados atuais do PessoaEndereco
+para representar o histórico do pedido.
+
+Caso o cliente altere posteriormente seu endereço cadastrado,
+o endereço já utilizado em um pedido existente permanece inalterado.
+
+Existe no máximo um PedidoEndereco por pedido.

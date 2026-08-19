@@ -62,14 +62,19 @@ Regras:
 
 # Criação de Pedido
 
-O Delivery nunca informa preços.
+O Delivery não informa preços.
 
-O frontend envia apenas:
+Quando houver endereço selecionado para o pedido, o Delivery envia
+o identificador do endereço pertencente ao cliente.
+
+Exemplo:
 
 ```json
 {
   "clienteId": 1,
+  "enderecoId": 2,
   "canalVendaId": 2,
+  "formaPagamentoId": 1,
   "itens": [
     {
       "produtoId": 5,
@@ -78,6 +83,30 @@ O frontend envia apenas:
   ]
 }
 ```
+O Core valida que o enderecoId pertence ao clienteId.
+
+Após a validação, os dados do PessoaEndereco são copiados para
+PedidoEndereco.
+
+O pedido passa a possuir um snapshot próprio do endereço utilizado.
+
+Cliente
+↓
+PessoaEndereco
+↓
+PedidoRequest.enderecoId
+↓
+validação de pertencimento
+↓
+PedidoEndereco
+↓
+Pedido
+
+O endereço persistido no pedido não é atualizado quando o cliente
+alterar posteriormente seu cadastro de endereço.
+
+O PedidoEndereco representa o endereço histórico utilizado naquele
+pedido.
 
 ---
 
@@ -261,6 +290,26 @@ O Delivery não mantém catálogo comercial paralelo.
 Preço e disponibilidade devem ser obtidos do Core.
 
 Checkout
+
+### Endereço
+
+O Core mantém os endereços cadastrados da Pessoa.
+
+O Delivery pode permitir ao cliente:
+
+- consultar seus endereços;
+- selecionar um endereço;
+- cadastrar novo endereço;
+- alterar endereço;
+- definir endereço principal.
+
+Na criação do pedido, o Delivery envia o `enderecoId` selecionado.
+
+O Core valida o vínculo entre cliente e endereço e persiste um
+snapshot no pedido.
+
+A regra de obrigatoriedade do endereço depende do tipo de recebimento
+e será definida na evolução do contrato de RETIRADA/ENTREGA.
 
 O Front pode apresentar valores calculados para fins de experiência.
 
