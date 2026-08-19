@@ -295,3 +295,11 @@ Sprint 05 será definida no Roadmap do projeto.
 * Validado comportamento de acesso sem token e com token inválido.
 * Não foram criados novos mecanismos de autenticação ou autorização.
 * Não foram adicionados endpoints de CRUD de usuários, perfis ou permissões nesta evolução.
+
+---
+
+## Delivery — Identificação do cliente
+
+- Liberado `POST /api/delivery/clientes` sem autenticação.
+- Mantida autenticação para os demais endpoints protegidos.
+- Fluxo permite cadastro do cliente antes do login no Delivery.

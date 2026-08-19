@@ -459,3 +459,16 @@ Um CPF representa uma identidade de cliente.
 Quando a Pessoa já existe, o fluxo verifica a existência de Usuario pelo pessoaId antes de criar uma nova identidade.
 
 O Delivery permanece consumidor da identidade oficial do Core.
+
+---
+
+### Identificação do cliente
+
+O Delivery utiliza os seguintes endpoints públicos para identificação do cliente:
+
+- `POST /api/delivery/clientes` — cadastro de cliente
+- `POST /auth/login` — autenticação do cliente existente
+
+O cadastro do cliente é público porque ocorre antes da autenticação.
+
+Após o cadastro, o cliente pode utilizar CPF e senha para autenticação.
