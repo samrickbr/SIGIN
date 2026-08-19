@@ -91,14 +91,21 @@ public class DeliveryIntegrationBootstrap implements CommandLineRunner {
 
         pessoa = pessoaRepository.save(pessoa);
 
+        String senha = gerarSenha();
+
         Usuario usuario = Usuario.builder()
                 .pessoa(pessoa)
                 .login(LOGIN)
+                .senha(passwordEncoder.encode(senha))
                 .ativo(true)
                 .dataCriacao(LocalDateTime.now())
                 .build();
 
-        return usuarioRepository.save(usuario);
+        usuario = usuarioRepository.save(usuario);
+
+        gravarSegredo(senha);
+
+        return usuario;
     }
 
     private String gerarSenha() {
