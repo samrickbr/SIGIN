@@ -11,11 +11,14 @@ import br.com.inova.sigin.ordemproducao.service.OrdemProducaoService;
 import br.com.inova.sigin.pedido.dto.PedidoRequest;
 import br.com.inova.sigin.pedido.dto.PedidoResponse;
 import br.com.inova.sigin.pedido.entity.Pedido;
+import br.com.inova.sigin.pedido.entity.PedidoEndereco;
 import br.com.inova.sigin.pedido.entity.PedidoItem;
 import br.com.inova.sigin.pedido.enums.StatusPedido;
 import br.com.inova.sigin.pedido.mapper.PedidoMapper;
 import br.com.inova.sigin.pedido.repository.PedidoRepository;
 import br.com.inova.sigin.pessoa.entity.Pessoa;
+import br.com.inova.sigin.pessoa.entity.PessoaEndereco;
+import br.com.inova.sigin.pessoa.repository.PessoaEnderecoRepository;
 import br.com.inova.sigin.pessoa.repository.PessoaRepository;
 import br.com.inova.sigin.produto.entity.Produto;
 import br.com.inova.sigin.produto.repository.ProdutoRepository;
@@ -44,6 +47,7 @@ public class PedidoService {
     private final ProdutoVendaService produtoVendaService;
     private final FormaPagamentoRepository formaPagamentoRepository;
     private final FinanceiroPedidoService financeiroPedidoService;
+    private final PessoaEnderecoRepository pessoaEnderecoRepository;
 
     @Transactional
     public PedidoResponse criar(PedidoRequest request) {
@@ -72,6 +76,36 @@ public class PedidoService {
                 .ativo(true)
                 .observacao(request.getObservacao())
                 .build();
+
+        if (request.getEnderecoId() != null) {
+
+            PessoaEndereco endereco =
+                    pessoaEnderecoRepository
+                            .findByIdAndPessoaId(
+                                    request.getEnderecoId(),
+                                    cliente.getId()
+                            )
+                            .orElseThrow(() ->
+                                    new RegraNegocioException(
+                                            "Endereço não pertence ao cliente"
+                                    )
+                            );
+
+            PedidoEndereco pedidoEndereco =
+                    PedidoEndereco.builder()
+                            .pedido(pedido)
+                            .pessoaEnderecoId(endereco.getId())
+                            .cep(endereco.getCep())
+                            .logradouro(endereco.getLogradouro())
+                            .numero(endereco.getNumero())
+                            .complemento(endereco.getComplemento())
+                            .bairro(endereco.getBairro())
+                            .cidade(endereco.getCidade())
+                            .uf(endereco.getUf())
+                            .build();
+
+            pedido.setEndereco(pedidoEndereco);
+        }
 
         List<PedidoItem> itens = request.getItens().stream().map(itemRequest -> {
             Produto produto = produtoRepository.findById(itemRequest.getProdutoId()).orElseThrow(() -> new RegraNegocioException("Produto não encontrado."));

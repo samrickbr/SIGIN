@@ -30,6 +30,14 @@ public class Pedido {
     @ManyToOne(optional = false)
     private Pessoa cliente;
 
+    @OneToOne(
+            mappedBy = "pedido",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    private PedidoEndereco endereco;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "canal_venda_id")
     private CanalVenda canalVenda;
