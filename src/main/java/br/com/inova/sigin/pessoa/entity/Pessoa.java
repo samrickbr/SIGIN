@@ -47,4 +47,8 @@ public class Pessoa {
     @OneToMany(mappedBy = "pessoa")
     @Builder.Default
     private Set<PessoaTipo> tipos = new HashSet<>();
+
+    @OneToMany(mappedBy = "pessoa")
+    @Builder.Default
+    private Set<PessoaEndereco> enderecos = new HashSet<>();
 }
