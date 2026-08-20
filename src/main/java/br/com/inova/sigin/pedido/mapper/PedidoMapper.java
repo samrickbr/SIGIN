@@ -24,6 +24,7 @@ public class PedidoMapper {
                 .canalVenda(pedido.getCanalVenda().getNome())
                 .dataPedido(pedido.getDataPedido())
                 .valorTotal(pedido.getValorTotal())
+                .taxaEntrega(pedido.getTaxaEntrega())
                 .status(pedido.getStatus().name())
                 .formaPagamentoId(pedido.getFormaPagamento().getId())
                 .formaPagamento(pedido.getFormaPagamento().getDescricao())

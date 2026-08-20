@@ -30,6 +30,8 @@ public class PedidoResponse {
 
     private BigDecimal valorTotal;
 
+    private BigDecimal taxaEntrega;
+
     private String status;
 
     private Long formaPagamentoId;

@@ -54,9 +54,19 @@ public class PedidoService {
     public PedidoResponse criar(PedidoRequest request) {
 
         Pessoa cliente = pessoaRepository.findById(request.getClienteId())
-                .orElseThrow(() -> new RegraNegocioException("Cliente não encontrado."));
+                .orElseThrow(() ->
+                        new RegraNegocioException(
+                                "Cliente não encontrado."
+                        )
+                );
 
-        CanalVenda canalVenda = canalVendaRepository.findById(request.getCanalVendaId()).orElseThrow(() -> new RegraNegocioException("Canal de venda não encontrado."));
+        CanalVenda canalVenda = canalVendaRepository
+                .findById(request.getCanalVendaId())
+                .orElseThrow(() ->
+                        new RegraNegocioException(
+                                "Canal de venda não encontrado."
+                        )
+                );
 
         FormaPagamento formaPagamento =
                 formaPagamentoRepository.findById(request.getFormaPagamentoId())
@@ -67,30 +77,36 @@ public class PedidoService {
                                 )
                         );
 
-        Pedido pedido = Pedido.builder()
-                .numero(configuracaoSistemaService.gerarProximoNumeroPedido())
-                .cliente(cliente)
-                .canalVenda(canalVenda)
-                .tipoRecebimento(request.getTipoRecebimento())
-                .formaPagamento(formaPagamento)
-                .dataPedido(LocalDateTime.now())
-                .status(StatusPedido.ABERTO)
-                .ativo(true)
-                .observacao(request.getObservacao())
-                .build();
-        if (request.getTipoRecebimento() == null) {
+        TipoRecebimento tipoRecebimento = request.getTipoRecebimento();
+
+        if (tipoRecebimento == null) {
             throw new RegraNegocioException(
                     "Tipo de recebimento é obrigatório."
             );
         }
 
-        if (request.getTipoRecebimento() == TipoRecebimento.ENTREGA
+        BigDecimal taxaEntrega = validarTaxaEntrega(request);
+
+        if (tipoRecebimento == TipoRecebimento.ENTREGA
                 && request.getEnderecoId() == null) {
 
             throw new RegraNegocioException(
                     "Endereço é obrigatório para entrega."
             );
         }
+
+        Pedido pedido = Pedido.builder()
+                .numero(configuracaoSistemaService.gerarProximoNumeroPedido())
+                .cliente(cliente)
+                .canalVenda(canalVenda)
+                .tipoRecebimento(tipoRecebimento)
+                .taxaEntrega(taxaEntrega)
+                .formaPagamento(formaPagamento)
+                .dataPedido(LocalDateTime.now())
+                .status(StatusPedido.ABERTO)
+                .ativo(true)
+                .observacao(request.getObservacao())
+                .build();
 
         if (request.getEnderecoId() != null) {
 
@@ -102,7 +118,7 @@ public class PedidoService {
                             )
                             .orElseThrow(() ->
                                     new RegraNegocioException(
-                                            "Endereço não pertence ao cliente"
+                                            "Endereço não pertence ao cliente."
                                     )
                             );
 
@@ -122,20 +138,94 @@ public class PedidoService {
             pedido.setEndereco(pedidoEndereco);
         }
 
-        List<PedidoItem> itens = request.getItens().stream().map(itemRequest -> {
-            Produto produto = produtoRepository.findById(itemRequest.getProdutoId()).orElseThrow(() -> new RegraNegocioException("Produto não encontrado."));
-            ProdutoVenda produtoVenda = produtoVendaService.obterProdutoDisponivel(produto.getId(), canalVenda.getId());
+        List<PedidoItem> itens = request.getItens()
+                .stream()
+                .map(itemRequest -> {
 
-            BigDecimal valorUnitario = produtoVenda.getPrecoVenda();
-            BigDecimal valorTotal = valorUnitario.multiply(itemRequest.getQuantidade());
-            return PedidoItem.builder().pedido(pedido).produto(produto).quantidade(itemRequest.getQuantidade()).valorUnitario(valorUnitario).valorTotal(valorTotal).ativo(true).build();
-        }).toList();
+                    Produto produto = produtoRepository
+                            .findById(itemRequest.getProdutoId())
+                            .orElseThrow(() ->
+                                    new RegraNegocioException(
+                                            "Produto não encontrado."
+                                    )
+                            );
+
+                    ProdutoVenda produtoVenda =
+                            produtoVendaService.obterProdutoDisponivel(
+                                    produto.getId(),
+                                    canalVenda.getId()
+                            );
+
+                    BigDecimal valorUnitario =
+                            produtoVenda.getPrecoVenda();
+
+                    BigDecimal valorTotal =
+                            valorUnitario.multiply(
+                                    itemRequest.getQuantidade()
+                            );
+
+                    return PedidoItem.builder()
+                            .pedido(pedido)
+                            .produto(produto)
+                            .quantidade(itemRequest.getQuantidade())
+                            .valorUnitario(valorUnitario)
+                            .valorTotal(valorTotal)
+                            .ativo(true)
+                            .build();
+                })
+                .toList();
+
         pedido.getItens().addAll(itens);
+
         atualizarValorTotal(pedido);
 
-        return mapper.toResponse(repository.save(pedido));
+        return mapper.toResponse(
+                repository.save(pedido)
+        );
     }
 
+    private BigDecimal validarTaxaEntrega(PedidoRequest request) {
+
+        TipoRecebimento tipoRecebimento =
+                request.getTipoRecebimento();
+
+        BigDecimal taxaInformada =
+                request.getTaxaEntrega();
+
+        if (tipoRecebimento == TipoRecebimento.RETIRADA) {
+
+            if (taxaInformada != null
+                    && taxaInformada.compareTo(BigDecimal.ZERO) != 0) {
+
+                throw new RegraNegocioException(
+                        "Retirada não possui taxa de entrega."
+                );
+            }
+
+            return BigDecimal.ZERO;
+        }
+
+        if (tipoRecebimento == TipoRecebimento.ENTREGA) {
+
+            if (taxaInformada == null) {
+                throw new RegraNegocioException(
+                        "Taxa de entrega é obrigatória para entrega."
+                );
+            }
+
+            if (taxaInformada.compareTo(BigDecimal.ZERO) < 0) {
+                throw new RegraNegocioException(
+                        "Taxa de entrega inválida."
+                );
+            }
+
+            return taxaInformada;
+        }
+
+        throw new RegraNegocioException(
+                "Tipo de recebimento inválido."
+        );
+    }
 
     public List<PedidoResponse> listar() {
 
@@ -145,14 +235,12 @@ public class PedidoService {
                 .toList();
     }
 
-
     public PedidoResponse buscarPorId(Long id) {
 
         Pedido pedido = buscarEntidadePorId(id);
 
         return mapper.toResponse(pedido);
     }
-
 
     private Pedido buscarEntidadePorId(Long id) {
 
@@ -167,8 +255,8 @@ public class PedidoService {
 
         Pedido pedido = buscarEntidadePorId(id);
 
-        if (pedido.getStatus() == StatusPedido.ENTREGUE ||
-                pedido.getStatus() == StatusPedido.FATURADO) {
+        if (pedido.getStatus() == StatusPedido.ENTREGUE
+                || pedido.getStatus() == StatusPedido.FATURADO) {
 
             throw new RegraNegocioException(
                     "Não é possível cancelar pedido finalizado."
@@ -201,7 +289,7 @@ public class PedidoService {
 
     private void atualizarValorTotal(Pedido pedido) {
 
-        BigDecimal total = pedido.getItens()
+        BigDecimal totalProdutos = pedido.getItens()
                 .stream()
                 .map(PedidoItem::getValorTotal)
                 .reduce(
@@ -209,7 +297,13 @@ public class PedidoService {
                         BigDecimal::add
                 );
 
-        pedido.setValorTotal(total);
+        BigDecimal taxaEntrega = pedido.getTaxaEntrega() != null
+                ? pedido.getTaxaEntrega()
+                : BigDecimal.ZERO;
+
+        pedido.setValorTotal(
+                totalProdutos.add(taxaEntrega)
+        );
     }
 
     @Transactional
@@ -217,7 +311,9 @@ public class PedidoService {
 
         Pedido pedido = repository.findById(pedidoId)
                 .orElseThrow(() ->
-                        new RegraNegocioException("Pedido não encontrado."));
+                        new RegraNegocioException(
+                                "Pedido não encontrado."
+                        ));
 
         if (pedido.getStatus() == StatusPedido.CANCELADO) {
             throw new RegraNegocioException(
@@ -247,6 +343,7 @@ public class PedidoService {
 
         return ordens;
     }
+
     @Transactional
     public PedidoResponse faturar(Long id) {
 

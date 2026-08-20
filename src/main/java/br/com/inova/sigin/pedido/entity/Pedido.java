@@ -61,6 +61,9 @@ public class Pedido {
     @Column(nullable = false)
     private BigDecimal valorTotal;
 
+    @Column(name = "taxa_entrega", nullable = false, precision = 12, scale = 2)
+    private BigDecimal taxaEntrega;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "forma_pagamento_id")
     private FormaPagamento formaPagamento;

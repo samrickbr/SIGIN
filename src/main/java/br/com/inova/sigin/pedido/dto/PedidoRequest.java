@@ -24,6 +24,8 @@ public class PedidoRequest {
 
     private BigDecimal valorTotal;
 
+    private BigDecimal taxaEntrega;
+
     private String observacao;
 
     private List<PedidoItemRequest> itens;
