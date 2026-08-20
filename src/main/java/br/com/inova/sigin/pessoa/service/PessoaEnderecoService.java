@@ -165,7 +165,6 @@ public class PessoaEnderecoService {
 
         return PessoaEnderecoResponse.builder()
                 .id(endereco.getId())
-                .pessoaId(endereco.getPessoa().getId())
                 .cep(endereco.getCep())
                 .logradouro(endereco.getLogradouro())
                 .numero(endereco.getNumero())

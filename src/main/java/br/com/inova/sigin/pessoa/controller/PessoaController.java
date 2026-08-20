@@ -1,5 +1,6 @@
 package br.com.inova.sigin.pessoa.controller;
 
+import br.com.inova.sigin.pessoa.dto.PessoaEnderecoResponse;
 import br.com.inova.sigin.pessoa.dto.PessoaRequest;
 import br.com.inova.sigin.pessoa.dto.PessoaResponse;
 import br.com.inova.sigin.pessoa.dto.PessoaUpdateRequest;
@@ -74,6 +75,15 @@ public class PessoaController {
     ) {
         return ResponseEntity.ok(
                 service.buscarPorTelefone(telefone)
+        );
+    }
+
+    @GetMapping("/{id}/enderecos")
+    public ResponseEntity<List<PessoaEnderecoResponse>> listarEnderecos(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(
+                service.listarEnderecos(id)
         );
     }
 }

@@ -1,5 +1,6 @@
 package br.com.inova.sigin.pessoa.dto;
 
+import br.com.inova.sigin.pessoa.entity.PessoaEndereco;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,8 +9,6 @@ import lombok.Data;
 public class PessoaEnderecoResponse {
 
     private Long id;
-
-    private Long pessoaId;
 
     private String cep;
 
@@ -26,4 +25,18 @@ public class PessoaEnderecoResponse {
     private String uf;
 
     private Boolean principal;
+
+    public static PessoaEnderecoResponse from(PessoaEndereco endereco) {
+        return PessoaEnderecoResponse.builder()
+                .id(endereco.getId())
+                .cep(endereco.getCep())
+                .logradouro(endereco.getLogradouro())
+                .numero(endereco.getNumero())
+                .complemento(endereco.getComplemento())
+                .bairro(endereco.getBairro())
+                .cidade(endereco.getCidade())
+                .uf(endereco.getUf())
+                .principal(endereco.getPrincipal())
+                .build();
+    }
 }

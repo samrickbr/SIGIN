@@ -1,9 +1,11 @@
 package br.com.inova.sigin.pessoa.service;
 
+import br.com.inova.sigin.pessoa.dto.PessoaEnderecoResponse;
 import br.com.inova.sigin.pessoa.dto.PessoaRequest;
 import br.com.inova.sigin.pessoa.dto.PessoaResponse;
 import br.com.inova.sigin.pessoa.dto.PessoaUpdateRequest;
 import br.com.inova.sigin.pessoa.entity.Pessoa;
+import br.com.inova.sigin.pessoa.repository.PessoaEnderecoRepository;
 import br.com.inova.sigin.pessoa.repository.PessoaRepository;
 import br.com.inova.sigin.shared.exception.RegraNegocioException;
 import br.com.inova.sigin.shared.util.StringUtil;
@@ -18,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PessoaService {
     private final PessoaRepository repository;
+    private final PessoaEnderecoRepository enderecoRepository;
 
     public PessoaResponse criar(PessoaRequest request) {
 
@@ -142,5 +145,19 @@ public class PessoaService {
                 );
 
         return converter(pessoa);
+    }
+    @Transactional(readOnly = true)
+    public List<PessoaEnderecoResponse> listarEnderecos(Long pessoaId) {
+
+        repository.findById(pessoaId)
+                .orElseThrow(() ->
+                        new RegraNegocioException("Pessoa não encontrada")
+                );
+
+        return enderecoRepository
+                .findByPessoaIdOrderByPrincipalDescIdAsc(pessoaId)
+                .stream()
+                .map(PessoaEnderecoResponse::from)
+                .toList();
     }
 }
