@@ -3,6 +3,7 @@ package br.com.inova.sigin.pedido.entity;
 import br.com.inova.sigin.canalvenda.entity.CanalVenda;
 import br.com.inova.sigin.financeiro.entity.FormaPagamento;
 import br.com.inova.sigin.pedido.enums.StatusPedido;
+import br.com.inova.sigin.pedido.enums.TipoRecebimento;
 import br.com.inova.sigin.pessoa.entity.Pessoa;
 import jakarta.persistence.*;
 import lombok.*;
@@ -37,6 +38,10 @@ public class Pedido {
             fetch = FetchType.LAZY
     )
     private PedidoEndereco endereco;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_recebimento", nullable = false, length = 20)
+    private TipoRecebimento tipoRecebimento;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "canal_venda_id")

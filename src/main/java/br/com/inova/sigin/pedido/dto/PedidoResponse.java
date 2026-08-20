@@ -20,6 +20,8 @@ public class PedidoResponse {
 
     private PedidoEnderecoResponse endereco;
 
+    private String tipoRecebimento;
+
     private Long canalVendaId;
 
     private String canalVenda;

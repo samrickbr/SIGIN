@@ -14,6 +14,7 @@ import br.com.inova.sigin.pedido.entity.Pedido;
 import br.com.inova.sigin.pedido.entity.PedidoEndereco;
 import br.com.inova.sigin.pedido.entity.PedidoItem;
 import br.com.inova.sigin.pedido.enums.StatusPedido;
+import br.com.inova.sigin.pedido.enums.TipoRecebimento;
 import br.com.inova.sigin.pedido.mapper.PedidoMapper;
 import br.com.inova.sigin.pedido.repository.PedidoRepository;
 import br.com.inova.sigin.pessoa.entity.Pessoa;
@@ -70,12 +71,26 @@ public class PedidoService {
                 .numero(configuracaoSistemaService.gerarProximoNumeroPedido())
                 .cliente(cliente)
                 .canalVenda(canalVenda)
+                .tipoRecebimento(request.getTipoRecebimento())
                 .formaPagamento(formaPagamento)
                 .dataPedido(LocalDateTime.now())
                 .status(StatusPedido.ABERTO)
                 .ativo(true)
                 .observacao(request.getObservacao())
                 .build();
+        if (request.getTipoRecebimento() == null) {
+            throw new RegraNegocioException(
+                    "Tipo de recebimento é obrigatório."
+            );
+        }
+
+        if (request.getTipoRecebimento() == TipoRecebimento.ENTREGA
+                && request.getEnderecoId() == null) {
+
+            throw new RegraNegocioException(
+                    "Endereço é obrigatório para entrega."
+            );
+        }
 
         if (request.getEnderecoId() != null) {
 

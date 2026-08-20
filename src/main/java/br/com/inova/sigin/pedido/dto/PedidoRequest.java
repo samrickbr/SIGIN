@@ -1,5 +1,6 @@
 package br.com.inova.sigin.pedido.dto;
 
+import br.com.inova.sigin.pedido.enums.TipoRecebimento;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -13,6 +14,8 @@ public class PedidoRequest {
     private Long clienteId;
 
     private Long enderecoId;
+
+    private TipoRecebimento tipoRecebimento;
 
     @NotNull
     private Long canalVendaId;

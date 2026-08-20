@@ -19,6 +19,7 @@ public class PedidoMapper {
                 .endereco(
                         converterEndereco(pedido.getEndereco())
                 )
+                .tipoRecebimento(pedido.getTipoRecebimento().name())
                 .canalVendaId(pedido.getCanalVenda().getId())
                 .canalVenda(pedido.getCanalVenda().getNome())
                 .dataPedido(pedido.getDataPedido())
