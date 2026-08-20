@@ -3,9 +3,11 @@ package br.com.inova.sigin.pessoa.controller;
 import br.com.inova.sigin.pessoa.dto.PessoaEnderecoRequest;
 import br.com.inova.sigin.pessoa.dto.PessoaEnderecoResponse;
 import br.com.inova.sigin.pessoa.service.PessoaEnderecoService;
+import br.com.inova.sigin.pessoa.service.PessoaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.List;
 public class PessoaEnderecoController {
 
     private final PessoaEnderecoService service;
+    private final PessoaService pessoaService;
 
     @PostMapping
     public ResponseEntity<PessoaEnderecoResponse> criar(
@@ -30,11 +33,11 @@ public class PessoaEnderecoController {
 
     @GetMapping
     public ResponseEntity<List<PessoaEnderecoResponse>> listar(
-            @PathVariable Long pessoaId
+            @PathVariable Long pessoaId,
+            Authentication authentication
     ) {
-
         return ResponseEntity.ok(
-                service.listar(pessoaId)
+                pessoaService.listarEnderecos(pessoaId, authentication)
         );
     }
 

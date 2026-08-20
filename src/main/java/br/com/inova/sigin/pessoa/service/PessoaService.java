@@ -12,6 +12,10 @@ import br.com.inova.sigin.shared.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import br.com.inova.sigin.usuario.entity.Usuario;
+import br.com.inova.sigin.usuario.repository.UsuarioRepository;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,6 +25,7 @@ import java.util.List;
 public class PessoaService {
     private final PessoaRepository repository;
     private final PessoaEnderecoRepository enderecoRepository;
+    private final UsuarioRepository usuarioRepository;
 
     public PessoaResponse criar(PessoaRequest request) {
 
@@ -147,7 +152,19 @@ public class PessoaService {
         return converter(pessoa);
     }
     @Transactional(readOnly = true)
-    public List<PessoaEnderecoResponse> listarEnderecos(Long pessoaId) {
+    public List<PessoaEnderecoResponse> listarEnderecos(
+            Long pessoaId,
+            Authentication authentication
+    ) {
+        Usuario usuario = usuarioRepository
+                .findByLoginAndAtivoTrue(authentication.getName())
+                .orElseThrow(() ->
+                        new AccessDeniedException("Acesso negado")
+                );
+
+        if (!usuario.getPessoa().getId().equals(pessoaId)) {
+            throw new AccessDeniedException("Acesso negado");
+        }
 
         repository.findById(pessoaId)
                 .orElseThrow(() ->
