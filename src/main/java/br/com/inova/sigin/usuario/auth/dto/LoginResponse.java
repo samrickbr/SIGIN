@@ -11,4 +11,6 @@ public class LoginResponse {
 
     @Builder.Default
     private String tipo = "Bearer";
+
+    private Long clienteId;
 }

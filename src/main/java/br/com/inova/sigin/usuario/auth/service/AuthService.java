@@ -49,6 +49,7 @@ public class AuthService {
 
         return LoginResponse.builder()
                 .token(jwtService.gerarToken(usuario.getLogin()))
+                .clienteId(usuario.getPessoa().getId())
                 .build();
     }
 
