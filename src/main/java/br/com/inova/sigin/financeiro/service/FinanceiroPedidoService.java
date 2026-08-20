@@ -25,38 +25,48 @@ public class FinanceiroPedidoService {
     @Transactional
     public void gerarFinanceiro(Pedido pedido) {
 
-        FormaPagamento forma = pedido.getFormaPagamento();
+        for (var pagamento : pedido.getPagamentos()) {
 
-        boolean baixaAutomatica =
-                Boolean.TRUE.equals(forma.getBaixaAutomatica());
+            FormaPagamento forma = pagamento.getFormaPagamento();
 
-        ContaReceber conta = ContaReceber.builder()
-                .pessoa(pedido.getCliente())
-                .pedido(pedido)
-                .formaPagamento(forma)
-                .valor(pedido.getValorTotal())
-                .dataVencimento(LocalDate.now())
-                .status(
-                        baixaAutomatica
-                                ? StatusContaReceber.PAGA
-                                : StatusContaReceber.ABERTA
-                )
-                .build();
+            boolean baixaAutomatica =
+                    Boolean.TRUE.equals(
+                            forma.getBaixaAutomatica()
+                    );
 
-        contaReceberRepository.save(conta);
+            ContaReceber conta = ContaReceber.builder()
+                    .pessoa(pedido.getCliente())
+                    .pedido(pedido)
+                    .formaPagamento(forma)
+                    .valor(pagamento.getValor())
+                    .dataVencimento(LocalDate.now())
+                    .status(
+                            baixaAutomatica
+                                    ? StatusContaReceber.PAGA
+                                    : StatusContaReceber.ABERTA
+                    )
+                    .build();
 
-        if (baixaAutomatica) {
+            contaReceberRepository.save(conta);
 
-            CaixaMovimento movimento =
-                    CaixaMovimento.builder()
-                            .tipo(TipoMovimentoCaixa.ENTRADA)
-                            .origem(OrigemMovimentoCaixa.PEDIDO)
-                            .valor(pedido.getValorTotal())
-                            .referenciaId(pedido.getId())
-                            .observacao("Pedido " + pedido.getNumero())
-                            .build();
+            if (baixaAutomatica) {
 
-            caixaMovimentoRepository.save(movimento);
+                CaixaMovimento movimento =
+                        CaixaMovimento.builder()
+                                .tipo(TipoMovimentoCaixa.ENTRADA)
+                                .origem(OrigemMovimentoCaixa.PEDIDO)
+                                .valor(pagamento.getValor())
+                                .referenciaId(pedido.getId())
+                                .observacao(
+                                        "Pedido "
+                                                + pedido.getNumero()
+                                                + " - "
+                                                + forma.getDescricao()
+                                )
+                                .build();
+
+                caixaMovimentoRepository.save(movimento);
+            }
         }
     }
 }

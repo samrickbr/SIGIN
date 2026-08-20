@@ -32,7 +32,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     FROM Pedido p
     LEFT JOIN FETCH p.cliente
     LEFT JOIN FETCH p.canalVenda
-    LEFT JOIN FETCH p.formaPagamento
+    LEFT JOIN FETCH p.pagamentos
     """)
     List<Pedido> listarCompleto();
 }

@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -34,9 +35,7 @@ public class PedidoResponse {
 
     private String status;
 
-    private Long formaPagamentoId;
-
-    private String formaPagamento;
+    private List<PedidoPagamentoResponse> pagamentos;
 
     private Boolean ativo;
 

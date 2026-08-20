@@ -20,7 +20,7 @@ public class PedidoRequest {
     @NotNull
     private Long canalVendaId;
 
-    private Long formaPagamentoId;
+    private List<PedidoPagamentoRequest> pagamentos;
 
     private BigDecimal valorTotal;
 

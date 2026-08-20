@@ -1,7 +1,6 @@
 package br.com.inova.sigin.pedido.entity;
 
 import br.com.inova.sigin.canalvenda.entity.CanalVenda;
-import br.com.inova.sigin.financeiro.entity.FormaPagamento;
 import br.com.inova.sigin.pedido.enums.StatusPedido;
 import br.com.inova.sigin.pedido.enums.TipoRecebimento;
 import br.com.inova.sigin.pessoa.entity.Pessoa;
@@ -64,9 +63,13 @@ public class Pedido {
     @Column(name = "taxa_entrega", nullable = false, precision = 12, scale = 2)
     private BigDecimal taxaEntrega;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "forma_pagamento_id")
-    private FormaPagamento formaPagamento;
+    @OneToMany(
+            mappedBy = "pedido",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @Builder.Default
+    private List<PedidoPagamento> pagamentos = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

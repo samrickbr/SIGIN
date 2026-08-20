@@ -5,6 +5,8 @@ import br.com.inova.sigin.pedido.dto.PedidoResponse;
 import br.com.inova.sigin.pedido.entity.Pedido;
 import br.com.inova.sigin.pedido.entity.PedidoEndereco;
 import org.springframework.stereotype.Component;
+import br.com.inova.sigin.pedido.dto.PedidoPagamentoResponse;
+import br.com.inova.sigin.pedido.entity.PedidoPagamento;
 
 @Component
 public class PedidoMapper {
@@ -26,8 +28,12 @@ public class PedidoMapper {
                 .valorTotal(pedido.getValorTotal())
                 .taxaEntrega(pedido.getTaxaEntrega())
                 .status(pedido.getStatus().name())
-                .formaPagamentoId(pedido.getFormaPagamento().getId())
-                .formaPagamento(pedido.getFormaPagamento().getDescricao())
+                .pagamentos(
+                        pedido.getPagamentos()
+                                .stream()
+                                .map(this::converterPagamento)
+                                .toList()
+                )
                 .ativo(pedido.getAtivo())
                 .observacao(pedido.getObservacao())
                 .build();
@@ -50,6 +56,20 @@ public class PedidoMapper {
                 .bairro(endereco.getBairro())
                 .cidade(endereco.getCidade())
                 .uf(endereco.getUf())
+                .build();
+    }
+    private PedidoPagamentoResponse converterPagamento(
+            PedidoPagamento pagamento
+    ) {
+        return PedidoPagamentoResponse.builder()
+                .id(pagamento.getId())
+                .formaPagamentoId(
+                        pagamento.getFormaPagamento().getId()
+                )
+                .formaPagamento(
+                        pagamento.getFormaPagamento().getDescricao()
+                )
+                .valor(pagamento.getValor())
                 .build();
     }
 }

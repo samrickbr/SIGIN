@@ -8,11 +8,13 @@ import br.com.inova.sigin.financeiro.repository.FormaPagamentoRepository;
 import br.com.inova.sigin.financeiro.service.FinanceiroPedidoService;
 import br.com.inova.sigin.ordemproducao.dto.OrdemProducaoResponse;
 import br.com.inova.sigin.ordemproducao.service.OrdemProducaoService;
+import br.com.inova.sigin.pedido.dto.PedidoPagamentoRequest;
 import br.com.inova.sigin.pedido.dto.PedidoRequest;
 import br.com.inova.sigin.pedido.dto.PedidoResponse;
 import br.com.inova.sigin.pedido.entity.Pedido;
 import br.com.inova.sigin.pedido.entity.PedidoEndereco;
 import br.com.inova.sigin.pedido.entity.PedidoItem;
+import br.com.inova.sigin.pedido.entity.PedidoPagamento;
 import br.com.inova.sigin.pedido.enums.StatusPedido;
 import br.com.inova.sigin.pedido.enums.TipoRecebimento;
 import br.com.inova.sigin.pedido.mapper.PedidoMapper;
@@ -68,15 +70,6 @@ public class PedidoService {
                         )
                 );
 
-        FormaPagamento formaPagamento =
-                formaPagamentoRepository.findById(request.getFormaPagamentoId())
-                        .filter(FormaPagamento::getAtivo)
-                        .orElseThrow(() ->
-                                new RegraNegocioException(
-                                        "Forma de pagamento não encontrada ou inativa."
-                                )
-                        );
-
         TipoRecebimento tipoRecebimento = request.getTipoRecebimento();
 
         if (tipoRecebimento == null) {
@@ -101,7 +94,6 @@ public class PedidoService {
                 .canalVenda(canalVenda)
                 .tipoRecebimento(tipoRecebimento)
                 .taxaEntrega(taxaEntrega)
-                .formaPagamento(formaPagamento)
                 .dataPedido(LocalDateTime.now())
                 .status(StatusPedido.ABERTO)
                 .ativo(true)
@@ -178,6 +170,8 @@ public class PedidoService {
         pedido.getItens().addAll(itens);
 
         atualizarValorTotal(pedido);
+
+        adicionarPagamentos(pedido, request.getPagamentos());
 
         return mapper.toResponse(
                 repository.save(pedido)
@@ -362,5 +356,75 @@ public class PedidoService {
         financeiroPedidoService.gerarFinanceiro(pedido);
 
         return mapper.toResponse(pedido);
+    }
+
+    private void adicionarPagamentos(
+            Pedido pedido,
+            List<PedidoPagamentoRequest> pagamentosRequest
+    ) {
+        if (pagamentosRequest == null || pagamentosRequest.isEmpty()) {
+            throw new RegraNegocioException(
+                    "Pedido deve possuir pelo menos um pagamento."
+            );
+        }
+
+        BigDecimal totalPagamentos = BigDecimal.ZERO;
+
+        for (PedidoPagamentoRequest pagamentoRequest : pagamentosRequest) {
+
+            if (pagamentoRequest.getValor() == null
+                    || pagamentoRequest.getValor().compareTo(BigDecimal.ZERO) <= 0) {
+
+                throw new RegraNegocioException(
+                        "Valor de pagamento deve ser maior que zero."
+                );
+            }
+
+            FormaPagamento formaPagamento =
+                    formaPagamentoRepository
+                            .findById(pagamentoRequest.getFormaPagamentoId())
+                            .filter(FormaPagamento::getAtivo)
+                            .orElseThrow(() ->
+                                    new RegraNegocioException(
+                                            "Forma de pagamento não encontrada ou inativa."
+                                    )
+                            );
+
+            PedidoPagamento pagamento = PedidoPagamento.builder()
+                    .pedido(pedido)
+                    .formaPagamento(formaPagamento)
+                    .valor(pagamentoRequest.getValor())
+                    .build();
+
+            pedido.getPagamentos().add(pagamento);
+
+            totalPagamentos = totalPagamentos.add(
+                    pagamentoRequest.getValor()
+            );
+        }
+
+        BigDecimal totalPedido = calcularTotalPedidoSemPagamento(pedido);
+
+        if (totalPagamentos.compareTo(totalPedido) != 0) {
+            throw new RegraNegocioException(
+                    "A soma dos pagamentos deve ser igual ao total do pedido."
+            );
+        }
+    }
+    private BigDecimal calcularTotalPedidoSemPagamento(Pedido pedido) {
+
+        BigDecimal totalProdutos = pedido.getItens()
+                .stream()
+                .map(PedidoItem::getValorTotal)
+                .reduce(
+                        BigDecimal.ZERO,
+                        BigDecimal::add
+                );
+
+        BigDecimal taxaEntrega = pedido.getTaxaEntrega() != null
+                ? pedido.getTaxaEntrega()
+                : BigDecimal.ZERO;
+
+        return totalProdutos.add(taxaEntrega);
     }
 }
