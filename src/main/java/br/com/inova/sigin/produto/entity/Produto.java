@@ -9,6 +9,7 @@ import jakarta.persistence.ManyToOne;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "produtos")
@@ -43,11 +44,11 @@ public class Produto {
     @Column(name = "disponivel_venda", nullable = false)
     private Boolean disponivelVenda = true;
 
-    @OneToOne(
+    @OneToMany(
             mappedBy = "produto",
             fetch = FetchType.LAZY
     )
-    private ProdutoVenda venda;
+    private List<ProdutoVenda> vendas;
 
     @Column(length = 500)
     private String imagem;

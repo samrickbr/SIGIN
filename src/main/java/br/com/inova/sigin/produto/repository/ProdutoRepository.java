@@ -22,13 +22,18 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
     List<Produto> findByAtivoTrueAndDisponivelVendaTrue();
 
     @Query("""
-        select p 
-        from Produto p
-        left join fetch p.categoria
-        left join fetch p.venda
-        where p.ativo = true
-        and p.venda.disponivelVenda = true
-        """)
+            select p 
+            from Produto p
+            left join fetch p.categoria
+            left join fetch p.vendas
+            where p.ativo = true
+                and exists (
+                    select 1
+                    from ProdutoVenda pv
+                    where pv.produto = p
+                      and pv.disponivelVenda = true
+                )
+            """)
     List<Produto> buscarCardapio();
 
     Optional<Produto> findByNome(String nome);
