@@ -175,4 +175,28 @@ public class PessoaEnderecoService {
                 .principal(endereco.getPrincipal())
                 .build();
     }
+    @Transactional
+    public void excluir(
+            Long pessoaId,
+            Long enderecoId
+    ) {
+        PessoaEndereco endereco = buscarEndereco(
+                pessoaId,
+                enderecoId
+        );
+
+        boolean eraPrincipal = Boolean.TRUE.equals(
+                endereco.getPrincipal()
+        );
+
+        repository.delete(endereco);
+
+        if (eraPrincipal) {
+            repository
+                    .findByPessoaIdOrderByPrincipalDescIdAsc(pessoaId)
+                    .stream()
+                    .findFirst()
+                    .ifPresent(this::definirPrincipal);
+        }
+    }
 }

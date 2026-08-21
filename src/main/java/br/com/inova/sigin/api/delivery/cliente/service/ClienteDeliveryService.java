@@ -2,20 +2,27 @@ package br.com.inova.sigin.api.delivery.cliente.service;
 
 import br.com.inova.sigin.api.delivery.cliente.dto.ClienteRequest;
 import br.com.inova.sigin.api.delivery.cliente.dto.ClienteResponse;
+import br.com.inova.sigin.pessoa.dto.PessoaEnderecoRequest;
+import br.com.inova.sigin.pessoa.dto.PessoaEnderecoResponse;
 import br.com.inova.sigin.pessoa.dto.PessoaRequest;
 import br.com.inova.sigin.pessoa.dto.PessoaResponse;
 import br.com.inova.sigin.pessoa.entity.Pessoa;
 import br.com.inova.sigin.pessoa.repository.PessoaRepository;
+import br.com.inova.sigin.pessoa.service.PessoaEnderecoService;
 import br.com.inova.sigin.pessoa.service.PessoaService;
 import br.com.inova.sigin.pessoa.service.PessoaTipoService;
 import br.com.inova.sigin.usuario.dto.UsuarioRequest;
+import br.com.inova.sigin.usuario.entity.Usuario;
 import br.com.inova.sigin.usuario.repository.PerfilRepository;
 import br.com.inova.sigin.usuario.repository.UsuarioRepository;
 import br.com.inova.sigin.usuario.service.UsuarioPerfilService;
 import br.com.inova.sigin.usuario.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +35,8 @@ public class ClienteDeliveryService {
     private final UsuarioPerfilService usuarioPerfilService;
     private final PerfilRepository perfilRepository;
     private final UsuarioRepository usuarioRepository;
+    private final PessoaEnderecoService pessoaEnderecoService;
+
     public ClienteResponse buscarPorTelefone(String telefone) {
 
         Pessoa pessoa = pessoaRepository.findByTelefone(telefone)
@@ -147,5 +156,76 @@ public class ClienteDeliveryService {
                 .telefone(pessoa.getTelefone())
                 .email(pessoa.getEmail())
                 .build();
+    }
+
+    private Long obterPessoaId(Authentication authentication) {
+
+        Usuario usuario = usuarioRepository
+                .findByLoginAndAtivoTrue(authentication.getName())
+                .orElseThrow(() ->
+                        new IllegalStateException("Usuário autenticado não encontrado.")
+                );
+
+        return usuario.getPessoa().getId();
+    }
+
+    public List<PessoaEnderecoResponse> listarEnderecos(
+            Authentication authentication
+    ) {
+        return pessoaEnderecoService.listar(
+                obterPessoaId(authentication)
+        );
+    }
+
+    public PessoaEnderecoResponse criarEndereco(
+            Authentication authentication,
+            PessoaEnderecoRequest request
+    ) {
+        return pessoaEnderecoService.criar(
+                obterPessoaId(authentication),
+                request
+        );
+    }
+
+    public PessoaEnderecoResponse buscarEndereco(
+            Authentication authentication,
+            Long enderecoId
+    ) {
+        return pessoaEnderecoService.buscarPorId(
+                obterPessoaId(authentication),
+                enderecoId
+        );
+    }
+
+    public PessoaEnderecoResponse atualizarEndereco(
+            Authentication authentication,
+            Long enderecoId,
+            PessoaEnderecoRequest request
+    ) {
+        return pessoaEnderecoService.atualizar(
+                obterPessoaId(authentication),
+                enderecoId,
+                request
+        );
+    }
+
+    public PessoaEnderecoResponse definirEnderecoPrincipal(
+            Authentication authentication,
+            Long enderecoId
+    ) {
+        return pessoaEnderecoService.definirPrincipal(
+                obterPessoaId(authentication),
+                enderecoId
+        );
+    }
+
+    public void excluirEndereco(
+            Authentication authentication,
+            Long enderecoId
+    ) {
+        pessoaEnderecoService.excluir(
+                obterPessoaId(authentication),
+                enderecoId
+        );
     }
 }
