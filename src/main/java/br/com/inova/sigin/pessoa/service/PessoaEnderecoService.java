@@ -38,12 +38,13 @@ public class PessoaEnderecoService {
                 .cidade(request.getCidade())
                 .uf(request.getUf())
                 .principal(false)
+                .ativo(true)
                 .build();
 
         PessoaEndereco salvo = repository.save(endereco);
 
         if (Boolean.TRUE.equals(request.getPrincipal())
-                || !repository.existsByPessoaIdAndPrincipalTrue(pessoaId)) {
+                || !repository.existsByPessoaIdAndAtivoTrueAndPrincipalTrue(pessoaId)) {
 
             definirPrincipal(salvo);
         }
@@ -57,7 +58,7 @@ public class PessoaEnderecoService {
         buscarPessoa(pessoaId);
 
         return repository
-                .findByPessoaIdOrderByPrincipalDescIdAsc(pessoaId)
+                .findByPessoaIdAndAtivoTrueOrderByPrincipalDescIdAsc(pessoaId)
                 .stream()
                 .map(this::converter)
                 .toList();
@@ -116,7 +117,9 @@ public class PessoaEnderecoService {
         Long pessoaId = endereco.getPessoa().getId();
 
         List<PessoaEndereco> enderecos =
-                repository.findByPessoaIdOrderByPrincipalDescIdAsc(pessoaId);
+                repository.findByPessoaIdAndAtivoTrueOrderByPrincipalDescIdAsc(
+                        pessoaId
+                );
 
         for (PessoaEndereco item : enderecos) {
             if (Boolean.TRUE.equals(item.getPrincipal())
@@ -148,7 +151,7 @@ public class PessoaEnderecoService {
 
         buscarPessoa(pessoaId);
 
-        return repository.findByIdAndPessoaId(
+        return repository.findByIdAndPessoaIdAndAtivoTrue(
                         enderecoId,
                         pessoaId
                 )
@@ -175,11 +178,13 @@ public class PessoaEnderecoService {
                 .principal(endereco.getPrincipal())
                 .build();
     }
+
     @Transactional
     public void excluir(
             Long pessoaId,
             Long enderecoId
     ) {
+
         PessoaEndereco endereco = buscarEndereco(
                 pessoaId,
                 enderecoId
@@ -189,11 +194,14 @@ public class PessoaEnderecoService {
                 endereco.getPrincipal()
         );
 
-        repository.delete(endereco);
+        endereco.setAtivo(false);
+        endereco.setPrincipal(false);
+
+        repository.save(endereco);
 
         if (eraPrincipal) {
             repository
-                    .findByPessoaIdOrderByPrincipalDescIdAsc(pessoaId)
+                    .findByPessoaIdAndAtivoTrueOrderByPrincipalDescIdAsc(pessoaId)
                     .stream()
                     .findFirst()
                     .ifPresent(this::definirPrincipal);

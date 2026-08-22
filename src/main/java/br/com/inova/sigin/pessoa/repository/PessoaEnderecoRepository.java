@@ -9,12 +9,25 @@ import java.util.Optional;
 public interface PessoaEnderecoRepository
         extends JpaRepository<PessoaEndereco, Long> {
 
-    List<PessoaEndereco> findByPessoaIdOrderByPrincipalDescIdAsc(Long pessoaId);
+    List<PessoaEndereco> findByPessoaIdOrderByPrincipalDescIdAsc(
+            Long pessoaId
+    );
 
     Optional<PessoaEndereco> findByIdAndPessoaId(
             Long id,
             Long pessoaId
     );
 
-    boolean existsByPessoaIdAndPrincipalTrue(Long pessoaId);
+    List<PessoaEndereco> findByPessoaIdAndAtivoTrueOrderByPrincipalDescIdAsc(
+            Long pessoaId
+    );
+
+    Optional<PessoaEndereco> findByIdAndPessoaIdAndAtivoTrue(
+            Long id,
+            Long pessoaId
+    );
+
+    boolean existsByPessoaIdAndAtivoTrueAndPrincipalTrue(
+            Long pessoaId
+    );
 }

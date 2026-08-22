@@ -81,4 +81,17 @@ public class PessoaEnderecoController {
                 )
         );
     }
+    @DeleteMapping("/{enderecoId}")
+    public ResponseEntity<Void> excluir(
+            @PathVariable Long pessoaId,
+            @PathVariable Long enderecoId
+    ) {
+
+        service.excluir(
+                pessoaId,
+                enderecoId
+        );
+
+        return ResponseEntity.noContent().build();
+    }
 }

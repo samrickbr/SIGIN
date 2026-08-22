@@ -1,0 +1,2 @@
+ALTER TABLE pessoa_enderecos
+    ADD COLUMN ativo BOOLEAN NOT NULL DEFAULT TRUE;

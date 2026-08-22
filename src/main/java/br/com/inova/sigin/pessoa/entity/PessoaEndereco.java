@@ -49,4 +49,8 @@ public class PessoaEndereco {
     @Column(nullable = false)
     @Builder.Default
     private Boolean principal = false;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean ativo = true;
 }
