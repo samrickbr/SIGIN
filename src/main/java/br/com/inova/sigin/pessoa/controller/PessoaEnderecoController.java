@@ -23,11 +23,15 @@ public class PessoaEnderecoController {
     @PostMapping
     public ResponseEntity<PessoaEnderecoResponse> criar(
             @PathVariable Long pessoaId,
-            @RequestBody @Valid PessoaEnderecoRequest request
+            @RequestBody @Valid PessoaEnderecoRequest request,
+            Authentication authentication
     ) {
-
         return ResponseEntity.ok(
-                service.criar(pessoaId, request)
+                service.criar(
+                        pessoaId,
+                        request,
+                        authentication
+                )
         );
     }
 
@@ -37,18 +41,25 @@ public class PessoaEnderecoController {
             Authentication authentication
     ) {
         return ResponseEntity.ok(
-                pessoaService.listarEnderecos(pessoaId, authentication)
+                pessoaService.listarEnderecos(
+                        pessoaId,
+                        authentication
+                )
         );
     }
 
     @GetMapping("/{enderecoId}")
     public ResponseEntity<PessoaEnderecoResponse> buscarPorId(
             @PathVariable Long pessoaId,
-            @PathVariable Long enderecoId
+            @PathVariable Long enderecoId,
+            Authentication authentication
     ) {
-
         return ResponseEntity.ok(
-                service.buscarPorId(pessoaId, enderecoId)
+                service.buscarPorId(
+                        pessoaId,
+                        enderecoId,
+                        authentication
+                )
         );
     }
 
@@ -56,14 +67,15 @@ public class PessoaEnderecoController {
     public ResponseEntity<PessoaEnderecoResponse> atualizar(
             @PathVariable Long pessoaId,
             @PathVariable Long enderecoId,
-            @RequestBody @Valid PessoaEnderecoRequest request
+            @RequestBody @Valid PessoaEnderecoRequest request,
+            Authentication authentication
     ) {
-
         return ResponseEntity.ok(
                 service.atualizar(
                         pessoaId,
                         enderecoId,
-                        request
+                        request,
+                        authentication
                 )
         );
     }
@@ -71,25 +83,28 @@ public class PessoaEnderecoController {
     @PutMapping("/{enderecoId}/principal")
     public ResponseEntity<PessoaEnderecoResponse> definirPrincipal(
             @PathVariable Long pessoaId,
-            @PathVariable Long enderecoId
+            @PathVariable Long enderecoId,
+            Authentication authentication
     ) {
-
         return ResponseEntity.ok(
                 service.definirPrincipal(
                         pessoaId,
-                        enderecoId
+                        enderecoId,
+                        authentication
                 )
         );
     }
+
     @DeleteMapping("/{enderecoId}")
     public ResponseEntity<Void> excluir(
             @PathVariable Long pessoaId,
-            @PathVariable Long enderecoId
+            @PathVariable Long enderecoId,
+            Authentication authentication
     ) {
-
         service.excluir(
                 pessoaId,
-                enderecoId
+                enderecoId,
+                authentication
         );
 
         return ResponseEntity.noContent().build();

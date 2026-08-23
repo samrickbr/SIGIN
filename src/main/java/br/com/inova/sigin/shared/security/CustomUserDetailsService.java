@@ -1,7 +1,6 @@
 package br.com.inova.sigin.shared.security;
 
 import br.com.inova.sigin.usuario.entity.Usuario;
-import br.com.inova.sigin.usuario.entity.UsuarioPerfil;
 import br.com.inova.sigin.usuario.repository.UsuarioPerfilRepository;
 import br.com.inova.sigin.usuario.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioPerfilRepository usuarioPerfilRepository;
 
-
     @Override
     public UserDetails loadUserByUsername(String login) {
 
@@ -28,25 +26,11 @@ public class CustomUserDetailsService implements UserDetailsService {
                         )
                 );
 
-
-        var authorities = usuarioPerfilRepository.buscarComPermissoesPorUsuario(
-                        usuario.getId()
-                )
+        var authorities = usuarioPerfilRepository
+                .buscarCodigosPermissoesPorUsuario(usuario.getId())
                 .stream()
-                .flatMap(usuarioPerfil ->
-                        usuarioPerfil.getPerfil()
-                                .getPermissoes()
-                                .stream()
-                )
-                .map(perfilPermissao ->
-                        new SimpleGrantedAuthority(
-                                perfilPermissao
-                                        .getPermissao()
-                                        .getCodigo()
-                        )
-                )
+                .map(SimpleGrantedAuthority::new)
                 .toList();
-
 
         return User.builder()
                 .username(usuario.getLogin())

@@ -19,10 +19,25 @@ public interface UsuarioPerfilRepository
         FROM UsuarioPerfil up
         JOIN FETCH up.perfil p
         LEFT JOIN FETCH p.permissoes pp
-        LEFT JOIN FETCH pp.permissao
+        LEFT JOIN FETCH pp.permissao perm
         WHERE up.usuario.id = :usuarioId
     """)
     List<UsuarioPerfil> buscarComPermissoesPorUsuario(
+            Long usuarioId
+    );
+
+    @Query("""
+        SELECT DISTINCT perm.codigo
+        FROM UsuarioPerfil up
+        JOIN up.perfil p
+        JOIN p.permissoes pp
+        JOIN pp.permissao perm
+        WHERE up.usuario.id = :usuarioId
+          AND p.ativo = true
+          AND perm.ativo = true
+          AND perm.codigo IS NOT NULL
+    """)
+    List<String> buscarCodigosPermissoesPorUsuario(
             Long usuarioId
     );
 }

@@ -7,6 +7,7 @@ import br.com.inova.sigin.pessoa.service.PessoaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,60 +21,84 @@ public class PessoaController {
 
     @PostMapping
     public ResponseEntity<PessoaResponse> criar(
-            @RequestBody @Valid PessoaRequest request
+            @RequestBody @Valid PessoaRequest request,
+            Authentication authentication
     ) {
-
-        return ResponseEntity.ok(service.criar(request));
+        return ResponseEntity.ok(
+                service.criar(request, authentication)
+        );
     }
 
     @GetMapping
-    public ResponseEntity<List<PessoaResponse>> listar() {
-
-        return ResponseEntity.ok(service.listar());
+    public ResponseEntity<List<PessoaResponse>> listar(
+            Authentication authentication
+    ) {
+        return ResponseEntity.ok(
+                service.listar(authentication)
+        );
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PessoaResponse> buscarPorId(
-            @PathVariable Long id
+            @PathVariable Long id,
+            Authentication authentication
     ) {
-
-        return ResponseEntity.ok(service.buscarPorId(id));
+        return ResponseEntity.ok(
+                service.buscarPorId(id, authentication)
+        );
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<PessoaResponse> atualizar(
             @PathVariable Long id,
-            @RequestBody PessoaUpdateRequest request
+            @RequestBody PessoaUpdateRequest request,
+            Authentication authentication
     ) {
-
-        return ResponseEntity.ok(service.atualizar(id, request));
+        return ResponseEntity.ok(
+                service.atualizar(
+                        id,
+                        request,
+                        authentication
+                )
+        );
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(
-            @PathVariable Long id
+            @PathVariable Long id,
+            Authentication authentication
     ) {
-
-        service.excluir(id);
+        service.excluir(
+                id,
+                authentication
+        );
 
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/por-documento")
     public ResponseEntity<PessoaResponse> buscarPorDocumento(
-            @RequestParam String documento
+            @RequestParam String documento,
+            Authentication authentication
     ) {
         return ResponseEntity.ok(
-                service.buscarPorDocumento(documento)
+                service.buscarPorDocumento(
+                        documento,
+                        authentication
+                )
         );
     }
 
     @GetMapping("/por-telefone")
     public ResponseEntity<PessoaResponse> buscarPorTelefone(
-            @RequestParam String telefone
+            @RequestParam String telefone,
+            Authentication authentication
     ) {
         return ResponseEntity.ok(
-                service.buscarPorTelefone(telefone)
+                service.buscarPorTelefone(
+                        telefone,
+                        authentication
+                )
         );
     }
 }
