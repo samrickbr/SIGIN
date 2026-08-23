@@ -256,7 +256,7 @@ public class PessoaService {
                 );
 
         return enderecoRepository
-                .findByPessoaIdOrderByPrincipalDescIdAsc(
+                .findByPessoaIdAndAtivoTrueOrderByPrincipalDescIdAsc(
                         pessoaId
                 )
                 .stream()
