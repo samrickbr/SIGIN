@@ -21,26 +21,46 @@ public class PessoaTipoService {
     private final TipoPessoaRepository tipoPessoaRepository;
     private final PessoaTipoRepository pessoaTipoRepository;
 
-
-    public void adicionarTipo(Long pessoaId, PessoaTipoRequest request) {
+    public void adicionarTipo(
+            Long pessoaId,
+            PessoaTipoRequest request
+    ) {
         Pessoa pessoa = pessoaRepository.findById(pessoaId)
                 .orElseThrow(() ->
-                        new RegraNegocioException("Pessoa não encontrada")
+                        new RegraNegocioException(
+                                "Pessoa não encontrada"
+                        )
                 );
-        TipoPessoa tipoPessoa = tipoPessoaRepository.findById(request.getTipoPessoaId())
+
+        TipoPessoa tipoPessoa = tipoPessoaRepository
+                .findById(request.getTipoPessoaId())
                 .orElseThrow(() ->
-                        new RegraNegocioException("Tipo de pessoa não encontrada")
+                        new RegraNegocioException(
+                                "Tipo de pessoa não encontrada"
+                        )
                 );
+
+        if (!tipoPessoa.getAtivo()) {
+            throw new RegraNegocioException(
+                    "Tipo de pessoa inativo não pode ser utilizado."
+            );
+        }
+
+        if (pessoaTipoRepository.existsByPessoaIdAndTipoPessoaId(
+                pessoaId,
+                request.getTipoPessoaId()
+        )) {
+            throw new RegraNegocioException(
+                    "A pessoa já possui esse tipo."
+            );
+        }
+
         PessoaTipo pessoaTipo = PessoaTipo.builder()
                 .pessoa(pessoa)
                 .tipoPessoa(tipoPessoa)
                 .dataCriacao(LocalDateTime.now())
                 .build();
-        if (pessoaTipoRepository.existsByPessoaIdAndTipoPessoaId(
-                pessoaId,
-                request.getTipoPessoaId())) {
-            throw new RegraNegocioException("A pessoa já possui esse tipo.");
-        }
+
         pessoaTipoRepository.save(pessoaTipo);
     }
 
@@ -49,35 +69,53 @@ public class PessoaTipoService {
         TipoPessoa cliente = tipoPessoaRepository
                 .findByNomeIgnoreCase("CLIENTE")
                 .orElseThrow(() ->
-                        new RegraNegocioException("Tipo CLIENTE não encontrado")
+                        new RegraNegocioException(
+                                "Tipo CLIENTE não encontrado"
+                        )
                 );
+
+        if (!cliente.getAtivo()) {
+            throw new RegraNegocioException(
+                    "Tipo CLIENTE está inativo."
+            );
+        }
 
         if (pessoaTipoRepository.existsByPessoaIdAndTipoPessoaId(
                 pessoaId,
-                cliente.getId())) {
+                cliente.getId()
+        )) {
             return;
         }
 
+        Pessoa pessoa = pessoaRepository.findById(pessoaId)
+                .orElseThrow(() ->
+                        new RegraNegocioException(
+                                "Pessoa não encontrada"
+                        )
+                );
+
         PessoaTipo pessoaTipo = PessoaTipo.builder()
-                .pessoa(
-                        pessoaRepository.findById(pessoaId)
-                                .orElseThrow(() ->
-                                        new RegraNegocioException(
-                                                "Pessoa não encontrada"
-                                        )
-                                )
-                )
+                .pessoa(pessoa)
                 .tipoPessoa(cliente)
                 .dataCriacao(LocalDateTime.now())
                 .build();
 
         pessoaTipoRepository.save(pessoaTipo);
     }
-    public void removerTipo(Long pessoaId, Long tipoPessoaId) {
+
+    public void removerTipo(
+            Long pessoaId,
+            Long tipoPessoaId
+    ) {
         PessoaTipo pessoaTipo = pessoaTipoRepository
-                .findByPessoaIdAndTipoPessoaId(pessoaId, tipoPessoaId)
+                .findByPessoaIdAndTipoPessoaId(
+                        pessoaId,
+                        tipoPessoaId
+                )
                 .orElseThrow(() ->
-                        new RegraNegocioException("A pessoa não possui esse tipo.")
+                        new RegraNegocioException(
+                                "A pessoa não possui esse tipo."
+                        )
                 );
 
         pessoaTipoRepository.delete(pessoaTipo);
