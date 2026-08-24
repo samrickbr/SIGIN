@@ -1,6 +1,7 @@
 package br.com.inova.sigin.pedido.mapper;
 
 import br.com.inova.sigin.pedido.dto.PedidoEnderecoResponse;
+import br.com.inova.sigin.pedido.dto.PedidoItemResponse;
 import br.com.inova.sigin.pedido.dto.PedidoPagamentoResponse;
 import br.com.inova.sigin.pedido.dto.PedidoResponse;
 import br.com.inova.sigin.pedido.entity.Pedido;
@@ -48,8 +49,28 @@ public class PedidoMapper {
                                 .map(this::converterPagamento)
                                 .toList()
                 )
+                .itens(
+                        pedido.getItens()
+                                .stream()
+                                .map(this::converterItem)
+                                .toList()
+                )
                 .ativo(pedido.getAtivo())
                 .observacao(pedido.getObservacao())
+                .build();
+    }
+
+    private PedidoItemResponse converterItem(
+            PedidoItem item
+    ) {
+
+        return PedidoItemResponse.builder()
+                .id(item.getId())
+                .produtoId(item.getProduto().getId())
+                .produto(item.getProduto().getNome())
+                .quantidade(item.getQuantidade())
+                .valorUnitario(item.getValorUnitario())
+                .valorTotal(item.getValorTotal())
                 .build();
     }
 

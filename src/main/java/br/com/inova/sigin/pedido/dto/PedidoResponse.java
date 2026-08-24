@@ -39,6 +39,8 @@ public class PedidoResponse {
 
     private List<PedidoPagamentoResponse> pagamentos;
 
+    private List<PedidoItemResponse> itens;
+
     private Boolean ativo;
 
     private String observacao;
