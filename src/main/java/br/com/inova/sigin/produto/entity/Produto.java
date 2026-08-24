@@ -1,11 +1,9 @@
 package br.com.inova.sigin.produto.entity;
 
+import br.com.inova.sigin.produto.enums.Setor;
 import br.com.inova.sigin.produtovenda.entity.ProdutoVenda;
 import jakarta.persistence.*;
 import lombok.*;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -60,4 +58,8 @@ public class Produto {
     @Builder.Default
     @Column(name = "data_criacao", nullable = false)
     private LocalDateTime dataCriacao = LocalDateTime.now();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "setor")
+    private Setor setor;
 }

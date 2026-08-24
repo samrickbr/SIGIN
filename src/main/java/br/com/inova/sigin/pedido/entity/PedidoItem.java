@@ -1,6 +1,7 @@
 package br.com.inova.sigin.pedido.entity;
 
 import br.com.inova.sigin.produto.entity.Produto;
+import br.com.inova.sigin.produto.enums.Setor;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,6 +36,10 @@ public class PedidoItem {
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal valorTotal;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "setor")
+    private Setor setor;
 
     @Column(nullable = false)
     private Boolean ativo;

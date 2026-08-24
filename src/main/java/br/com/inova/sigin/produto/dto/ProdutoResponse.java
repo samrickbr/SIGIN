@@ -1,9 +1,10 @@
 package br.com.inova.sigin.produto.dto;
 
+import br.com.inova.sigin.produto.enums.Setor;
 import lombok.Builder;
 import lombok.Getter;
-import java.math.BigDecimal;
 
+import java.math.BigDecimal;
 
 @Getter
 @Builder
@@ -19,5 +20,5 @@ public class ProdutoResponse {
     private String imagem;
     private Boolean ativo;
     private Long categoriaId;
-
+    private Setor setor;
 }

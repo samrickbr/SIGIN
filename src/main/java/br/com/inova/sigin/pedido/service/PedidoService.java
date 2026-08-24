@@ -147,6 +147,12 @@ public class PedidoService {
                                     )
                             );
 
+                    if (produto.getSetor() == null) {
+                        throw new RegraNegocioException(
+                                "Produto não possui setor definido."
+                        );
+                    }
+
                     ProdutoVenda produtoVenda =
                             produtoVendaService.obterProdutoDisponivel(
                                     produto.getId(),
@@ -164,6 +170,7 @@ public class PedidoService {
                     return PedidoItem.builder()
                             .pedido(pedido)
                             .produto(produto)
+                            .setor(produto.getSetor())
                             .quantidade(itemRequest.getQuantidade())
                             .valorUnitario(valorUnitario)
                             .valorTotal(valorTotal)

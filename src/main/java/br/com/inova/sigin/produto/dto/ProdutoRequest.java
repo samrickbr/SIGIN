@@ -1,5 +1,6 @@
 package br.com.inova.sigin.produto.dto;
 
+import br.com.inova.sigin.produto.enums.Setor;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,4 +24,5 @@ public class ProdutoRequest {
 
     private String imagem;
 
+    private Setor setor;
 }

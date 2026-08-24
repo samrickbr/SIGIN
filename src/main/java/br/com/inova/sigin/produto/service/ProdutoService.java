@@ -22,9 +22,14 @@ public class ProdutoService {
     private final CategoriaRepository categoriaRepository;
     private final GeradorCodigoService geradorCodigoService;
 
-
     @Transactional
     public ProdutoResponse salvar(ProdutoRequest request) {
+
+        if (request.getSetor() == null) {
+            throw new RegraNegocioException(
+                    "Setor é obrigatório para criação do produto."
+            );
+        }
 
         Categoria categoria = null;
 
@@ -42,8 +47,8 @@ public class ProdutoService {
                 .disponivelVenda(request.getDisponivelVenda())
                 .imagem(request.getImagem())
                 .categoria(categoria)
+                .setor(request.getSetor())
                 .build();
-
 
         Produto salvo = produtoRepository.save(produto);
 
@@ -53,28 +58,9 @@ public class ProdutoService {
 
         salvo = produtoRepository.save(salvo);
 
-
-        return ProdutoResponse.builder()
-                .id(salvo.getId())
-                .codigo(salvo.getCodigo())
-                .nome(salvo.getNome())
-                .descricao(salvo.getDescricao())
-                .precoVenda(salvo.getPrecoVenda())
-                .disponivelVenda(salvo.getDisponivelVenda())
-                .imagem(salvo.getImagem())
-                .categoriaId(
-                        salvo.getCategoria() != null
-                                ? salvo.getCategoria().getId()
-                                : null
-                )
-                .categoria(
-                        salvo.getCategoria() != null
-                                ? salvo.getCategoria().getNome()
-                                : null
-                )
-                .ativo(salvo.getAtivo())
-                .build();
+        return toResponse(salvo);
     }
+
     @Transactional(readOnly = true)
     public ProdutoResponse buscarPorId(Long id) {
 
@@ -82,6 +68,101 @@ public class ProdutoService {
                 .orElseThrow(() ->
                         new RegraNegocioException("Produto não encontrado")
                 );
+
+        return toResponse(produto);
+    }
+
+    @Transactional
+    public ProdutoResponse atualizar(Long id, ProdutoRequest request) {
+
+        if (request.getSetor() == null) {
+            throw new RegraNegocioException(
+                    "Setor é obrigatório para atualização do produto."
+            );
+        }
+
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() ->
+                        new RegraNegocioException("Produto não encontrado")
+                );
+
+        produto.setNome(request.getNome());
+        produto.setDescricao(request.getDescricao());
+        produto.setPrecoVenda(request.getPrecoVenda());
+        produto.setDisponivelVenda(request.getDisponivelVenda());
+        produto.setImagem(request.getImagem());
+        produto.setSetor(request.getSetor());
+
+        if (request.getCategoriaId() != null) {
+
+            Categoria categoria = categoriaRepository.findById(
+                            request.getCategoriaId()
+                    )
+                    .orElseThrow(() ->
+                            new RegraNegocioException(
+                                    "Categoria não encontrada"
+                            )
+                    );
+
+            produto.setCategoria(categoria);
+        } else {
+            produto.setCategoria(null);
+        }
+
+        Produto atualizado = produtoRepository.save(produto);
+
+        return toResponse(atualizado);
+    }
+
+    @Transactional
+    public void excluir(Long id) {
+
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() ->
+                        new RegraNegocioException("Produto não encontrado")
+                );
+
+        produto.setAtivo(false);
+
+        produtoRepository.save(produto);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProdutoResponse> listar() {
+
+        return produtoRepository.findByAtivoTrue()
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProdutoResponse> listarInativos() {
+
+        return produtoRepository.findByAtivoFalse()
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProdutoResponse> listarDisponiveisVenda() {
+
+        return produtoRepository
+                .findProdutosDisponiveisVenda()
+                .stream()
+                .map(produto -> ProdutoResponse.builder()
+                        .id(produto.getId())
+                        .nome(produto.getNome())
+                        .descricao(produto.getDescricao())
+                        .ativo(produto.getAtivo())
+                        .setor(produto.getSetor())
+                        .build()
+                )
+                .toList();
+    }
+
+    private ProdutoResponse toResponse(Produto produto) {
 
         return ProdutoResponse.builder()
                 .id(produto.getId())
@@ -102,137 +183,7 @@ public class ProdutoService {
                                 : null
                 )
                 .ativo(produto.getAtivo())
+                .setor(produto.getSetor())
                 .build();
-    }
-
-    @Transactional
-    public ProdutoResponse atualizar(Long id, ProdutoRequest request) {
-
-        Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() ->
-                        new RegraNegocioException("Produto não encontrado")
-                );
-
-        produto.setNome(request.getNome());
-        produto.setDescricao(request.getDescricao());
-        produto.setPrecoVenda(request.getPrecoVenda());
-        produto.setDisponivelVenda(request.getDisponivelVenda());
-        produto.setImagem(request.getImagem());
-
-        if (request.getCategoriaId() != null) {
-
-            Categoria categoria = categoriaRepository.findById(request.getCategoriaId())
-                    .orElseThrow(() ->
-                            new RegraNegocioException("Categoria não encontrada")
-                    );
-
-            produto.setCategoria(categoria);
-        }
-
-        Produto atualizado = produtoRepository.save(produto);
-
-        return ProdutoResponse.builder()
-                .id(atualizado.getId())
-                .codigo(atualizado.getCodigo())
-                .nome(atualizado.getNome())
-                .descricao(atualizado.getDescricao())
-                .precoVenda(atualizado.getPrecoVenda())
-                .disponivelVenda(atualizado.getDisponivelVenda())
-                .imagem(atualizado.getImagem())
-                .categoriaId(
-                        atualizado.getCategoria() != null
-                                ? atualizado.getCategoria().getId()
-                                : null
-                )
-                .categoria(
-                        atualizado.getCategoria() != null
-                                ? atualizado.getCategoria().getNome()
-                                : null
-                )
-                .ativo(atualizado.getAtivo())
-                .build();
-    }
-    @Transactional
-    public void excluir(Long id) {
-
-        Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() ->
-                        new RegraNegocioException("Produto não encontrado")
-                );
-
-        produto.setAtivo(false);
-
-        produtoRepository.save(produto);
-    }
-
-    @Transactional(readOnly = true)
-    public List<ProdutoResponse> listar() {
-
-        return produtoRepository.findByAtivoTrue()
-                .stream()
-                .map(produto -> ProdutoResponse.builder()
-                        .id(produto.getId())
-                        .codigo(produto.getCodigo())
-                        .nome(produto.getNome())
-                        .descricao(produto.getDescricao())
-                        .precoVenda(produto.getPrecoVenda())
-                        .disponivelVenda(produto.getDisponivelVenda())
-                        .imagem(produto.getImagem())
-                        .categoriaId(
-                                produto.getCategoria() != null
-                                        ? produto.getCategoria().getId()
-                                        : null
-                        )
-                        .categoria(
-                                produto.getCategoria() != null
-                                        ? produto.getCategoria().getNome()
-                                        : null
-                        )
-                        .ativo(produto.getAtivo())
-                        .build()
-                )
-                .toList();
-    }
-    @Transactional(readOnly = true)
-    public List<ProdutoResponse> listarInativos() {
-
-        return produtoRepository.findByAtivoFalse()
-                .stream()
-                .map(produto -> ProdutoResponse.builder()
-                        .id(produto.getId())
-                        .codigo(produto.getCodigo())
-                        .nome(produto.getNome())
-                        .descricao(produto.getDescricao())
-                        .precoVenda(produto.getPrecoVenda())
-                        .disponivelVenda(produto.getDisponivelVenda())
-                        .imagem(produto.getImagem())
-                        .categoriaId(
-                                produto.getCategoria() != null
-                                        ? produto.getCategoria().getId()
-                                        : null
-                        )
-                        .categoria(
-                                produto.getCategoria() != null
-                                        ? produto.getCategoria().getNome()
-                                        : null
-                        )
-                        .ativo(produto.getAtivo())
-                        .build()
-                )
-                .toList();
-    }
-    public List<ProdutoResponse> listarDisponiveisVenda() {
-
-        return produtoRepository
-                .findProdutosDisponiveisVenda()
-                .stream()
-                .map(produto -> ProdutoResponse.builder()
-                        .id(produto.getId())
-                        .nome(produto.getNome())
-                        .descricao(produto.getDescricao())
-                        .ativo(produto.getAtivo())
-                        .build()
-                )
-                .toList();
     }
 }

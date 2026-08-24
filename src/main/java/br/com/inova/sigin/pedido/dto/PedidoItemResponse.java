@@ -1,5 +1,6 @@
 package br.com.inova.sigin.pedido.dto;
 
+import br.com.inova.sigin.produto.enums.Setor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -20,4 +21,6 @@ public class PedidoItemResponse {
     private BigDecimal valorUnitario;
 
     private BigDecimal valorTotal;
+
+    private Setor setor;
 }
