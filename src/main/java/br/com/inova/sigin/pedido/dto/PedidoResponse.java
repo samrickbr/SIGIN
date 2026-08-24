@@ -19,6 +19,8 @@ public class PedidoResponse {
 
     private String cliente;
 
+    private String clienteWhatsapp;
+
     private PedidoEnderecoResponse endereco;
 
     private String tipoRecebimento;
