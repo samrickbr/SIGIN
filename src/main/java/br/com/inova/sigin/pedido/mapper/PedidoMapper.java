@@ -1,17 +1,28 @@
 package br.com.inova.sigin.pedido.mapper;
 
 import br.com.inova.sigin.pedido.dto.PedidoEnderecoResponse;
+import br.com.inova.sigin.pedido.dto.PedidoPagamentoResponse;
 import br.com.inova.sigin.pedido.dto.PedidoResponse;
 import br.com.inova.sigin.pedido.entity.Pedido;
 import br.com.inova.sigin.pedido.entity.PedidoEndereco;
-import org.springframework.stereotype.Component;
-import br.com.inova.sigin.pedido.dto.PedidoPagamentoResponse;
+import br.com.inova.sigin.pedido.entity.PedidoItem;
 import br.com.inova.sigin.pedido.entity.PedidoPagamento;
+import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
 
 @Component
 public class PedidoMapper {
 
     public PedidoResponse toResponse(Pedido pedido) {
+
+        BigDecimal valorProdutos = pedido.getItens()
+                .stream()
+                .map(PedidoItem::getValorTotal)
+                .reduce(
+                        BigDecimal.ZERO,
+                        BigDecimal::add
+                );
 
         return PedidoResponse.builder()
                 .id(pedido.getId())
@@ -21,12 +32,15 @@ public class PedidoMapper {
                 .endereco(
                         converterEndereco(pedido.getEndereco())
                 )
-                .tipoRecebimento(pedido.getTipoRecebimento().name())
+                .tipoRecebimento(
+                        pedido.getTipoRecebimento().name()
+                )
                 .canalVendaId(pedido.getCanalVenda().getId())
                 .canalVenda(pedido.getCanalVenda().getNome())
                 .dataPedido(pedido.getDataPedido())
-                .valorTotal(pedido.getValorTotal())
+                .valorProdutos(valorProdutos)
                 .taxaEntrega(pedido.getTaxaEntrega())
+                .valorTotal(pedido.getValorTotal())
                 .status(pedido.getStatus().name())
                 .pagamentos(
                         pedido.getPagamentos()
@@ -42,6 +56,7 @@ public class PedidoMapper {
     private PedidoEnderecoResponse converterEndereco(
             PedidoEndereco endereco
     ) {
+
         if (endereco == null) {
             return null;
         }
@@ -58,9 +73,11 @@ public class PedidoMapper {
                 .uf(endereco.getUf())
                 .build();
     }
+
     private PedidoPagamentoResponse converterPagamento(
             PedidoPagamento pagamento
     ) {
+
         return PedidoPagamentoResponse.builder()
                 .id(pagamento.getId())
                 .formaPagamentoId(

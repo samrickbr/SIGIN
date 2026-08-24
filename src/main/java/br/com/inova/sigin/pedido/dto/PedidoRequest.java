@@ -22,12 +22,19 @@ public class PedidoRequest {
 
     private List<PedidoPagamentoRequest> pagamentos;
 
+    /**
+     * Mantido temporariamente por compatibilidade.
+     * O Core não utiliza este valor para calcular o pedido.
+     */
     private BigDecimal valorTotal;
 
+    /**
+     * Mantido temporariamente por compatibilidade.
+     * O Core ignora este valor e calcula a taxa de entrega.
+     */
     private BigDecimal taxaEntrega;
 
     private String observacao;
 
     private List<PedidoItemRequest> itens;
-
 }

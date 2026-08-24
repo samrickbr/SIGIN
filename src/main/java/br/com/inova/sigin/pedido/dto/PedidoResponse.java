@@ -29,9 +29,11 @@ public class PedidoResponse {
 
     private LocalDateTime dataPedido;
 
-    private BigDecimal valorTotal;
+    private BigDecimal valorProdutos;
 
     private BigDecimal taxaEntrega;
+
+    private BigDecimal valorTotal;
 
     private String status;
 

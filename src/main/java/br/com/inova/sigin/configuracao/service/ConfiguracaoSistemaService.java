@@ -7,17 +7,24 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 public class ConfiguracaoSistemaService {
+
+    private static final Long CONFIGURACAO_ID = 1L;
 
     private final ConfiguracaoSistemaRepository repository;
 
     private ConfiguracaoSistema obterConfiguracao() {
 
-        return repository.findById(1L)
+        return repository.findById(CONFIGURACAO_ID)
                 .orElseThrow(() ->
-                        new RegraNegocioException("Configuração do sistema não encontrada."));
+                        new RegraNegocioException(
+                                "Configuração do sistema não encontrada."
+                        )
+                );
     }
 
     @Transactional
@@ -59,8 +66,41 @@ public class ConfiguracaoSistemaService {
     }
 
     public Long getLocalProducaoPadraoId() {
+
         return obterConfiguracao()
                 .getLocalProducaoPadrao()
                 .getId();
+    }
+
+    public BigDecimal getTaxaEntregaPadrao() {
+
+        return obterConfiguracao()
+                .getTaxaEntregaPadrao();
+    }
+
+    @Transactional
+    public BigDecimal atualizarTaxaEntregaPadrao(
+            BigDecimal taxaEntrega
+    ) {
+
+        if (taxaEntrega == null) {
+            throw new RegraNegocioException(
+                    "Taxa de entrega é obrigatória."
+            );
+        }
+
+        if (taxaEntrega.compareTo(BigDecimal.ZERO) < 0) {
+            throw new RegraNegocioException(
+                    "Taxa de entrega não pode ser negativa."
+            );
+        }
+
+        ConfiguracaoSistema config = obterConfiguracao();
+
+        config.setTaxaEntregaPadrao(taxaEntrega);
+
+        repository.save(config);
+
+        return config.getTaxaEntregaPadrao();
     }
 }

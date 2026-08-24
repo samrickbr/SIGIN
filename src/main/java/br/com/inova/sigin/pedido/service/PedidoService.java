@@ -44,6 +44,7 @@ public class PedidoService {
     private final PessoaRepository pessoaRepository;
     private final PedidoMapper mapper;
     private final ConfiguracaoSistemaService configuracaoSistemaService;
+    private final TaxaEntregaService taxaEntregaService;
     private final OrdemProducaoService ordemProducaoService;
     private final ProdutoRepository produtoRepository;
     private final CanalVendaRepository canalVendaRepository;
@@ -78,7 +79,8 @@ public class PedidoService {
             );
         }
 
-        BigDecimal taxaEntrega = validarTaxaEntrega(request);
+        BigDecimal taxaEntrega =
+                taxaEntregaService.calcular(tipoRecebimento);
 
         if (tipoRecebimento == TipoRecebimento.ENTREGA
                 && request.getEnderecoId() == null) {
@@ -89,7 +91,10 @@ public class PedidoService {
         }
 
         Pedido pedido = Pedido.builder()
-                .numero(configuracaoSistemaService.gerarProximoNumeroPedido())
+                .numero(
+                        configuracaoSistemaService
+                                .gerarProximoNumeroPedido()
+                )
                 .cliente(cliente)
                 .canalVenda(canalVenda)
                 .tipoRecebimento(tipoRecebimento)
@@ -171,53 +176,13 @@ public class PedidoService {
 
         atualizarValorTotal(pedido);
 
-        adicionarPagamentos(pedido, request.getPagamentos());
+        adicionarPagamentos(
+                pedido,
+                request.getPagamentos()
+        );
 
         return mapper.toResponse(
                 repository.save(pedido)
-        );
-    }
-
-    private BigDecimal validarTaxaEntrega(PedidoRequest request) {
-
-        TipoRecebimento tipoRecebimento =
-                request.getTipoRecebimento();
-
-        BigDecimal taxaInformada =
-                request.getTaxaEntrega();
-
-        if (tipoRecebimento == TipoRecebimento.RETIRADA) {
-
-            if (taxaInformada != null
-                    && taxaInformada.compareTo(BigDecimal.ZERO) != 0) {
-
-                throw new RegraNegocioException(
-                        "Retirada não possui taxa de entrega."
-                );
-            }
-
-            return BigDecimal.ZERO;
-        }
-
-        if (tipoRecebimento == TipoRecebimento.ENTREGA) {
-
-            if (taxaInformada == null) {
-                throw new RegraNegocioException(
-                        "Taxa de entrega é obrigatória para entrega."
-                );
-            }
-
-            if (taxaInformada.compareTo(BigDecimal.ZERO) < 0) {
-                throw new RegraNegocioException(
-                        "Taxa de entrega inválida."
-                );
-            }
-
-            return taxaInformada;
-        }
-
-        throw new RegraNegocioException(
-                "Tipo de recebimento inválido."
         );
     }
 
@@ -301,7 +266,9 @@ public class PedidoService {
     }
 
     @Transactional
-    public List<OrdemProducaoResponse> gerarOrdemProducao(Long pedidoId) {
+    public List<OrdemProducaoResponse> gerarOrdemProducao(
+            Long pedidoId
+    ) {
 
         Pedido pedido = repository.findById(pedidoId)
                 .orElseThrow(() ->
@@ -315,23 +282,29 @@ public class PedidoService {
             );
         }
 
-        if (pedido.getItens() == null || pedido.getItens().isEmpty()) {
+        if (pedido.getItens() == null
+                || pedido.getItens().isEmpty()) {
+
             throw new RegraNegocioException(
                     "Pedido não possui itens."
             );
         }
 
-        List<OrdemProducaoResponse> ordens = pedido.getItens()
-                .stream()
-                .map(item ->
-                        ordemProducaoService.criarAPartirPedidoItem(
-                                pedido,
-                                item
+        List<OrdemProducaoResponse> ordens =
+                pedido.getItens()
+                        .stream()
+                        .map(item ->
+                                ordemProducaoService
+                                        .criarAPartirPedidoItem(
+                                                pedido,
+                                                item
+                                        )
                         )
-                )
-                .toList();
+                        .toList();
 
-        pedido.setStatus(StatusPedido.AGUARDANDO_PRODUCAO);
+        pedido.setStatus(
+                StatusPedido.AGUARDANDO_PRODUCAO
+        );
 
         repository.save(pedido);
 
@@ -362,7 +335,10 @@ public class PedidoService {
             Pedido pedido,
             List<PedidoPagamentoRequest> pagamentosRequest
     ) {
-        if (pagamentosRequest == null || pagamentosRequest.isEmpty()) {
+
+        if (pagamentosRequest == null
+                || pagamentosRequest.isEmpty()) {
+
             throw new RegraNegocioException(
                     "Pedido deve possuir pelo menos um pagamento."
             );
@@ -370,10 +346,12 @@ public class PedidoService {
 
         BigDecimal totalPagamentos = BigDecimal.ZERO;
 
-        for (PedidoPagamentoRequest pagamentoRequest : pagamentosRequest) {
+        for (PedidoPagamentoRequest pagamentoRequest :
+                pagamentosRequest) {
 
             if (pagamentoRequest.getValor() == null
-                    || pagamentoRequest.getValor().compareTo(BigDecimal.ZERO) <= 0) {
+                    || pagamentoRequest.getValor()
+                    .compareTo(BigDecimal.ZERO) <= 0) {
 
                 throw new RegraNegocioException(
                         "Valor de pagamento deve ser maior que zero."
@@ -382,7 +360,10 @@ public class PedidoService {
 
             FormaPagamento formaPagamento =
                     formaPagamentoRepository
-                            .findById(pagamentoRequest.getFormaPagamentoId())
+                            .findById(
+                                    pagamentoRequest
+                                            .getFormaPagamentoId()
+                            )
                             .filter(FormaPagamento::getAtivo)
                             .orElseThrow(() ->
                                     new RegraNegocioException(
@@ -390,28 +371,35 @@ public class PedidoService {
                                     )
                             );
 
-            PedidoPagamento pagamento = PedidoPagamento.builder()
-                    .pedido(pedido)
-                    .formaPagamento(formaPagamento)
-                    .valor(pagamentoRequest.getValor())
-                    .build();
+            PedidoPagamento pagamento =
+                    PedidoPagamento.builder()
+                            .pedido(pedido)
+                            .formaPagamento(formaPagamento)
+                            .valor(pagamentoRequest.getValor())
+                            .build();
 
             pedido.getPagamentos().add(pagamento);
 
-            totalPagamentos = totalPagamentos.add(
-                    pagamentoRequest.getValor()
-            );
+            totalPagamentos =
+                    totalPagamentos.add(
+                            pagamentoRequest.getValor()
+                    );
         }
 
-        BigDecimal totalPedido = calcularTotalPedidoSemPagamento(pedido);
+        BigDecimal totalPedido =
+                calcularTotalPedidoSemPagamento(pedido);
 
         if (totalPagamentos.compareTo(totalPedido) != 0) {
+
             throw new RegraNegocioException(
                     "A soma dos pagamentos deve ser igual ao total do pedido."
             );
         }
     }
-    private BigDecimal calcularTotalPedidoSemPagamento(Pedido pedido) {
+
+    private BigDecimal calcularTotalPedidoSemPagamento(
+            Pedido pedido
+    ) {
 
         BigDecimal totalProdutos = pedido.getItens()
                 .stream()
