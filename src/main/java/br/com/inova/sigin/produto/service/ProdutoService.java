@@ -4,11 +4,15 @@ import br.com.inova.sigin.produto.dto.ProdutoRequest;
 import br.com.inova.sigin.produto.dto.ProdutoResponse;
 import br.com.inova.sigin.produto.entity.Categoria;
 import br.com.inova.sigin.produto.entity.Produto;
+import br.com.inova.sigin.produto.enums.Setor;
 import br.com.inova.sigin.produto.repository.CategoriaRepository;
 import br.com.inova.sigin.produto.repository.ProdutoRepository;
 import br.com.inova.sigin.shared.exception.RegraNegocioException;
 import br.com.inova.sigin.shared.service.GeradorCodigoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -128,12 +132,65 @@ public class ProdutoService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProdutoResponse> listar() {
+    public Page<ProdutoResponse> listar(
+            String busca,
+            Long categoriaId,
+            boolean semCategoria,
+            Setor setor,
+            boolean semSetor,
+            Boolean disponivelVenda,
+            Boolean ativo,
+            Pageable pageable
+    ) {
+        Specification<Produto> specification = (root, query, cb) -> cb.conjunction();
 
-        return produtoRepository.findByAtivoTrue()
-                .stream()
-                .map(this::toResponse)
-                .toList();
+        if (busca != null && !busca.isBlank()) {
+            String termo = "%" + busca.trim().toLowerCase() + "%";
+
+            specification = specification.and((root, query, cb) ->
+                    cb.or(
+                            cb.like(cb.lower(root.get("codigo")), termo),
+                            cb.like(cb.lower(root.get("nome")), termo),
+                            cb.like(cb.lower(root.get("descricao")), termo)
+                    )
+            );
+        }
+
+        if (semCategoria) {
+            specification = specification.and((root, query, cb) ->
+                    cb.isNull(root.get("categoria"))
+            );
+        } else if (categoriaId != null) {
+            specification = specification.and((root, query, cb) ->
+                    cb.equal(root.get("categoria").get("id"), categoriaId)
+            );
+        }
+
+        if (semSetor) {
+            specification = specification.and((root, query, cb) ->
+                    cb.isNull(root.get("setor"))
+            );
+        } else if (setor != null) {
+            specification = specification.and((root, query, cb) ->
+                    cb.equal(root.get("setor"), setor)
+            );
+        }
+
+        if (disponivelVenda != null) {
+            specification = specification.and((root, query, cb) ->
+                    cb.equal(root.get("disponivelVenda"), disponivelVenda)
+            );
+        }
+
+        if (ativo != null) {
+            specification = specification.and((root, query, cb) ->
+                    cb.equal(root.get("ativo"), ativo)
+            );
+        }
+
+        return produtoRepository
+                .findAll(specification, pageable)
+                .map(this::toResponse);
     }
 
     @Transactional(readOnly = true)
