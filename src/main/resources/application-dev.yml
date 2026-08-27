@@ -3,3 +3,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/sigin
     username: postgres
     password: admin
+
+sigin:
+  cors:
+    allowed-origins: http://localhost:5173,http://localhost:5174
