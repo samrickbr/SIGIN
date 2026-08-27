@@ -9,6 +9,8 @@ public class CanalVendaResponse {
 
     private Long id;
 
+    private String codigo;
+
     private String nome;
 
     private String descricao;

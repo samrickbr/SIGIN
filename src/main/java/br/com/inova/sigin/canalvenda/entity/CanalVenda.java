@@ -8,7 +8,15 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "canais_venda")
+@Table(
+        name = "canais_venda",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_canais_venda_codigo",
+                        columnNames = "codigo"
+                )
+        }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,7 +28,20 @@ public class CanalVenda {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nome", nullable = false, length = 80, unique = true)
+    @Column(
+            name = "codigo",
+            nullable = false,
+            length = 30,
+            unique = true
+    )
+    private String codigo;
+
+    @Column(
+            name = "nome",
+            nullable = false,
+            length = 80,
+            unique = true
+    )
     private String nome;
 
     @Column(name = "descricao", length = 255)
@@ -31,10 +52,17 @@ public class CanalVenda {
     private Boolean ativo = true;
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(
+            name = "created_at",
+            nullable = false,
+            updatable = false
+    )
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
+    @Column(
+            name = "updated_at",
+            nullable = false
+    )
     private LocalDateTime updatedAt;
 }
