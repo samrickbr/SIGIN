@@ -31,6 +31,7 @@ public class CanalVendaController {
     @GetMapping
     public ResponseEntity<List<CanalVendaResponse>> listar(
             @RequestParam(required = false) Boolean ativo) {
+        System.out.println(">>> ENTROU NO GET /api/canais-venda");
 
         return ResponseEntity.ok(
                 service.listar(ativo)
