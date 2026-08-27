@@ -3,3 +3,7 @@ spring:
     url: jdbc:postgresql://${PGHOST}:${PGPORT}/${POSTGRES_DB}
     username: ${PGUSER}
     password: ${PGPASSWORD}
+
+sigin:
+  cors:
+    allowed-origins: ${SIGIN_CORS_ALLOWED_ORIGINS:http://localhost:5173}
