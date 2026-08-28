@@ -48,30 +48,80 @@ public class SecurityConfig {
                                 SessionCreationPolicy.STATELESS
                         )
                 )
+
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(
                                 (request, response, authException) ->
-                                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
+                                        response.sendError(
+                                                HttpServletResponse.SC_UNAUTHORIZED
+                                        )
                         )
                         .accessDeniedHandler(
                                 (request, response, accessDeniedException) ->
-                                        response.sendError(HttpServletResponse.SC_FORBIDDEN)
+                                        response.sendError(
+                                                HttpServletResponse.SC_FORBIDDEN
+                                        )
                         )
                 )
 
                 .authorizeHttpRequests(auth -> auth
 
+                        /*
+                         * Autenticação e documentação
+                         */
                         .requestMatchers(
                                 "/auth/login",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
-                                "/api/catalogo/**",
-                                "/api/delivery/clientes",
                                 "/ceps/**",
                                 "/estados"
                         ).permitAll()
 
+                        /*
+                         * Catálogo público existente.
+                         */
+                        .requestMatchers(
+                                "/api/catalogo/**"
+                        ).permitAll()
+
+                        /*
+                         * Autocadastro do cliente.
+                         *
+                         * Mantém POST /api/delivery/clientes público.
+                         */
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/delivery/clientes"
+                        ).permitAll()
+
+                        /*
+                         * Pesquisa operacional de clientes.
+                         */
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/delivery/clientes"
+                        ).authenticated()
+
+                        /*
+                         * Cadastro operacional de cliente.
+                         */
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/delivery/clientes/operacional"
+                        ).authenticated()
+
+                        /*
+                         * Endereço operacional de cliente.
+                         */
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/delivery/clientes/*/enderecos"
+                        ).authenticated()
+
+                        /*
+                         * Demais endpoints existentes.
+                         */
                         .requestMatchers(HttpMethod.OPTIONS, "/**")
                         .permitAll()
 

@@ -1,18 +1,21 @@
 package br.com.inova.sigin.api.delivery.cliente.controller;
 
+import br.com.inova.sigin.api.delivery.cliente.dto.ClientePesquisaResponse;
 import br.com.inova.sigin.api.delivery.cliente.dto.ClienteRequest;
 import br.com.inova.sigin.api.delivery.cliente.dto.ClienteResponse;
 import br.com.inova.sigin.api.delivery.cliente.service.ClienteDeliveryService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-
 import br.com.inova.sigin.pessoa.dto.PessoaEnderecoRequest;
 import br.com.inova.sigin.pessoa.dto.PessoaEnderecoResponse;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import br.com.inova.sigin.api.delivery.cliente.dto.ClienteOperacionalRequest;
+import br.com.inova.sigin.api.delivery.cliente.dto.ClienteOperacionalResponse;
 
 @RestController
 @RequestMapping("/api/delivery/clientes")
@@ -20,24 +23,37 @@ import java.util.List;
 public class ClienteController {
 
     private final ClienteDeliveryService service;
+
     @PostMapping
     public ClienteResponse criar(
             @RequestBody @Valid ClienteRequest request
     ) {
         return service.criar(request);
     }
+
+    @GetMapping
+    public ResponseEntity<List<ClientePesquisaResponse>> pesquisar(
+            @RequestParam String busca
+    ) {
+        return ResponseEntity.ok(
+                service.pesquisar(busca)
+        );
+    }
+
     @GetMapping("/telefone/{telefone}")
     public ClienteResponse buscar(
             @PathVariable String telefone
     ) {
         return service.buscarPorTelefone(telefone);
     }
+
     @GetMapping("/documento/{documento}")
     public ClienteResponse buscarPorDocumento(
             @PathVariable String documento
     ) {
         return service.buscarPorDocumento(documento);
     }
+
     @GetMapping("/meus-enderecos")
     public ResponseEntity<List<PessoaEnderecoResponse>> listarEnderecos(
             Authentication authentication
@@ -100,6 +116,7 @@ public class ClienteController {
                 )
         );
     }
+
     @DeleteMapping("/meus-enderecos/{enderecoId}")
     public ResponseEntity<Void> excluirEndereco(
             Authentication authentication,
@@ -111,5 +128,26 @@ public class ClienteController {
         );
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/operacional")
+    public ResponseEntity<ClienteOperacionalResponse> criarOperacional(
+            @RequestBody @Valid ClienteOperacionalRequest request
+    ) {
+        return ResponseEntity.ok(
+                service.criarOperacional(request)
+        );
+    }
+    @PostMapping("/{clienteId}/enderecos")
+    public ResponseEntity<PessoaEnderecoResponse> criarEnderecoOperacional(
+            @PathVariable Long clienteId,
+            @RequestBody @Valid PessoaEnderecoRequest request
+    ) {
+        return ResponseEntity.ok(
+                service.criarEnderecoOperacional(
+                        clienteId,
+                        request
+                )
+        );
     }
 }

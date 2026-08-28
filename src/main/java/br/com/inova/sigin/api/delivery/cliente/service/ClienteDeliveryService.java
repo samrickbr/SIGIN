@@ -1,5 +1,6 @@
 package br.com.inova.sigin.api.delivery.cliente.service;
 
+import br.com.inova.sigin.api.delivery.cliente.dto.ClientePesquisaResponse;
 import br.com.inova.sigin.api.delivery.cliente.dto.ClienteRequest;
 import br.com.inova.sigin.api.delivery.cliente.dto.ClienteResponse;
 import br.com.inova.sigin.pessoa.dto.PessoaEnderecoRequest;
@@ -21,6 +22,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import br.com.inova.sigin.shared.exception.RegraNegocioException;
+import br.com.inova.sigin.api.delivery.cliente.dto.ClienteOperacionalRequest;
+import br.com.inova.sigin.api.delivery.cliente.dto.ClienteOperacionalResponse;
 
 import java.util.List;
 
@@ -37,12 +41,27 @@ public class ClienteDeliveryService {
     private final UsuarioRepository usuarioRepository;
     private final PessoaEnderecoService pessoaEnderecoService;
 
+
+    @Transactional(readOnly = true)
+    public List<ClientePesquisaResponse> pesquisar(String busca) {
+
+        if (busca == null || busca.isBlank()) {
+            return List.of();
+        }
+
+        String termo = busca.trim();
+
+        return pessoaRepository
+                .pesquisarClientes(termo)
+                .stream()
+                .map(this::converterPesquisa)
+                .toList();
+    }
+
     public ClienteResponse buscarPorTelefone(String telefone) {
 
         Pessoa pessoa = pessoaRepository.findByTelefone(telefone)
                 .orElseThrow();
-
-        pessoaTipoService.adicionarTipoCliente(pessoa.getId());
 
         return converter(pessoa);
     }
@@ -51,8 +70,6 @@ public class ClienteDeliveryService {
 
         Pessoa pessoa = pessoaRepository.findByDocumento(documento)
                 .orElseThrow();
-
-        pessoaTipoService.adicionarTipoCliente(pessoa.getId());
 
         return converter(pessoa);
     }
@@ -92,7 +109,9 @@ public class ClienteDeliveryService {
                         .map(perfil -> perfil.getId())
                         .findFirst()
                         .orElseThrow(() ->
-                                new IllegalStateException("Perfil CLIENTE nÃ£o encontrado.")
+                                new IllegalStateException(
+                                        "Perfil CLIENTE não encontrado."
+                                )
                         );
 
                 usuarioPerfilService.adicionarPerfil(
@@ -132,7 +151,9 @@ public class ClienteDeliveryService {
                 .map(perfil -> perfil.getId())
                 .findFirst()
                 .orElseThrow(() ->
-                        new IllegalStateException("Perfil CLIENTE nÃ£o encontrado.")
+                        new IllegalStateException(
+                                "Perfil CLIENTE não encontrado."
+                        )
                 );
 
         usuarioPerfilService.adicionarPerfil(
@@ -144,6 +165,17 @@ public class ClienteDeliveryService {
                 .id(pessoa.getId())
                 .nome(pessoa.getNome())
                 .telefone(pessoa.getTelefone())
+                .email(pessoa.getEmail())
+                .build();
+    }
+
+    private ClientePesquisaResponse converterPesquisa(Pessoa pessoa) {
+
+        return ClientePesquisaResponse.builder()
+                .id(pessoa.getId())
+                .nome(pessoa.getNome())
+                .telefone(pessoa.getTelefone())
+                .documento(pessoa.getDocumento())
                 .email(pessoa.getEmail())
                 .build();
     }
@@ -163,7 +195,9 @@ public class ClienteDeliveryService {
         Usuario usuario = usuarioRepository
                 .findByLoginAndAtivoTrue(authentication.getName())
                 .orElseThrow(() ->
-                        new IllegalStateException("Usuário autenticado não encontrado.")
+                        new IllegalStateException(
+                                "Usuário autenticado não encontrado."
+                        )
                 );
 
         return usuario.getPessoa().getId();
@@ -228,4 +262,93 @@ public class ClienteDeliveryService {
                 enderecoId
         );
     }
+    @Transactional
+    public ClienteOperacionalResponse criarOperacional(
+            ClienteOperacionalRequest request
+    ) {
+
+        if (request.getDocumento() != null
+                && !request.getDocumento().isBlank()
+                && pessoaRepository.findByDocumento(
+                request.getDocumento().trim()
+        ).isPresent()) {
+
+            throw new RegraNegocioException(
+                    "Já existe uma pessoa cadastrada com este documento."
+            );
+        }
+
+        if (request.getTelefone() != null
+                && !request.getTelefone().isBlank()
+                && pessoaRepository.findByTelefone(
+                request.getTelefone().trim()
+        ).isPresent()) {
+
+            throw new RegraNegocioException(
+                    "Já existe uma pessoa cadastrada com este telefone."
+            );
+        }
+
+        PessoaRequest pessoaRequest = new PessoaRequest();
+
+        pessoaRequest.setNome(request.getNome());
+        pessoaRequest.setTipoDocumento("CPF");
+        pessoaRequest.setDocumento(
+                request.getDocumento()
+        );
+        pessoaRequest.setTelefone(
+                request.getTelefone()
+        );
+        pessoaRequest.setEmail(
+                request.getEmail()
+        );
+
+        PessoaResponse pessoa = pessoaService.criar(
+                pessoaRequest
+        );
+
+        pessoaTipoService.adicionarTipoCliente(
+                pessoa.getId()
+        );
+
+        return ClienteOperacionalResponse.builder()
+                .id(pessoa.getId())
+                .nome(pessoa.getNome())
+                .documento(pessoa.getDocumento())
+                .telefone(pessoa.getTelefone())
+                .email(pessoa.getEmail())
+                .build();
+    }
+    @Transactional
+    public PessoaEnderecoResponse criarEnderecoOperacional(
+            Long clienteId,
+            PessoaEnderecoRequest request
+    ) {
+        Pessoa pessoa = pessoaRepository.findById(clienteId)
+                .orElseThrow(() ->
+                        new RegraNegocioException(
+                                "Cliente não encontrado."
+                        )
+                );
+
+        boolean ehCliente = pessoa.getTipos()
+                .stream()
+                .anyMatch(tipo ->
+                        "CLIENTE".equalsIgnoreCase(
+                                tipo.getTipoPessoa().getNome()
+                        )
+                );
+
+        if (!ehCliente) {
+            throw new RegraNegocioException(
+                    "A pessoa informada não é um cliente."
+            );
+        }
+
+        return pessoaEnderecoService.criar(
+                clienteId,
+                request
+        );
+    }
+
 }
