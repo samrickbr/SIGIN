@@ -11,10 +11,12 @@ import br.com.inova.sigin.ordemproducao.service.OrdemProducaoService;
 import br.com.inova.sigin.pedido.dto.PedidoPagamentoRequest;
 import br.com.inova.sigin.pedido.dto.PedidoRequest;
 import br.com.inova.sigin.pedido.dto.PedidoResponse;
+import br.com.inova.sigin.pedido.dto.PedidoSituacaoFinanceiraResponse;
 import br.com.inova.sigin.pedido.entity.Pedido;
 import br.com.inova.sigin.pedido.entity.PedidoEndereco;
 import br.com.inova.sigin.pedido.entity.PedidoItem;
 import br.com.inova.sigin.pedido.entity.PedidoPagamento;
+import br.com.inova.sigin.pedido.enums.SituacaoFinanceira;
 import br.com.inova.sigin.pedido.enums.StatusPedido;
 import br.com.inova.sigin.pedido.enums.TipoRecebimento;
 import br.com.inova.sigin.pedido.mapper.PedidoMapper;
@@ -421,5 +423,40 @@ public class PedidoService {
                 : BigDecimal.ZERO;
 
         return totalProdutos.add(taxaEntrega);
+    }
+    @Transactional
+    public PedidoSituacaoFinanceiraResponse consultarSituacaoFinanceira(Long pedidoId) {
+        Pedido pedido = buscarEntidadePorId(pedidoId);
+
+        BigDecimal valorTotal = pedido.getValorTotal();
+
+        BigDecimal valorPago = pedido.getPagamentos().stream()
+                .map(PedidoPagamento::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal saldoPendente = BigDecimal.ZERO;
+        BigDecimal valorExcedente = BigDecimal.ZERO;
+        SituacaoFinanceira situacao;
+
+        int comparacao = valorPago.compareTo(valorTotal);
+
+        if (comparacao == 0) {
+            situacao = SituacaoFinanceira.FINANCEIRO_OK;
+        } else if (comparacao < 0) {
+            situacao = SituacaoFinanceira.PAGAMENTO_PENDENTE;
+            saldoPendente = valorTotal.subtract(valorPago);
+        } else {
+            situacao = SituacaoFinanceira.PAGAMENTO_EXCEDENTE;
+            valorExcedente = valorPago.subtract(valorTotal);
+        }
+
+        return new PedidoSituacaoFinanceiraResponse(
+                pedido.getId(),
+                valorTotal,
+                valorPago,
+                saldoPendente,
+                valorExcedente,
+                situacao
+        );
     }
 }

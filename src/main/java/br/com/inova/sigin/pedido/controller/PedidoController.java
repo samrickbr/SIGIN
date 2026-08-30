@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import br.com.inova.sigin.pedido.dto.PedidoSituacaoFinanceiraResponse;
 
 import java.util.List;
 
@@ -48,6 +49,14 @@ public class PedidoController {
 
         return ResponseEntity.ok(
                 service.buscarPorId(id)
+        );
+    }
+    @GetMapping("/{id}/situacao-financeira")
+    public ResponseEntity<PedidoSituacaoFinanceiraResponse> consultarSituacaoFinanceira(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                service.consultarSituacaoFinanceira(id)
         );
     }
 
