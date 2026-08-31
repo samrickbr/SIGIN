@@ -101,4 +101,8 @@ public class PessoaController {
                 )
         );
     }
+    @GetMapping("/consumidor-final")
+    public PessoaResponse buscarConsumidorFinal() {
+        return service.buscarConsumidorFinal();
+    }
 }

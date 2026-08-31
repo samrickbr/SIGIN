@@ -26,6 +26,16 @@ public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
     Optional<Pessoa> findByDocumento(String documento);
 
     @Query("""
+    SELECT DISTINCT p
+    FROM Pessoa p
+    JOIN p.tipos pt
+    JOIN pt.tipoPessoa tp
+    WHERE p.ativo = true
+      AND tp.nome = 'CONSUMIDOR_FINAL'
+    """)
+    Optional<Pessoa> buscarConsumidorFinal();
+
+    @Query("""
         SELECT DISTINCT p
         FROM Pessoa p
         JOIN p.tipos pt

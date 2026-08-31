@@ -264,6 +264,17 @@ public class PessoaService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public PessoaResponse buscarConsumidorFinal() {
+        Pessoa pessoa = repository.buscarConsumidorFinal()
+                .orElseThrow(() ->
+                        new RegraNegocioException(
+                                "Consumidor Final não encontrado"
+                        )
+                );
+
+        return converter(pessoa);
+    }
     private PessoaResponse converter(
             Pessoa pessoa
     ) {
