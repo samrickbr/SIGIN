@@ -330,6 +330,15 @@ public class PedidoService {
                     "Somente pedidos abertos podem ser faturados."
             );
         }
+        BigDecimal valorPago = pedido.getPagamentos().stream()
+                .map(PedidoPagamento::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (valorPago.compareTo(pedido.getValorTotal()) != 0) {
+            throw new RegraNegocioException(
+                    "Pedido não pode ser faturado enquanto não estiver totalmente pago."
+            );
+        }
 
         pedido.setStatus(StatusPedido.FATURADO);
 
@@ -347,10 +356,7 @@ public class PedidoService {
 
         if (pagamentosRequest == null
                 || pagamentosRequest.isEmpty()) {
-
-            throw new RegraNegocioException(
-                    "Pedido deve possuir pelo menos um pagamento."
-            );
+            return;
         }
 
         BigDecimal totalPagamentos = BigDecimal.ZERO;
