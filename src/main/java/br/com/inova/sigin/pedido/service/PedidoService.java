@@ -465,4 +465,48 @@ public class PedidoService {
                 situacao
         );
     }
+    @Transactional
+    public PedidoResponse adicionarPagamento(
+            Long pedidoId,
+            PedidoPagamentoRequest request
+    ) {
+        Pedido pedido = buscarEntidadePorId(pedidoId);
+
+        if (pedido.getStatus() != StatusPedido.ABERTO) {
+            throw new RegraNegocioException(
+                    "Somente pedidos abertos podem receber pagamentos."
+            );
+        }
+
+        if (request.getValor() == null
+                || request.getValor().compareTo(BigDecimal.ZERO) <= 0) {
+
+            throw new RegraNegocioException(
+                    "Valor de pagamento deve ser maior que zero."
+            );
+        }
+
+        FormaPagamento formaPagamento =
+                formaPagamentoRepository
+                        .findById(request.getFormaPagamentoId())
+                        .filter(FormaPagamento::getAtivo)
+                        .orElseThrow(() ->
+                                new RegraNegocioException(
+                                        "Forma de pagamento não encontrada ou inativa."
+                                )
+                        );
+
+        PedidoPagamento pagamento =
+                PedidoPagamento.builder()
+                        .pedido(pedido)
+                        .formaPagamento(formaPagamento)
+                        .valor(request.getValor())
+                        .build();
+
+        pedido.getPagamentos().add(pagamento);
+
+        repository.save(pedido);
+
+        return mapper.toResponse(pedido);
+    }
 }

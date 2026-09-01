@@ -3,6 +3,7 @@ package br.com.inova.sigin.pedido.controller;
 import br.com.inova.sigin.local.repository.LocalRepository;
 import br.com.inova.sigin.ordemproducao.dto.OrdemProducaoResponse;
 import br.com.inova.sigin.ordemproducao.repository.OrdemProducaoRepository;
+import br.com.inova.sigin.pedido.dto.PedidoPagamentoRequest;
 import br.com.inova.sigin.pedido.dto.PedidoRequest;
 import br.com.inova.sigin.pedido.dto.PedidoResponse;
 import br.com.inova.sigin.pedido.service.PedidoService;
@@ -84,6 +85,15 @@ public class PedidoController {
 
         return ResponseEntity.ok(
                 service.gerarOrdemProducao(id)
+        );
+    }
+    @PostMapping("/{id}/pagamentos")
+    public ResponseEntity<PedidoResponse> adicionarPagamento(
+            @PathVariable Long id,
+            @Valid @RequestBody PedidoPagamentoRequest request) {
+
+        return ResponseEntity.ok(
+                service.adicionarPagamento(id, request)
         );
     }
     @PostMapping("/{id}/faturar")
