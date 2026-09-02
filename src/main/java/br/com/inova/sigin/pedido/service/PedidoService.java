@@ -203,6 +203,7 @@ public class PedidoService {
                 .toList();
     }
 
+    @Transactional
     public PedidoResponse buscarPorId(Long id) {
 
         Pedido pedido = buscarEntidadePorId(id);
