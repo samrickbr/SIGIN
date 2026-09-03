@@ -195,6 +195,7 @@ public class PedidoService {
         );
     }
 
+    @Transactional
     public List<PedidoResponse> listar() {
 
         return repository.listarCompleto()

@@ -23,4 +23,6 @@ public class PedidoItemResponse {
     private BigDecimal valorTotal;
 
     private Setor setor;
+
+    private Boolean ativo;
 }

@@ -16,6 +16,8 @@ public class PedidoItemMapper {
                 .quantidade(item.getQuantidade())
                 .valorUnitario(item.getValorUnitario())
                 .valorTotal(item.getValorTotal())
+                .setor(item.getSetor())
+                .ativo(item.getAtivo())
                 .build();
     }
 }
