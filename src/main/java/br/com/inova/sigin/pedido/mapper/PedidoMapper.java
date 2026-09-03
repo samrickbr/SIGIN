@@ -72,6 +72,7 @@ public class PedidoMapper {
                 .valorUnitario(item.getValorUnitario())
                 .valorTotal(item.getValorTotal())
                 .setor(item.getSetor())
+                .ativo(item.getAtivo())
                 .build();
     }
 
