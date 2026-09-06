@@ -221,6 +221,7 @@ public class PedidoService {
                         ));
     }
 
+    @Transactional
     public PedidoResponse cancelar(Long id) {
 
         Pedido pedido = buscarEntidadePorId(id);
@@ -232,6 +233,11 @@ public class PedidoService {
                     "Não é possível cancelar pedido finalizado."
             );
         }
+
+        pedido.getItens()
+                .forEach(item -> item.setAtivo(false));
+
+        atualizarValorTotal(pedido);
 
         pedido.setStatus(StatusPedido.CANCELADO);
 
@@ -261,6 +267,7 @@ public class PedidoService {
 
         BigDecimal totalProdutos = pedido.getItens()
                 .stream()
+                .filter(item -> Boolean.TRUE.equals(item.getAtivo()))
                 .map(PedidoItem::getValorTotal)
                 .reduce(
                         BigDecimal.ZERO,
@@ -420,6 +427,7 @@ public class PedidoService {
 
         BigDecimal totalProdutos = pedido.getItens()
                 .stream()
+                .filter(item -> Boolean.TRUE.equals(item.getAtivo()))
                 .map(PedidoItem::getValorTotal)
                 .reduce(
                         BigDecimal.ZERO,

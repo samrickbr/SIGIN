@@ -19,6 +19,7 @@ public class PedidoMapper {
 
         BigDecimal valorProdutos = pedido.getItens()
                 .stream()
+                .filter(item -> Boolean.TRUE.equals(item.getAtivo()))
                 .map(PedidoItem::getValorTotal)
                 .reduce(
                         BigDecimal.ZERO,
