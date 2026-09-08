@@ -395,6 +395,19 @@ public class PedidoService {
                                     )
                             );
 
+            totalPagamentos = pedido.getPagamentos().stream()
+                    .map(PedidoPagamento::getValor)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            BigDecimal novoTotalPagamentos =
+                    totalPagamentos.add(pagamentoRequest.getValor());
+
+            if (novoTotalPagamentos.compareTo(pedido.getValorTotal()) > 0) {
+                throw new RegraNegocioException(
+                        "A soma dos pagamentos não pode ser maior que o valor do pedido."
+                );
+            }
+
             PedidoPagamento pagamento =
                     PedidoPagamento.builder()
                             .pedido(pedido)
@@ -421,6 +434,99 @@ public class PedidoService {
         }
     }
 
+    @Transactional
+    public PedidoResponse alterarPagamento(
+            Long pedidoId,
+            Long pagamentoId,
+            PedidoPagamentoRequest request
+    ) {
+        Pedido pedido = buscarEntidadePorId(pedidoId);
+
+        if (pedido.getStatus() != StatusPedido.ABERTO) {
+            throw new RegraNegocioException(
+                    "Somente pedidos abertos podem alterar pagamentos."
+            );
+        }
+
+        PedidoPagamento pagamento = pedido.getPagamentos()
+                .stream()
+                .filter(item -> item.getId().equals(pagamentoId))
+                .findFirst()
+                .orElseThrow(() ->
+                        new RegraNegocioException(
+                                "Pagamento não encontrado no pedido."
+                        )
+                );
+
+        if (request.getValor() == null
+                || request.getValor().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RegraNegocioException(
+                    "Valor de pagamento deve ser maior que zero."
+            );
+        }
+
+        FormaPagamento formaPagamento =
+                formaPagamentoRepository
+                        .findById(request.getFormaPagamentoId())
+                        .filter(FormaPagamento::getAtivo)
+                        .orElseThrow(() ->
+                                new RegraNegocioException(
+                                        "Forma de pagamento não encontrada ou inativa."
+                                )
+                        );
+
+        BigDecimal totalSemPagamentoAtual = pedido.getPagamentos()
+                .stream()
+                .filter(item -> !item.getId().equals(pagamentoId))
+                .map(PedidoPagamento::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal novoTotalPagamentos =
+                totalSemPagamentoAtual.add(request.getValor());
+
+        if (novoTotalPagamentos.compareTo(pedido.getValorTotal()) > 0) {
+            throw new RegraNegocioException(
+                    "A soma dos pagamentos não pode ser maior que o valor do pedido."
+            );
+        }
+
+        pagamento.setFormaPagamento(formaPagamento);
+        pagamento.setValor(request.getValor());
+
+        repository.save(pedido);
+
+        return mapper.toResponse(pedido);
+    }
+
+    @Transactional
+    public PedidoResponse removerPagamento(
+            Long pedidoId,
+            Long pagamentoId
+    ) {
+        Pedido pedido = buscarEntidadePorId(pedidoId);
+
+        if (pedido.getStatus() != StatusPedido.ABERTO) {
+            throw new RegraNegocioException(
+                    "Somente pedidos abertos podem remover pagamentos."
+            );
+        }
+
+        PedidoPagamento pagamento = pedido.getPagamentos()
+                .stream()
+                .filter(item -> item.getId().equals(pagamentoId))
+                .findFirst()
+                .orElseThrow(() ->
+                        new RegraNegocioException(
+                                "Pagamento não encontrado no pedido."
+                        )
+                );
+
+        pedido.getPagamentos().remove(pagamento);
+
+        repository.save(pedido);
+
+        return mapper.toResponse(pedido);
+    }
     private BigDecimal calcularTotalPedidoSemPagamento(
             Pedido pedido
     ) {

@@ -96,6 +96,27 @@ public class PedidoController {
                 service.adicionarPagamento(id, request)
         );
     }
+
+    @PutMapping("/{id}/pagamentos/{pagamentoId}")
+    public ResponseEntity<PedidoResponse> alterarPagamento(
+            @PathVariable Long id,
+            @PathVariable Long pagamentoId,
+            @Valid @RequestBody PedidoPagamentoRequest request) {
+
+        return ResponseEntity.ok(
+                service.alterarPagamento(id, pagamentoId, request)
+        );
+    }
+
+    @DeleteMapping("/{id}/pagamentos/{pagamentoId}")
+    public ResponseEntity<PedidoResponse> removerPagamento(
+            @PathVariable Long id,
+            @PathVariable Long pagamentoId) {
+
+        return ResponseEntity.ok(
+                service.removerPagamento(id, pagamentoId)
+        );
+    }
     @PostMapping("/{id}/faturar")
     public PedidoResponse faturar(
             @PathVariable Long id) {
