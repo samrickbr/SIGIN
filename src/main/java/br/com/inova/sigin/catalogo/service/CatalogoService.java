@@ -34,6 +34,7 @@ public class CatalogoService {
                         .produto(pv.getProduto().getNome())
                         .precoVenda(pv.getPrecoVenda())
                         .imagem(pv.getImagem())
+                        .setor(pv.getProduto().getSetor())
                         .build()
                 )
                 .toList();

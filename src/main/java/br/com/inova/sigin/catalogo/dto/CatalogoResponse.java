@@ -1,5 +1,6 @@
 package br.com.inova.sigin.catalogo.dto;
 
+import br.com.inova.sigin.produto.enums.Setor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -18,5 +19,7 @@ public class CatalogoResponse {
     private BigDecimal precoVenda;
 
     private String imagem;
+
+    private Setor setor;
 
 }

@@ -239,6 +239,8 @@ public class PedidoService {
 
         atualizarValorTotal(pedido);
 
+        pedido.getPagamentos().clear();
+
         pedido.setStatus(StatusPedido.CANCELADO);
 
         return mapper.toResponse(
